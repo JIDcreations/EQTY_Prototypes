@@ -123,7 +123,7 @@ export default function LessonStepScreen() {
 function ConceptStep({ content, onNext, onPressTerm }) {
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.conceptCard}>
+      <Card style={styles.conceptCard}>
         <GlossaryText
           text={content?.steps?.concept?.body}
           style={styles.bodyText}
@@ -151,7 +151,7 @@ function VisualizationStep({ content, onNext, onPressTerm }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.visualCard}>
+      <Card style={styles.visualCard}>
         <GlossaryText
           text={content?.steps?.visualization?.title}
           style={styles.bodyText}
@@ -194,7 +194,7 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.scenarioCard}>
+      <Card style={styles.scenarioCard}>
         <GlossaryText text={variant?.prompt} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.optionList}>
           {variant?.options?.map((option) => {
@@ -216,7 +216,7 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
         </View>
       </Card>
       {selected ? (
-        <Card active style={styles.insightCard}>
+        <Card style={styles.insightCard}>
           <Text style={styles.insightTitle}>Insight</Text>
           <GlossaryText
             text={variant?.insight}
@@ -236,7 +236,7 @@ function ExerciseStep({ content, onNext, onPressTerm }) {
   if (!exercise) {
     return (
       <View style={styles.stepBody}>
-        <Card active style={styles.exerciseCard}>
+        <Card style={styles.exerciseCard}>
           <Text style={styles.bodyText}>No exercise is available for this lesson.</Text>
         </Card>
         <PrimaryButton label="Continue" onPress={onNext} />
@@ -279,7 +279,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.exerciseCard}>
+      <Card style={styles.exerciseCard}>
         <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <Text style={styles.exerciseLabel}>Your order</Text>
         <View style={styles.sequenceList}>
@@ -329,7 +329,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
       </Card>
 
       {message ? (
-        <Card active style={styles.insightCard}>
+        <Card style={styles.insightCard}>
           <Text style={styles.insightTitle}>{isCorrect ? 'Aligned' : 'Recheck the flow'}</Text>
           <GlossaryText text={message} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
@@ -352,7 +352,7 @@ function ChoiceExercise({ exercise, onNext, onPressTerm }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.exerciseCard}>
+      <Card style={styles.exerciseCard}>
         <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.optionList}>
           {options.map((option) => {
@@ -375,7 +375,7 @@ function ChoiceExercise({ exercise, onNext, onPressTerm }) {
       </Card>
 
       {selected ? (
-        <Card active style={styles.insightCard}>
+        <Card style={styles.insightCard}>
           <Text style={styles.insightTitle}>{selected.revealTitle || revealTitle}</Text>
           <GlossaryText text={selected.reveal} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
@@ -460,7 +460,7 @@ function TradeoffExercise({ exercise, onNext, onPressTerm }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.exerciseCard}>
+      <Card style={styles.exerciseCard}>
         <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.exerciseSection}>
           {sliders.map((slider) => (
@@ -502,7 +502,7 @@ function TradeoffExercise({ exercise, onNext, onPressTerm }) {
         </View>
       </Card>
 
-      <Card active style={styles.exerciseCard}>
+      <Card style={styles.exerciseCard}>
         {requiresRun ? (
           <PrimaryButton label={ctaLabel} onPress={() => setHasRun(true)} />
         ) : null}
@@ -571,7 +571,7 @@ function MultiExercise({ exercise, onNext, onPressTerm }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.exerciseCard}>
+      <Card style={styles.exerciseCard}>
         <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.optionList}>
           {options.map((option) => {
@@ -593,7 +593,7 @@ function MultiExercise({ exercise, onNext, onPressTerm }) {
         </View>
       </Card>
 
-      <Card active style={styles.insightCard}>
+      <Card style={styles.insightCard}>
         <Text style={styles.insightTitle}>{scoreLabel}</Text>
         <View style={styles.resultRow}>
           <Text style={styles.resultLabel}>{scoreLabel}</Text>
@@ -640,7 +640,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.stepBody}
     >
-      <Card active style={styles.reflectionCard}>
+      <Card style={styles.reflectionCard}>
         <GlossaryText
           text={content?.steps?.reflection?.question}
           style={styles.bodyText}
@@ -663,7 +663,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
 function SummaryStep({ content, onComplete, onPressTerm }) {
   return (
     <View style={styles.stepBody}>
-      <Card active style={styles.summaryCard}>
+      <Card style={styles.summaryCard}>
         <Text style={styles.bodyText}>Key takeaways</Text>
         <View style={styles.takeawayList}>
           {content?.steps?.summary?.takeaways?.map((item) => (
@@ -736,9 +736,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
+    backgroundColor: colors.surfaceActive,
     borderWidth: 1,
     borderColor: colors.textPrimary,
-    backgroundColor: 'transparent',
   },
   segmentLabel: {
     fontFamily: typography.fontFamilyMedium,
@@ -760,13 +760,13 @@ const styles = StyleSheet.create({
   option: {
     padding: spacing.sm,
     borderRadius: 14,
+    backgroundColor: colors.surfaceActive,
     borderWidth: 1,
     borderColor: colors.textPrimary,
-    backgroundColor: 'transparent',
   },
   optionActive: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
+    backgroundColor: colors.surfaceActive,
+    borderWidth: 1,
     borderColor: colors.textPrimary,
   },
   optionText: {
@@ -806,9 +806,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.sm,
     borderRadius: 14,
+    backgroundColor: colors.surfaceActive,
     borderWidth: 1,
     borderColor: colors.textPrimary,
-    backgroundColor: 'transparent',
   },
   sequenceIndex: {
     width: 24,
@@ -908,9 +908,9 @@ const styles = StyleSheet.create({
     minHeight: 120,
     borderRadius: 16,
     padding: spacing.md,
+    backgroundColor: colors.surfaceActive,
     borderWidth: 1,
     borderColor: colors.textPrimary,
-    backgroundColor: 'transparent',
     color: colors.textPrimary,
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.body,

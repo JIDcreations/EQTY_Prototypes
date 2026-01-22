@@ -50,7 +50,7 @@ export default function LessonOverviewScreen() {
           </View>
         </View>
 
-        <Card active style={styles.overviewCard}>
+        <Card style={styles.overviewCard}>
           <SectionTitle title="Lesson structure" subtitle="6 guided steps" />
           <View style={styles.stepList}>
             {stepLabels.map((label, index) => (
@@ -64,7 +64,7 @@ export default function LessonOverviewScreen() {
           </View>
         </Card>
 
-        <Card active style={styles.summaryCard}>
+        <Card style={styles.summaryCard}>
           <GlossaryText text={content?.steps?.concept?.title} style={styles.summaryTitle} />
           <GlossaryText text={content?.steps?.concept?.body} style={styles.summaryText} />
         </Card>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceActive,
     alignItems: 'center',
     justifyContent: 'center',
   },
