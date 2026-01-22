@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import Toast from '../components/Toast';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -13,6 +13,8 @@ import useToast from '../utils/useToast';
 
 export default function EditPersonalContextScreen({ navigation }) {
   const { onboardingContext, updateOnboardingContext } = useApp();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [experienceAnswer, setExperienceAnswer] = useState(
     onboardingContext?.experienceAnswer || ''
   );
@@ -107,77 +109,78 @@ export default function EditPersonalContextScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.lg,
-    paddingBottom: spacing.xxxl,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.h1,
-    color: colors.textPrimary,
-  },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-  field: {
-    gap: spacing.xs,
-  },
-  label: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-  },
-  input: {
-    minHeight: 96,
-    borderRadius: 16,
-    padding: spacing.md,
-    backgroundColor: colors.surfaceActive,
-    color: colors.textPrimary,
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    textAlignVertical: 'top',
-  },
-  noteCard: {
-    backgroundColor: colors.surfaceActive,
-    borderRadius: 14,
-    padding: spacing.md,
-  },
-  noteText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  flex: {
-    flex: 1,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+      paddingBottom: spacing.xxxl,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    title: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h1,
+      color: colors.textPrimary,
+    },
+    closeButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    subtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+    field: {
+      gap: spacing.xs,
+    },
+    label: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textPrimary,
+    },
+    input: {
+      minHeight: 96,
+      borderRadius: 16,
+      padding: spacing.md,
+      backgroundColor: colors.surfaceActive,
+      color: colors.textPrimary,
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      textAlignVertical: 'top',
+    },
+    noteCard: {
+      backgroundColor: colors.surfaceActive,
+      borderRadius: 14,
+      padding: spacing.md,
+    },
+    noteText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    actions: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    flex: {
+      flex: 1,
+    },
+  });

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import AppText from './AppText';
 
 export default function SettingsHeader({ title, subtitle, onBack, rightAction }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -25,35 +28,36 @@ export default function SettingsHeader({ title, subtitle, onBack, rightAction })
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: spacing.xs,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backSpacer: {
-    width: 36,
-    height: 36,
-  },
-  title: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.h1,
-  },
-  subtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      gap: spacing.xs,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    backButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    backSpacer: {
+      width: 36,
+      height: 36,
+    },
+    title: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.textPrimary,
+      fontSize: typography.h1,
+    },
+    subtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.small,
+    },
+  });

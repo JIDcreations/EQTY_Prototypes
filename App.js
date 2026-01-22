@@ -1,18 +1,18 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from './theme/colors';
 import { spacing } from './theme/spacing';
 import { typography } from './theme/typography';
 import { AppProvider, useApp } from './utils/AppContext';
 import { GlossaryProvider } from './components/GlossaryProvider';
+import useThemeColors from './theme/useTheme';
 import HomeScreen from './screens/HomeScreen';
 import LessonsScreen from './screens/LessonsScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
@@ -26,6 +26,7 @@ const Stack = createStackNavigator();
 
 function Tabs() {
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
   const tabBarHeight = 64 + insets.bottom;
   const tabBarPaddingBottom = Math.max(insets.bottom, spacing.xs);
 
@@ -35,7 +36,7 @@ function Tabs() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopColor: colors.surfaceActive,
+          borderTopColor: colors.divider,
           height: tabBarHeight,
           paddingTop: spacing.xs,
           paddingBottom: tabBarPaddingBottom,
@@ -66,6 +67,7 @@ function Tabs() {
 
 function RootStack() {
   const { isReady } = useApp();
+  const colors = useThemeColors();
 
   if (!isReady) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
@@ -81,19 +83,44 @@ function RootStack() {
   );
 }
 
-export default function App() {
+function AppShell() {
+  const { preferences } = useApp();
+  const colors = useThemeColors();
+  const isLight = preferences?.appearance === 'Light';
+  const navTheme = useMemo(
+    () => ({
+      ...DefaultTheme,
+      dark: !isLight,
+      colors: {
+        ...DefaultTheme.colors,
+        background: colors.background,
+        card: colors.surface,
+        text: colors.textPrimary,
+        border: colors.divider,
+        primary: colors.accent,
+      },
+    }),
+    [colors, isLight]
+  );
+
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
-      <AppProvider>
-        <SafeAreaProvider>
-          <GlossaryProvider>
-            <NavigationContainer>
-              <StatusBar style="light" />
-              <RootStack />
-            </NavigationContainer>
-          </GlossaryProvider>
-        </SafeAreaProvider>
-      </AppProvider>
+      <SafeAreaProvider>
+        <GlossaryProvider>
+          <NavigationContainer theme={navTheme}>
+            <StatusBar style={isLight ? 'dark' : 'light'} />
+            <RootStack />
+          </NavigationContainer>
+        </GlossaryProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
+  );
+}
+
+export default function App() {
+  return (
+    <AppProvider>
+      <AppShell />
+    </AppProvider>
   );
 }

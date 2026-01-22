@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import AppText from './AppText';
@@ -15,6 +15,8 @@ export default function SettingsRow({
   isLast = false,
   disabled = false,
 }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const Container = onPress ? Pressable : View;
 
   return (
@@ -38,43 +40,44 @@ export default function SettingsRow({
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  rowDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceActive,
-  },
-  rowDisabled: {
-    opacity: 0.6,
-  },
-  rowContent: {
-    flex: 1,
-    gap: 2,
-  },
-  label: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-  },
-  subtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-  },
-  value: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-  },
-  rowRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    rowDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.divider,
+    },
+    rowDisabled: {
+      opacity: 0.6,
+    },
+    rowContent: {
+      flex: 1,
+      gap: 2,
+    },
+    label: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textPrimary,
+      fontSize: typography.body,
+    },
+    subtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.small,
+    },
+    value: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.small,
+    },
+    rowRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+  });

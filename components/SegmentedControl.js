@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import AppText from './AppText';
 
 export default function SegmentedControl({ options, value, onChange }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.container}>
       {options.map((option) => {
@@ -26,30 +29,31 @@ export default function SegmentedControl({ options, value, onChange }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceActive,
-    borderRadius: 16,
-    padding: spacing.xs,
-    gap: spacing.xs,
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: spacing.xs,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  segmentActive: {
-    backgroundColor: colors.accent,
-  },
-  segmentText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  segmentTextActive: {
-    color: colors.background,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      backgroundColor: colors.surfaceActive,
+      borderRadius: 16,
+      padding: spacing.xs,
+      gap: spacing.xs,
+    },
+    segment: {
+      flex: 1,
+      paddingVertical: spacing.xs,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    segmentActive: {
+      backgroundColor: colors.accent,
+    },
+    segmentText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    segmentTextActive: {
+      color: colors.background,
+    },
+  });

@@ -16,7 +16,7 @@ import SegmentedControl from '../components/SegmentedControl';
 import SettingsRow from '../components/SettingsRow';
 import SettingsSection from '../components/SettingsSection';
 import Toast from '../components/Toast';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -37,6 +37,8 @@ const TEXT_SIZE_OPTIONS = [
 export default function ProfileOverviewScreen() {
   const navigation = useNavigation();
   const { authUser, onboardingContext, preferences, updatePreferences, logOut } = useApp();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const toast = useToast();
 
   const previewAnswers = useMemo(() => {
@@ -263,153 +265,154 @@ export default function ProfileOverviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.lg,
-    paddingBottom: spacing.xxxl,
-  },
-  header: {
-    gap: spacing.xs,
-  },
-  title: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.title,
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  card: {
-    gap: spacing.md,
-  },
-  inlineHint: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  contextBlock: {
-    gap: 4,
-  },
-  contextLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  contextValue: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-  },
-  contextPlaceholder: {
-    color: colors.textSecondary,
-  },
-  contextButton: {
-    marginTop: spacing.xs,
-  },
-  contextHelper: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  cardTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-  },
-  cardSubtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  textSizeHeader: {
-    gap: 4,
-  },
-  textSizeList: {
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.surface,
-  },
-  textSizeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.surfaceActive,
-  },
-  rowDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceActive,
-  },
-  textSizeLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  textSizeLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-  },
-  textSizeSample: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  textSizeSampleComfort: {
-    fontSize: typography.body,
-  },
-  textSizeSampleLarge: {
-    fontSize: typography.h2,
-  },
-  radio: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1,
-    borderColor: colors.textSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioActive: {
-    borderColor: colors.accent,
-  },
-  radioDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.accent,
-  },
-  previewCard: {
-    backgroundColor: colors.surfaceActive,
-    padding: spacing.md,
-    borderRadius: 14,
-    gap: spacing.xs,
-  },
-  previewTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.small,
-    color: colors.textPrimary,
-  },
-  previewText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  logoutButton: {
-    marginTop: spacing.sm,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+      paddingBottom: spacing.xxxl,
+    },
+    header: {
+      gap: spacing.xs,
+    },
+    title: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.title,
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    card: {
+      gap: spacing.md,
+    },
+    inlineHint: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    contextBlock: {
+      gap: 4,
+    },
+    contextLabel: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    contextValue: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textPrimary,
+    },
+    contextPlaceholder: {
+      color: colors.textSecondary,
+    },
+    contextButton: {
+      marginTop: spacing.xs,
+    },
+    contextHelper: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    cardTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.body,
+      color: colors.textPrimary,
+    },
+    cardSubtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    textSizeHeader: {
+      gap: 4,
+    },
+    textSizeList: {
+      borderRadius: 14,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.divider,
+    },
+    textSizeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.surfaceActive,
+    },
+    rowDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.divider,
+    },
+    textSizeLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    textSizeLabel: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textPrimary,
+    },
+    textSizeSample: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    textSizeSampleComfort: {
+      fontSize: typography.body,
+    },
+    textSizeSampleLarge: {
+      fontSize: typography.h2,
+    },
+    radio: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      borderWidth: 1,
+      borderColor: colors.textSecondary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    radioActive: {
+      borderColor: colors.accent,
+    },
+    radioDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.accent,
+    },
+    previewCard: {
+      backgroundColor: colors.surfaceActive,
+      padding: spacing.md,
+      borderRadius: 14,
+      gap: spacing.xs,
+    },
+    previewTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.small,
+      color: colors.textPrimary,
+    },
+    previewText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    logoutButton: {
+      marginTop: spacing.sm,
+    },
+  });

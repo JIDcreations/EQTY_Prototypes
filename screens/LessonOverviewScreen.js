@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -9,7 +9,7 @@ import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { lessonContent } from '../data/lessonContent';
 import { lessons } from '../data/curriculum';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -28,6 +28,8 @@ export default function LessonOverviewScreen() {
   const route = useRoute();
   const { lessonId, entrySource } = route.params || {};
   const { progress } = useApp();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const lesson = lessons.find((item) => item.id === lessonId) || lessons[0];
   const content = lessonContent[lesson.id] || lessonContent.lesson_1;
@@ -87,80 +89,81 @@ export default function LessonOverviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.xl,
-    paddingBottom: spacing.xxxl,
-  },
-  header: {
-    gap: spacing.sm,
-  },
-  title: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.title,
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textSecondary,
-  },
-  tagRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  overviewCard: {
-    gap: spacing.md,
-  },
-  stepList: {
-    gap: spacing.sm,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  stepIndex: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.surfaceActive,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepNumber: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.small,
-  },
-  stepLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-  },
-  summaryCard: {
-    gap: spacing.sm,
-  },
-  summaryTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.h1,
-  },
-  summaryText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-  },
-  buttonStack: {
-    gap: spacing.md,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.xl,
+      paddingBottom: spacing.xxxl,
+    },
+    header: {
+      gap: spacing.sm,
+    },
+    title: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.title,
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textSecondary,
+    },
+    tagRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    overviewCard: {
+      gap: spacing.md,
+    },
+    stepList: {
+      gap: spacing.sm,
+    },
+    stepRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    stepIndex: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: colors.surfaceActive,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    stepNumber: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.textPrimary,
+      fontSize: typography.small,
+    },
+    stepLabel: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textPrimary,
+      fontSize: typography.body,
+    },
+    summaryCard: {
+      gap: spacing.sm,
+    },
+    summaryTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.textPrimary,
+      fontSize: typography.h1,
+    },
+    summaryText: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.body,
+    },
+    buttonStack: {
+      gap: spacing.md,
+    },
+  });

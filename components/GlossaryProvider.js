@@ -2,14 +2,16 @@ import React, { createContext, useCallback, useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from './BottomSheet';
-import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import AppText from './AppText';
+import useThemeColors from '../theme/useTheme';
 
 export const GlossaryContext = createContext(null);
 
 export function GlossaryProvider({ children }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [activeTerm, setActiveTerm] = useState(null);
 
   const openTerm = useCallback((term) => {
@@ -66,31 +68,32 @@ export function useGlossary() {
   return React.useContext(GlossaryContext);
 }
 
-const styles = StyleSheet.create({
-  sheetText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 22,
-  },
-  sheetLabel: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.small,
-    letterSpacing: 0.3,
-  },
-  glossarySection: {
-    gap: spacing.xs,
-  },
-  learnMoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingTop: spacing.xs,
-  },
-  learnMoreText: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.accent,
-    fontSize: typography.body,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    sheetText: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.body,
+      lineHeight: 22,
+    },
+    sheetLabel: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.textPrimary,
+      fontSize: typography.small,
+      letterSpacing: 0.3,
+    },
+    glossarySection: {
+      gap: spacing.xs,
+    },
+    learnMoreRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingTop: spacing.xs,
+    },
+    learnMoreText: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.accent,
+      fontSize: typography.body,
+    },
+  });

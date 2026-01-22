@@ -8,7 +8,7 @@ import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { lessons, modules } from '../data/curriculum';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -17,6 +17,8 @@ import { getLessonStatus } from '../utils/helpers';
 export default function LessonsScreen() {
   const navigation = useNavigation();
   const { progress } = useApp();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const modulesWithLessons = useMemo(() => {
     return modules.map((module) => ({
@@ -88,67 +90,68 @@ export default function LessonsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.xl,
-    paddingBottom: spacing.xxxl,
-  },
-  module: {
-    gap: spacing.md,
-  },
-  moduleHeader: {
-    gap: spacing.xs,
-  },
-  moduleTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.h1,
-    color: colors.textPrimary,
-  },
-  moduleSubtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  moduleLessons: {
-    gap: spacing.md,
-  },
-  lessonCard: {
-    gap: spacing.sm,
-  },
-  lessonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  lessonTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.h2,
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  lessonDescription: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  completedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  completedText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.xl,
+      paddingBottom: spacing.xxxl,
+    },
+    module: {
+      gap: spacing.md,
+    },
+    moduleHeader: {
+      gap: spacing.xs,
+    },
+    moduleTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h1,
+      color: colors.textPrimary,
+    },
+    moduleSubtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    moduleLessons: {
+      gap: spacing.md,
+    },
+    lessonCard: {
+      gap: spacing.sm,
+    },
+    lessonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    lessonTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h2,
+      color: colors.textPrimary,
+      flex: 1,
+    },
+    lessonDescription: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    completedRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    completedText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+  });

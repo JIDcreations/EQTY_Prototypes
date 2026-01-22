@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import AppText from './AppText';
+import useThemeColors from '../theme/useTheme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -29,6 +29,8 @@ function usePressScale() {
 }
 
 export function PrimaryButton({ label, onPress, style, disabled }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { animatedStyle, onPressIn, onPressOut } = usePressScale();
 
   return (
@@ -45,6 +47,8 @@ export function PrimaryButton({ label, onPress, style, disabled }) {
 }
 
 export function SecondaryButton({ label, onPress, style, disabled, tone = 'default' }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { animatedStyle, onPressIn, onPressOut } = usePressScale();
   const isAccent = tone === 'accent';
 
@@ -64,48 +68,49 @@ export function SecondaryButton({ label, onPress, style, disabled, tone = 'defau
   );
 }
 
-const styles = StyleSheet.create({
-  primaryButton: {
-    backgroundColor: colors.accent,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryLabel: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.body,
-    color: colors.background,
-    letterSpacing: 0.3,
-  },
-  secondaryButton: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  secondaryBorder: {
-    position: 'absolute',
-    inset: 0,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.surfaceActive,
-  },
-  secondaryBorderAccent: {
-    borderColor: colors.accent,
-  },
-  secondaryLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-  },
-  secondaryLabelAccent: {
-    color: colors.accent,
-  },
-  disabled: {
-    opacity: 0.55,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    primaryButton: {
+      backgroundColor: colors.accent,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryLabel: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.body,
+      color: colors.background,
+      letterSpacing: 0.3,
+    },
+    secondaryButton: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+    },
+    secondaryBorder: {
+      position: 'absolute',
+      inset: 0,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.surfaceActive,
+    },
+    secondaryBorderAccent: {
+      borderColor: colors.accent,
+    },
+    secondaryLabel: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textPrimary,
+    },
+    secondaryLabelAccent: {
+      color: colors.accent,
+    },
+    disabled: {
+      opacity: 0.55,
+    },
+  });

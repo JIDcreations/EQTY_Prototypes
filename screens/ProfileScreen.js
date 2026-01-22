@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
 
 export default function ProfileScreen() {
   const { userContext, updateUserContext } = useApp();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [experience, setExperience] = useState(userContext.experience);
   const [knowledge, setKnowledge] = useState(userContext.knowledge);
   const [motivation, setMotivation] = useState(userContext.motivation);
@@ -82,48 +84,49 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.lg,
-    paddingBottom: spacing.xxxl,
-  },
-  card: {
-    gap: spacing.md,
-  },
-  label: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  input: {
-    borderRadius: 14,
-    padding: spacing.sm,
-    backgroundColor: colors.surfaceActive,
-    color: colors.textPrimary,
-    fontFamily: typography.fontFamilyMedium,
-  },
-  switchRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  switchLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-  },
-  caption: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+      paddingBottom: spacing.xxxl,
+    },
+    card: {
+      gap: spacing.md,
+    },
+    label: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    input: {
+      borderRadius: 14,
+      padding: spacing.sm,
+      backgroundColor: colors.surfaceActive,
+      color: colors.textPrimary,
+      fontFamily: typography.fontFamilyMedium,
+    },
+    switchRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    switchLabel: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textPrimary,
+      fontSize: typography.body,
+    },
+    caption: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.small,
+    },
+  });

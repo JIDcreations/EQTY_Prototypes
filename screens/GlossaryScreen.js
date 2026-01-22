@@ -7,11 +7,13 @@ import Card from '../components/Card';
 import BottomSheet from '../components/BottomSheet';
 import SectionTitle from '../components/SectionTitle';
 import { glossaryTerms } from '../data/glossary';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 
 export default function GlossaryScreen() {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [query, setQuery] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(null);
 
@@ -110,82 +112,83 @@ export default function GlossaryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.lg,
-    paddingBottom: spacing.xxxl,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-  },
-  clearButton: {
-    padding: spacing.xs,
-  },
-  list: {
-    gap: spacing.md,
-  },
-  termCard: {
-    gap: spacing.xs,
-  },
-  termTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.h2,
-    color: colors.textPrimary,
-  },
-  termDescription: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  emptyText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  sheetSection: {
-    gap: spacing.xs,
-  },
-  sheetLabel: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.small,
-    letterSpacing: 0.3,
-  },
-  sheetText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-  },
-  learnMoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingTop: spacing.xs,
-  },
-  learnMoreText: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.accent,
-    fontSize: typography.body,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+      paddingBottom: spacing.xxxl,
+    },
+    searchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      gap: spacing.sm,
+    },
+    searchInput: {
+      flex: 1,
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textPrimary,
+      fontSize: typography.body,
+    },
+    clearButton: {
+      padding: spacing.xs,
+    },
+    list: {
+      gap: spacing.md,
+    },
+    termCard: {
+      gap: spacing.xs,
+    },
+    termTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h2,
+      color: colors.textPrimary,
+    },
+    termDescription: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    emptyText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    sheetSection: {
+      gap: spacing.xs,
+    },
+    sheetLabel: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.textPrimary,
+      fontSize: typography.small,
+      letterSpacing: 0.3,
+    },
+    sheetText: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.body,
+    },
+    learnMoreRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingTop: spacing.xs,
+    },
+    learnMoreText: {
+      fontFamily: typography.fontFamilyDemi,
+      color: colors.accent,
+      fontSize: typography.body,
+    },
+  });

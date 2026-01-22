@@ -1,9 +1,9 @@
 import React, { useContext, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { glossaryTerms } from '../data/glossary';
-import { colors } from '../theme/colors';
 import AppText from './AppText';
 import { GlossaryContext } from './GlossaryProvider';
+import useThemeColors from '../theme/useTheme';
 
 const glossaryIndex = buildGlossaryIndex(glossaryTerms);
 
@@ -40,6 +40,8 @@ export default function GlossaryText({
   ...textProps
 }) {
   const glossary = useContext(GlossaryContext);
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const content = text ?? children;
   const resolvedText = typeof content === 'number' ? String(content) : content;
   const parts = useMemo(() => {
@@ -76,9 +78,10 @@ export default function GlossaryText({
   );
 }
 
-const styles = StyleSheet.create({
-  term: {
-    color: colors.accent,
-    textDecorationLine: 'underline',
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    term: {
+      color: colors.accent,
+      textDecorationLine: 'underline',
+    },
+  });

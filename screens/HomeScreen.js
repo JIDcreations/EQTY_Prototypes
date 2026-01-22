@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -10,7 +10,7 @@ import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { lessons } from '../data/curriculum';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -19,6 +19,8 @@ import { getLessonById } from '../utils/helpers';
 export default function HomeScreen() {
   const navigation = useNavigation();
   const { progress } = useApp();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const completedCount = progress.completedLessonIds.length;
   const totalLessons = lessons.length;
@@ -97,81 +99,82 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: spacing.lg,
-    gap: spacing.lg,
-    paddingBottom: spacing.xxxl,
-  },
-  header: {
-    gap: spacing.xs,
-  },
-  title: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.title,
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  progressCard: {
-    gap: spacing.sm,
-  },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  progressLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-  progressValue: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.body,
-    color: colors.textPrimary,
-  },
-  heroCard: {
-    gap: spacing.md,
-  },
-  heroHeader: {
-    gap: spacing.sm,
-  },
-  heroTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.h1,
-    color: colors.textPrimary,
-  },
-  heroSubtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textSecondary,
-  },
-  list: {
-    gap: spacing.md,
-  },
-  lessonCard: {
-    gap: spacing.xs,
-  },
-  lessonTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.h2,
-    color: colors.textPrimary,
-  },
-  lessonDescription: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+      paddingBottom: spacing.xxxl,
+    },
+    header: {
+      gap: spacing.xs,
+    },
+    title: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.title,
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    progressCard: {
+      gap: spacing.sm,
+    },
+    progressRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    progressLabel: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    progressValue: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.body,
+      color: colors.textPrimary,
+    },
+    heroCard: {
+      gap: spacing.md,
+    },
+    heroHeader: {
+      gap: spacing.sm,
+    },
+    heroTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h1,
+      color: colors.textPrimary,
+    },
+    heroSubtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textSecondary,
+    },
+    list: {
+      gap: spacing.md,
+    },
+    lessonCard: {
+      gap: spacing.xs,
+    },
+    lessonTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h2,
+      color: colors.textPrimary,
+    },
+    lessonDescription: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+  });

@@ -20,13 +20,19 @@ import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
 import StepHeader from '../components/StepHeader';
 import { lessonContent } from '../data/lessonContent';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
 import { getScenarioVariant } from '../utils/helpers';
 
 const TOTAL_STEPS = 6;
+
+function useLessonStepStyles() {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  return { colors, styles };
+}
 
 export default function LessonStepScreen() {
   const navigation = useNavigation();
@@ -121,6 +127,8 @@ export default function LessonStepScreen() {
 }
 
 function ConceptStep({ content, onNext, onPressTerm }) {
+  const { styles } = useLessonStepStyles();
+
   return (
     <View style={styles.stepBody}>
       <Card style={styles.conceptCard}>
@@ -147,6 +155,7 @@ function ConceptStep({ content, onNext, onPressTerm }) {
 }
 
 function VisualizationStep({ content, onNext, onPressTerm }) {
+  const { styles } = useLessonStepStyles();
   const [selected, setSelected] = useState(null);
 
   return (
@@ -188,6 +197,7 @@ function VisualizationStep({ content, onNext, onPressTerm }) {
 }
 
 function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
+  const { styles } = useLessonStepStyles();
   const variantKey = getScenarioVariant(userContext);
   const variant = content?.steps?.scenario?.variants?.[variantKey];
   const [selected, setSelected] = useState(null);
@@ -231,6 +241,7 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
 }
 
 function ExerciseStep({ content, onNext, onPressTerm }) {
+  const { styles } = useLessonStepStyles();
   const exercise = content?.steps?.exercise;
 
   if (!exercise) {
@@ -258,6 +269,7 @@ function ExerciseStep({ content, onNext, onPressTerm }) {
 }
 
 function SequenceExercise({ exercise, onNext, onPressTerm }) {
+  const { styles } = useLessonStepStyles();
   const { description, items = [], correctOrder = [], feedback = {} } = exercise;
   const [order, setOrder] = useState([]);
 
@@ -344,6 +356,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
 }
 
 function ChoiceExercise({ exercise, onNext, onPressTerm }) {
+  const { styles } = useLessonStepStyles();
   const { description, options = [], revealTitle = 'Outcome' } = exercise;
   const [selectedId, setSelectedId] = useState(null);
   const selected = options.find((option) => option.id === selectedId);
@@ -390,6 +403,7 @@ function ChoiceExercise({ exercise, onNext, onPressTerm }) {
 }
 
 function TradeoffExercise({ exercise, onNext, onPressTerm }) {
+  const { colors, styles } = useLessonStepStyles();
   const {
     description,
     sliders = [],
@@ -538,6 +552,7 @@ function TradeoffExercise({ exercise, onNext, onPressTerm }) {
 }
 
 function MultiExercise({ exercise, onNext, onPressTerm }) {
+  const { colors, styles } = useLessonStepStyles();
   const {
     description,
     options = [],
@@ -633,6 +648,7 @@ function MultiExercise({ exercise, onNext, onPressTerm }) {
 }
 
 function ReflectionStep({ content, onSubmit, onPressTerm }) {
+  const { colors, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
 
   return (
@@ -661,6 +677,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
 }
 
 function SummaryStep({ content, onComplete, onPressTerm }) {
+  const { colors, styles } = useLessonStepStyles();
   return (
     <View style={styles.stepBody}>
       <Card style={styles.summaryCard}>
@@ -694,7 +711,8 @@ function SummaryStep({ content, onComplete, onPressTerm }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) =>
+  StyleSheet.create({
   stepBody: {
     gap: spacing.lg,
   },
@@ -945,4 +963,4 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.body,
   },
-});
+  });

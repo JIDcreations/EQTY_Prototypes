@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { colors } from '../theme/colors';
+import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import AppText from './AppText';
 
 export default function Toast({ message, visible, onHide, duration = 1600 }) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(12)).current;
 
@@ -54,25 +56,26 @@ export default function Toast({ message, visible, onHide, duration = 1600 }) {
   );
 }
 
-const styles = StyleSheet.create({
-  toast: {
-    position: 'absolute',
-    left: spacing.lg,
-    right: spacing.lg,
-    bottom: spacing.xl,
-  },
-  toastInner: {
-    backgroundColor: colors.surfaceActive,
-    borderRadius: 14,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.surface,
-  },
-  toastText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.small,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    toast: {
+      position: 'absolute',
+      left: spacing.lg,
+      right: spacing.lg,
+      bottom: spacing.xl,
+    },
+    toastInner: {
+      backgroundColor: colors.surfaceActive,
+      borderRadius: 14,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.divider,
+    },
+    toastText: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textPrimary,
+      fontSize: typography.small,
+    },
+  });
