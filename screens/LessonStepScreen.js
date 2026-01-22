@@ -22,7 +22,6 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
-import { simulateCompound, formatCurrency } from '../utils/finance';
 import { getScenarioVariant } from '../utils/helpers';
 
 const TOTAL_STEPS = 6;
@@ -182,106 +181,272 @@ function ScenarioStep({ content, userContext, onNext }) {
 }
 
 function ExerciseStep({ content, onNext }) {
-  const defaults = content?.steps?.exercise?.defaults;
-  const ranges = content?.steps?.exercise?.ranges;
-  const [contribution, setContribution] = useState(defaults?.contribution || 150);
-  const [years, setYears] = useState(defaults?.years || 10);
-  const [returnRate, setReturnRate] = useState(defaults?.returnRate || 6);
-  const [hasRun, setHasRun] = useState(false);
+  const exercise = content?.steps?.exercise;
 
-  const results = useMemo(
-    () => simulateCompound({ contribution, years, returnRate }),
-    [contribution, years, returnRate]
+  if (!exercise) {
+    return (
+      <View style={styles.stepBody}>
+        <Card style={styles.exerciseCard}>
+          <Text style={styles.bodyText}>No exercise is available for this lesson.</Text>
+        </Card>
+        <PrimaryButton label="Continue" onPress={onNext} />
+      </View>
+    );
+  }
+
+  switch (exercise.type) {
+    case 'sequence':
+      return <SequenceExercise exercise={exercise} onNext={onNext} />;
+    case 'choice':
+      return <ChoiceExercise exercise={exercise} onNext={onNext} />;
+    case 'multi':
+      return <MultiExercise exercise={exercise} onNext={onNext} />;
+    case 'tradeoff':
+    default:
+      return <TradeoffExercise exercise={exercise} onNext={onNext} />;
+  }
+}
+
+function SequenceExercise({ exercise, onNext }) {
+  const { description, items = [], correctOrder = [], feedback = {} } = exercise;
+  const [order, setOrder] = useState([]);
+
+  const isComplete = order.length === items.length;
+  const isCorrect =
+    isComplete && correctOrder.every((stepId, index) => order[index] === stepId);
+  const message = isComplete ? (isCorrect ? feedback.correct : feedback.incorrect) : null;
+
+  const handleAdd = (stepId) => {
+    if (order.includes(stepId)) return;
+    setOrder((prev) => [...prev, stepId]);
+  };
+
+  const handleRemove = (stepId) => {
+    setOrder((prev) => prev.filter((item) => item !== stepId));
+  };
+
+  const reset = () => setOrder([]);
+
+  return (
+    <View style={styles.stepBody}>
+      <Card style={styles.exerciseCard}>
+        <Text style={styles.bodyText}>{description}</Text>
+        <Text style={styles.exerciseLabel}>Your order</Text>
+        <View style={styles.sequenceList}>
+          {order.length === 0 ? (
+            <Text style={styles.caption}>Tap actions below to build the sequence.</Text>
+          ) : (
+            order.map((stepId, index) => {
+              const item = items.find((entry) => entry.id === stepId);
+              return (
+                <Pressable
+                  key={stepId}
+                  onPress={() => handleRemove(stepId)}
+                  style={styles.sequenceItem}
+                >
+                  <View style={styles.sequenceIndex}>
+                    <Text style={styles.sequenceIndexText}>{index + 1}</Text>
+                  </View>
+                  <Text style={styles.sequenceText}>{item?.label}</Text>
+                </Pressable>
+              );
+            })
+          )}
+        </View>
+        <Text style={styles.exerciseLabel}>Actions</Text>
+        <View style={styles.optionList}>
+          {items.map((item) => {
+            const isSelected = order.includes(item.id);
+            return (
+              <Pressable
+                key={item.id}
+                onPress={() => handleAdd(item.id)}
+                style={[styles.option, isSelected && styles.optionDisabled]}
+              >
+                <Text style={styles.optionText}>{item.label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Card>
+
+      {message ? (
+        <Card active style={styles.insightCard}>
+          <Text style={styles.insightTitle}>{isCorrect ? 'Aligned' : 'Recheck the flow'}</Text>
+          <Text style={styles.caption}>{message}</Text>
+        </Card>
+      ) : null}
+
+      <View style={styles.exerciseActions}>
+        <SecondaryButton label="Reset" onPress={reset} />
+        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!isComplete} />
+      </View>
+    </View>
   );
+}
 
-  const principalPercent = results.total === 0 ? 0 : results.principal / results.total;
-  const growthPercent = results.total === 0 ? 0 : results.growth / results.total;
+function ChoiceExercise({ exercise, onNext }) {
+  const { description, options = [], revealTitle = 'Outcome' } = exercise;
+  const [selectedId, setSelectedId] = useState(null);
+  const selected = options.find((option) => option.id === selectedId);
+
+  const reset = () => setSelectedId(null);
+
+  return (
+    <View style={styles.stepBody}>
+      <Card style={styles.exerciseCard}>
+        <Text style={styles.bodyText}>{description}</Text>
+        <View style={styles.optionList}>
+          {options.map((option) => {
+            const isActive = option.id === selectedId;
+            return (
+              <Pressable
+                key={option.id}
+                style={[styles.option, isActive && styles.optionActive]}
+                onPress={() => setSelectedId(option.id)}
+              >
+                <Text style={[styles.optionText, isActive && styles.optionTextActive]}>
+                  {option.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Card>
+
+      {selected ? (
+        <Card active style={styles.insightCard}>
+          <Text style={styles.insightTitle}>{selected.revealTitle || revealTitle}</Text>
+          <Text style={styles.caption}>{selected.reveal}</Text>
+        </Card>
+      ) : null}
+
+      <View style={styles.exerciseActions}>
+        <SecondaryButton label="Reset" onPress={reset} />
+        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!selected} />
+      </View>
+    </View>
+  );
+}
+
+function TradeoffExercise({ exercise, onNext }) {
+  const {
+    description,
+    sliders = [],
+    requiresRun = false,
+    ctaLabel = 'Reveal impact',
+    scoreLabel = 'Signal',
+    insight = {},
+    insightMode = 'score',
+    insightBySlider = {},
+    scoreMode = 'average',
+  } = exercise;
+
+  const initialValues = useMemo(() => {
+    return sliders.reduce((acc, slider) => {
+      const fallback = slider.min + (slider.max - slider.min) / 2;
+      acc[slider.id] = slider.defaultValue ?? fallback;
+      return acc;
+    }, {});
+  }, [sliders]);
+
+  const [values, setValues] = useState(initialValues);
+  const [hasRun, setHasRun] = useState(!requiresRun);
 
   const reset = () => {
-    setContribution(defaults?.contribution || 150);
-    setYears(defaults?.years || 10);
-    setReturnRate(defaults?.returnRate || 6);
-    setHasRun(false);
+    setValues(initialValues);
+    setHasRun(!requiresRun);
+  };
+
+  const handleValueChange = (id, nextValue) => {
+    setValues((prev) => ({ ...prev, [id]: nextValue }));
+  };
+
+  const normalized = sliders.map((slider) => {
+    const raw = values[slider.id] ?? slider.min;
+    const range = slider.max - slider.min || 1;
+    const ratio = (raw - slider.min) / range;
+    return slider.invert ? 1 - ratio : ratio;
+  });
+
+  const score = (() => {
+    if (normalized.length === 0) return 0;
+    if (scoreMode === 'range') {
+      const max = Math.max(...normalized);
+      const min = Math.min(...normalized);
+      return Math.round((max - min) * 100);
+    }
+    const total = normalized.reduce((sum, value) => sum + value, 0);
+    return Math.round((total / normalized.length) * 100);
+  })();
+
+  const insightText = (() => {
+    if (insightMode === 'dominant' && sliders.length) {
+      const dominant = sliders.reduce((winner, slider) =>
+        (values[slider.id] ?? 0) > (values[winner.id] ?? 0) ? slider : winner
+      );
+      return insightBySlider[dominant.id] || insight.mid || '';
+    }
+    if (score <= 35) return insight.low || '';
+    if (score >= 66) return insight.high || '';
+    return insight.mid || '';
+  })();
+
+  const formatSliderValue = (slider, value) => {
+    const prefix = slider.prefix || '';
+    const suffix = slider.suffix || '';
+    return `${prefix}${value}${suffix}`;
   };
 
   return (
     <View style={styles.stepBody}>
       <Card style={styles.exerciseCard}>
-        <Text style={styles.bodyText}>{content?.steps?.exercise?.description}</Text>
+        <Text style={styles.bodyText}>{description}</Text>
         <View style={styles.exerciseSection}>
-          <Text style={styles.exerciseLabel}>Step A - Set the inputs</Text>
-          <View style={styles.sliderRow}>
-            <Text style={styles.sliderTitle}>Monthly contribution</Text>
-            <Text style={styles.sliderValue}>{formatCurrency(contribution)}</Text>
-            <Slider
-              value={contribution}
-              minimumValue={ranges?.contribution?.min || 50}
-              maximumValue={ranges?.contribution?.max || 500}
-              step={ranges?.contribution?.step || 10}
-              minimumTrackTintColor={colors.accent}
-              maximumTrackTintColor={colors.surfaceActive}
-              thumbTintColor={colors.accent}
-              onValueChange={setContribution}
-            />
-          </View>
-          <View style={styles.sliderRow}>
-            <Text style={styles.sliderTitle}>Time horizon</Text>
-            <Text style={styles.sliderValue}>{`${years} years`}</Text>
-            <Slider
-              value={years}
-              minimumValue={ranges?.years?.min || 5}
-              maximumValue={ranges?.years?.max || 30}
-              step={ranges?.years?.step || 1}
-              minimumTrackTintColor={colors.accent}
-              maximumTrackTintColor={colors.surfaceActive}
-              thumbTintColor={colors.accent}
-              onValueChange={setYears}
-            />
-          </View>
-          <View style={styles.sliderRow}>
-            <Text style={styles.sliderTitle}>Expected return</Text>
-            <Text style={styles.sliderValue}>{`${returnRate.toFixed(1)}%`}</Text>
-            <Slider
-              value={returnRate}
-              minimumValue={ranges?.returnRate?.min || 3}
-              maximumValue={ranges?.returnRate?.max || 10}
-              step={ranges?.returnRate?.step || 0.5}
-              minimumTrackTintColor={colors.accent}
-              maximumTrackTintColor={colors.surfaceActive}
-              thumbTintColor={colors.accent}
-              onValueChange={setReturnRate}
-            />
-          </View>
+          {sliders.map((slider) => (
+            <View key={slider.id} style={styles.sliderRow}>
+              <Text style={styles.sliderTitle}>{slider.label}</Text>
+              <Text style={styles.sliderValue}>
+                {formatSliderValue(slider, values[slider.id])}
+              </Text>
+              <Slider
+                value={values[slider.id]}
+                minimumValue={slider.min}
+                maximumValue={slider.max}
+                step={slider.step}
+                minimumTrackTintColor={colors.accent}
+                maximumTrackTintColor={colors.surfaceActive}
+                thumbTintColor={colors.accent}
+                onValueChange={(nextValue) => handleValueChange(slider.id, nextValue)}
+              />
+              {slider.leftLabel || slider.rightLabel ? (
+                <View style={styles.sliderHintRow}>
+                  <Text style={styles.sliderHintText}>{slider.leftLabel}</Text>
+                  <Text style={styles.sliderHintText}>{slider.rightLabel}</Text>
+                </View>
+              ) : null}
+            </View>
+          ))}
         </View>
       </Card>
 
       <Card active style={styles.exerciseCard}>
-        <Text style={styles.exerciseLabel}>Step B - Run simulation</Text>
-        <PrimaryButton label="Run simulation" onPress={() => setHasRun(true)} />
+        {requiresRun ? (
+          <PrimaryButton label={ctaLabel} onPress={() => setHasRun(true)} />
+        ) : null}
         {hasRun ? (
           <View style={styles.resultsBlock}>
-            <Text style={styles.exerciseLabel}>Step C - See the impact</Text>
             <View style={styles.resultRow}>
-              <Text style={styles.resultLabel}>Total value</Text>
-              <Text style={styles.resultValue}>{formatCurrency(results.total)}</Text>
+              <Text style={styles.resultLabel}>{scoreLabel}</Text>
+              <Text style={styles.resultValue}>{`${score}/100`}</Text>
             </View>
-            <View style={styles.stackedBar}>
-              <View
-                style={[styles.principalBar, { flex: principalPercent || 0.6 }]}
-              />
-              <View style={[styles.growthBar, { flex: growthPercent || 0.4 }]} />
+            <View style={styles.scoreTrack}>
+              <View style={[styles.scoreFill, { width: `${score}%` }]} />
             </View>
-            <View style={styles.resultRow}>
-              <Text style={styles.resultLabel}>Contributions</Text>
-              <Text style={styles.resultValue}>{formatCurrency(results.principal)}</Text>
-            </View>
-            <View style={styles.resultRow}>
-              <Text style={styles.resultLabel}>Growth</Text>
-              <Text style={styles.resultValue}>{formatCurrency(results.growth)}</Text>
-            </View>
-            <Text style={styles.caption}>
-              More time increases growth faster than higher monthly deposits.
-            </Text>
+            {insightText ? <Text style={styles.caption}>{insightText}</Text> : null}
+            {exercise.resultHint ? (
+              <Text style={styles.caption}>{exercise.resultHint}</Text>
+            ) : null}
           </View>
         ) : null}
       </Card>
@@ -289,6 +454,93 @@ function ExerciseStep({ content, onNext }) {
       <View style={styles.exerciseActions}>
         <SecondaryButton label="Reset" onPress={reset} />
         <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!hasRun} />
+      </View>
+    </View>
+  );
+}
+
+function MultiExercise({ exercise, onNext }) {
+  const {
+    description,
+    options = [],
+    baseScore = 100,
+    scoreLabel = 'Coverage',
+    unit = '%',
+    insight = {},
+    emptyMessage = 'Select items to see the impact.',
+  } = exercise;
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const toggle = (id) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
+
+  const reset = () => setSelectedIds([]);
+
+  const totalImpact = selectedIds.reduce((sum, id) => {
+    const option = options.find((item) => item.id === id);
+    return sum + (option?.impact || 0);
+  }, 0);
+
+  const remaining = Math.max(0, baseScore - totalImpact);
+  const insightText = (() => {
+    if (remaining <= 35) return insight.low || '';
+    if (remaining >= 66) return insight.high || '';
+    return insight.mid || '';
+  })();
+
+  const hasSelection = selectedIds.length > 0;
+
+  return (
+    <View style={styles.stepBody}>
+      <Card style={styles.exerciseCard}>
+        <Text style={styles.bodyText}>{description}</Text>
+        <View style={styles.optionList}>
+          {options.map((option) => {
+            const isActive = selectedIds.includes(option.id);
+            return (
+              <Pressable
+                key={option.id}
+                style={[styles.option, isActive && styles.optionActive]}
+                onPress={() => toggle(option.id)}
+              >
+                <Text style={[styles.optionText, isActive && styles.optionTextActive]}>
+                  {option.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Card>
+
+      <Card active style={styles.insightCard}>
+        <Text style={styles.insightTitle}>{scoreLabel}</Text>
+        <View style={styles.resultRow}>
+          <Text style={styles.resultLabel}>{scoreLabel}</Text>
+          <Text style={styles.resultValue}>{`${Math.round(remaining)}${unit}`}</Text>
+        </View>
+        {insightText ? <Text style={styles.caption}>{insightText}</Text> : null}
+        {hasSelection ? (
+          <View style={styles.impactList}>
+            {selectedIds.map((id) => {
+              const option = options.find((item) => item.id === id);
+              if (!option) return null;
+              return (
+                <View key={id} style={styles.impactRow}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.accent} />
+                  <Text style={styles.impactText}>{option.detail}</Text>
+                </View>
+              );
+            })}
+          </View>
+        ) : (
+          <Text style={styles.caption}>{emptyMessage}</Text>
+        )}
+      </Card>
+
+      <View style={styles.exerciseActions}>
+        <SecondaryButton label="Reset" onPress={reset} />
+        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!hasSelection} />
       </View>
     </View>
   );
@@ -446,6 +698,37 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.small,
   },
+  sequenceList: {
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  sequenceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: 14,
+    backgroundColor: colors.surfaceActive,
+  },
+  sequenceIndex: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sequenceIndexText: {
+    fontFamily: typography.fontFamilyDemi,
+    fontSize: typography.small,
+    color: colors.textPrimary,
+  },
+  sequenceText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small,
+    color: colors.textPrimary,
+    flex: 1,
+  },
   sliderRow: {
     gap: spacing.xs,
   },
@@ -458,6 +741,18 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamilyDemi,
     color: colors.textPrimary,
     fontSize: typography.body,
+  },
+  sliderHintRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  sliderHintText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+  },
+  optionDisabled: {
+    opacity: 0.45,
   },
   resultsBlock: {
     gap: spacing.sm,
@@ -478,18 +773,30 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.body,
   },
-  stackedBar: {
-    flexDirection: 'row',
-    height: 10,
+  scoreTrack: {
+    height: 8,
     borderRadius: 6,
     overflow: 'hidden',
     backgroundColor: colors.surface,
   },
-  principalBar: {
-    backgroundColor: colors.surfaceActive,
-  },
-  growthBar: {
+  scoreFill: {
+    height: 8,
     backgroundColor: colors.accent,
+  },
+  impactList: {
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  impactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  impactText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    flex: 1,
   },
   exerciseActions: {
     gap: spacing.md,
