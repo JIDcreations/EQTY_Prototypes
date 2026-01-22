@@ -1,4 +1,5 @@
 import { lessons } from '../data/curriculum';
+import { defaultUserContext } from '../data/defaults';
 
 export function getLessonById(lessonId) {
   return lessons.find((lesson) => lesson.id === lessonId);
@@ -43,4 +44,40 @@ export function getGlossaryExplanation(term, userContext) {
     return term.simple || term.definition;
   }
   return term.definition;
+}
+
+export function getTextScale(textSize) {
+  if (textSize === 'Large') return 1.2;
+  if (textSize === 'Comfort') return 1.1;
+  return 1;
+}
+
+export function deriveUserContextFromOnboarding(context) {
+  const experienceText = (context?.experienceAnswer || '').toLowerCase();
+  const knowledgeText = (context?.knowledgeAnswer || '').toLowerCase();
+  const motivationText = context?.motivationAnswer?.trim();
+
+  let experience = defaultUserContext.experience;
+  if (/(seasoned|professional|advisor|decade|advanced)/.test(experienceText)) {
+    experience = 'seasoned';
+  } else if (/(year|years|portfolio|stock|crypto|etf|bond|fund|index)/.test(experienceText)) {
+    experience = 'growing';
+  } else if (/(none|nothing|new|starting|beginner)/.test(experienceText)) {
+    experience = 'new';
+  }
+
+  let knowledge = defaultUserContext.knowledge;
+  if (/(advanced|expert|professional)/.test(knowledgeText)) {
+    knowledge = 'advanced';
+  } else if (/(intermediate|familiar|comfortable|some)/.test(knowledgeText)) {
+    knowledge = 'intermediate';
+  } else if (/(basic|new|beginner|none)/.test(knowledgeText)) {
+    knowledge = 'basic';
+  }
+
+  return {
+    experience,
+    knowledge,
+    motivation: motivationText || defaultUserContext.motivation,
+  };
 }

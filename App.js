@@ -16,7 +16,7 @@ import { GlossaryProvider } from './components/GlossaryProvider';
 import HomeScreen from './screens/HomeScreen';
 import LessonsScreen from './screens/LessonsScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
-import ProfileScreen from './screens/ProfileScreen';
+import ProfileStack from './navigation/ProfileStack';
 import LessonOverviewScreen from './screens/LessonOverviewScreen';
 import LessonStepScreen from './screens/LessonStepScreen';
 import GlossaryDetailScreen from './screens/GlossaryDetailScreen';
@@ -59,7 +59,7 @@ function Tabs() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Lessons" component={LessonsScreen} />
       <Tab.Screen name="Glossary" component={GlossaryScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }

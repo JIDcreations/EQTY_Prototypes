@@ -1,11 +1,12 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import ProgressBar from './ProgressBar';
 import GlossaryText from './GlossaryText';
+import AppText from './AppText';
 
 export default function StepHeader({ step, total, title, onBack, onPressTerm }) {
   const isPlainTitle = typeof title === 'string' || typeof title === 'number';
@@ -21,7 +22,7 @@ export default function StepHeader({ step, total, title, onBack, onPressTerm }) 
         <Pressable onPress={onBack} style={styles.backButton}>
           <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
         </Pressable>
-        <Text style={styles.stepText}>{`Step ${step} of ${total}`}</Text>
+        <AppText style={styles.stepText}>{`Step ${step} of ${total}`}</AppText>
       </View>
       {titleNode}
       <ProgressBar progress={step / total} />

@@ -5,13 +5,13 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
+import AppText from '../components/AppText';
 import BottomSheet from '../components/BottomSheet';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
@@ -157,7 +157,7 @@ function VisualizationStep({ content, onNext, onPressTerm }) {
           style={styles.bodyText}
           onPressTerm={onPressTerm}
         />
-        <Text style={styles.caption}>Tap elements to explore</Text>
+        <AppText style={styles.caption}>Tap elements to explore</AppText>
         <View style={styles.segmentRow}>
           {content?.steps?.visualization?.segments?.map((segment) => (
             <Pressable
@@ -181,7 +181,7 @@ function VisualizationStep({ content, onNext, onPressTerm }) {
         onClose={() => setSelected(null)}
         title={selected?.label}
       >
-        <Text style={styles.sheetText}>{selected?.description}</Text>
+        <AppText style={styles.sheetText}>{selected?.description}</AppText>
       </BottomSheet>
     </View>
   );
@@ -217,7 +217,7 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
       </Card>
       {selected ? (
         <Card style={styles.insightCard}>
-          <Text style={styles.insightTitle}>Insight</Text>
+          <AppText style={styles.insightTitle}>Insight</AppText>
           <GlossaryText
             text={variant?.insight}
             style={styles.caption}
@@ -237,7 +237,7 @@ function ExerciseStep({ content, onNext, onPressTerm }) {
     return (
       <View style={styles.stepBody}>
         <Card style={styles.exerciseCard}>
-          <Text style={styles.bodyText}>No exercise is available for this lesson.</Text>
+          <AppText style={styles.bodyText}>No exercise is available for this lesson.</AppText>
         </Card>
         <PrimaryButton label="Continue" onPress={onNext} />
       </View>
@@ -281,10 +281,10 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
     <View style={styles.stepBody}>
       <Card style={styles.exerciseCard}>
         <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
-        <Text style={styles.exerciseLabel}>Your order</Text>
+        <AppText style={styles.exerciseLabel}>Your order</AppText>
         <View style={styles.sequenceList}>
           {order.length === 0 ? (
-            <Text style={styles.caption}>Tap actions below to build the sequence.</Text>
+            <AppText style={styles.caption}>Tap actions below to build the sequence.</AppText>
           ) : (
             order.map((stepId, index) => {
               const item = items.find((entry) => entry.id === stepId);
@@ -295,7 +295,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
                   style={styles.sequenceItem}
                 >
                   <View style={styles.sequenceIndex}>
-                    <Text style={styles.sequenceIndexText}>{index + 1}</Text>
+                    <AppText style={styles.sequenceIndexText}>{index + 1}</AppText>
                   </View>
                   <GlossaryText
                     text={item?.label}
@@ -307,7 +307,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
             })
           )}
         </View>
-        <Text style={styles.exerciseLabel}>Actions</Text>
+        <AppText style={styles.exerciseLabel}>Actions</AppText>
         <View style={styles.optionList}>
           {items.map((item) => {
             const isSelected = order.includes(item.id);
@@ -330,7 +330,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
 
       {message ? (
         <Card style={styles.insightCard}>
-          <Text style={styles.insightTitle}>{isCorrect ? 'Aligned' : 'Recheck the flow'}</Text>
+          <AppText style={styles.insightTitle}>{isCorrect ? 'Aligned' : 'Recheck the flow'}</AppText>
           <GlossaryText text={message} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
       ) : null}
@@ -376,7 +376,7 @@ function ChoiceExercise({ exercise, onNext, onPressTerm }) {
 
       {selected ? (
         <Card style={styles.insightCard}>
-          <Text style={styles.insightTitle}>{selected.revealTitle || revealTitle}</Text>
+          <AppText style={styles.insightTitle}>{selected.revealTitle || revealTitle}</AppText>
           <GlossaryText text={selected.reveal} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
       ) : null}
@@ -470,9 +470,9 @@ function TradeoffExercise({ exercise, onNext, onPressTerm }) {
                 style={styles.sliderTitle}
                 onPressTerm={onPressTerm}
               />
-              <Text style={styles.sliderValue}>
+              <AppText style={styles.sliderValue}>
                 {formatSliderValue(slider, values[slider.id])}
-              </Text>
+              </AppText>
               <Slider
                 value={values[slider.id]}
                 minimumValue={slider.min}
@@ -509,8 +509,8 @@ function TradeoffExercise({ exercise, onNext, onPressTerm }) {
         {hasRun ? (
           <View style={styles.resultsBlock}>
             <View style={styles.resultRow}>
-              <Text style={styles.resultLabel}>{scoreLabel}</Text>
-              <Text style={styles.resultValue}>{`${score}/100`}</Text>
+              <AppText style={styles.resultLabel}>{scoreLabel}</AppText>
+              <AppText style={styles.resultValue}>{`${score}/100`}</AppText>
             </View>
             <View style={styles.scoreTrack}>
               <View style={[styles.scoreFill, { width: `${score}%` }]} />
@@ -594,10 +594,10 @@ function MultiExercise({ exercise, onNext, onPressTerm }) {
       </Card>
 
       <Card style={styles.insightCard}>
-        <Text style={styles.insightTitle}>{scoreLabel}</Text>
+        <AppText style={styles.insightTitle}>{scoreLabel}</AppText>
         <View style={styles.resultRow}>
-          <Text style={styles.resultLabel}>{scoreLabel}</Text>
-          <Text style={styles.resultValue}>{`${Math.round(remaining)}${unit}`}</Text>
+          <AppText style={styles.resultLabel}>{scoreLabel}</AppText>
+          <AppText style={styles.resultValue}>{`${Math.round(remaining)}${unit}`}</AppText>
         </View>
         {insightText ? (
           <GlossaryText text={insightText} style={styles.caption} onPressTerm={onPressTerm} />
@@ -664,7 +664,7 @@ function SummaryStep({ content, onComplete, onPressTerm }) {
   return (
     <View style={styles.stepBody}>
       <Card style={styles.summaryCard}>
-        <Text style={styles.bodyText}>Key takeaways</Text>
+        <AppText style={styles.bodyText}>Key takeaways</AppText>
         <View style={styles.takeawayList}>
           {content?.steps?.summary?.takeaways?.map((item) => (
             <View key={item} style={styles.takeawayRow}>
@@ -685,7 +685,7 @@ function SummaryStep({ content, onComplete, onPressTerm }) {
           style={styles.videoRow}
         >
           <Ionicons name="play-circle" size={20} color={colors.accent} />
-          <Text style={styles.videoText}>{content.steps.summary.video.label}</Text>
+          <AppText style={styles.videoText}>{content.steps.summary.video.label}</AppText>
         </Pressable>
       ) : null}
 

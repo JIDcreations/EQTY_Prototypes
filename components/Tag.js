@@ -1,12 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import AppText from './AppText';
 
 export default function Tag({ label, tone = 'default', style }) {
   return (
     <View style={[styles.base, tone === 'accent' && styles.accent, style]}>
-      <Text style={[styles.text, tone === 'accent' && styles.textAccent]}>{label}</Text>
+      <AppText style={[styles.text, tone === 'accent' && styles.textAccent]}>{label}</AppText>
     </View>
   );
 }

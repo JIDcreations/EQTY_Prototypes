@@ -4,5 +4,5 @@ export const colors = {
   surfaceActive: '#1E2738',
   textPrimary: '#F2F4F6',
   textSecondary: '#ACB4BF',
-  accent: '#FFD500',
+  accent: '#C6921D',
 };

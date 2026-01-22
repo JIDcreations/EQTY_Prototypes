@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import AppText from './AppText';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -38,13 +39,14 @@ export function PrimaryButton({ label, onPress, style, disabled }) {
       onPress={onPress}
       disabled={disabled}
     >
-      <Text style={styles.primaryLabel}>{label}</Text>
+      <AppText style={styles.primaryLabel}>{label}</AppText>
     </AnimatedPressable>
   );
 }
 
-export function SecondaryButton({ label, onPress, style, disabled }) {
+export function SecondaryButton({ label, onPress, style, disabled, tone = 'default' }) {
   const { animatedStyle, onPressIn, onPressOut } = usePressScale();
+  const isAccent = tone === 'accent';
 
   return (
     <AnimatedPressable
@@ -54,8 +56,10 @@ export function SecondaryButton({ label, onPress, style, disabled }) {
       onPress={onPress}
       disabled={disabled}
     >
-      <View style={styles.secondaryBorder} />
-      <Text style={styles.secondaryLabel}>{label}</Text>
+      <View style={[styles.secondaryBorder, isAccent && styles.secondaryBorderAccent]} />
+      <AppText style={[styles.secondaryLabel, isAccent && styles.secondaryLabelAccent]}>
+        {label}
+      </AppText>
     </AnimatedPressable>
   );
 }
@@ -90,10 +94,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.surfaceActive,
   },
+  secondaryBorderAccent: {
+    borderColor: colors.accent,
+  },
   secondaryLabel: {
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.body,
     color: colors.textPrimary,
+  },
+  secondaryLabelAccent: {
+    color: colors.accent,
   },
   disabled: {
     opacity: 0.55,

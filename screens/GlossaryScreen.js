@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AppText from '../components/AppText';
 import Card from '../components/Card';
 import BottomSheet from '../components/BottomSheet';
 import SectionTitle from '../components/SectionTitle';
@@ -68,13 +69,13 @@ export default function GlossaryScreen() {
 
         <View style={styles.list}>
           {filteredTerms.length === 0 ? (
-            <Text style={styles.emptyText}>No matches. Try a different term.</Text>
+            <AppText style={styles.emptyText}>No matches. Try a different term.</AppText>
           ) : (
             filteredTerms.map((term) => (
               <Pressable key={term.id} onPress={() => handleOpen(term)}>
                 <Card style={styles.termCard}>
-                  <Text style={styles.termTitle}>{term.term}</Text>
-                  <Text style={styles.termDescription}>{term.definition}</Text>
+                  <AppText style={styles.termTitle}>{term.term}</AppText>
+                  <AppText style={styles.termDescription}>{term.definition}</AppText>
                 </Card>
               </Pressable>
             ))
@@ -88,19 +89,19 @@ export default function GlossaryScreen() {
         onClose={() => setSelectedTerm(null)}
       >
         <View style={styles.sheetSection}>
-          <Text style={styles.sheetLabel}>Definition</Text>
-          <Text style={styles.sheetText}>{selectedTerm?.definition}</Text>
+          <AppText style={styles.sheetLabel}>Definition</AppText>
+          <AppText style={styles.sheetText}>{selectedTerm?.definition}</AppText>
         </View>
         <View style={styles.sheetSection}>
-          <Text style={styles.sheetLabel}>Example</Text>
-          <Text style={styles.sheetText}>{selectedTerm?.example}</Text>
+          <AppText style={styles.sheetLabel}>Example</AppText>
+          <AppText style={styles.sheetText}>{selectedTerm?.example}</AppText>
         </View>
         {selectedTerm?.learnMoreUrl ? (
           <View style={styles.sheetSection}>
-            <Text style={styles.sheetLabel}>Learn more</Text>
+            <AppText style={styles.sheetLabel}>Learn more</AppText>
             <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
               <Ionicons name="logo-youtube" size={18} color={colors.accent} />
-              <Text style={styles.learnMoreText}>Learn more on YouTube</Text>
+              <AppText style={styles.learnMoreText}>Learn more on YouTube</AppText>
             </Pressable>
           </View>
         ) : null}

@@ -1,10 +1,11 @@
 import React, { createContext, useCallback, useMemo, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from './BottomSheet';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import AppText from './AppText';
 
 export const GlossaryContext = createContext(null);
 
@@ -38,21 +39,21 @@ export function GlossaryProvider({ children }) {
       {children}
       <BottomSheet visible={!!activeTerm} onClose={closeTerm} title={activeTerm?.term}>
         <View style={styles.glossarySection}>
-          <Text style={styles.sheetLabel}>Definition</Text>
-          <Text style={styles.sheetText}>{activeTerm?.definition}</Text>
+          <AppText style={styles.sheetLabel}>Definition</AppText>
+          <AppText style={styles.sheetText}>{activeTerm?.definition}</AppText>
         </View>
         {activeTerm?.example ? (
           <View style={styles.glossarySection}>
-            <Text style={styles.sheetLabel}>Example</Text>
-            <Text style={styles.sheetText}>{activeTerm?.example}</Text>
+            <AppText style={styles.sheetLabel}>Example</AppText>
+            <AppText style={styles.sheetText}>{activeTerm?.example}</AppText>
           </View>
         ) : null}
         {activeTerm?.learnMoreUrl ? (
           <View style={styles.glossarySection}>
-            <Text style={styles.sheetLabel}>Learn more</Text>
+            <AppText style={styles.sheetLabel}>Learn more</AppText>
             <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
               <Ionicons name="logo-youtube" size={18} color={colors.accent} />
-              <Text style={styles.learnMoreText}>Learn more on YouTube</Text>
+              <AppText style={styles.learnMoreText}>Learn more on YouTube</AppText>
             </Pressable>
           </View>
         ) : null}

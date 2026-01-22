@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Card from '../components/Card';
+import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
 import { colors } from '../theme/colors';
@@ -36,7 +37,7 @@ export default function ProfileScreen() {
         <SectionTitle title="Profile" subtitle="Personal learning context" />
 
         <Card style={styles.card}>
-          <Text style={styles.label}>Experience</Text>
+          <AppText style={styles.label}>Experience</AppText>
           <TextInput
             style={styles.input}
             value={experience}
@@ -44,7 +45,7 @@ export default function ProfileScreen() {
             placeholder="new / growing / seasoned"
             placeholderTextColor={colors.textSecondary}
           />
-          <Text style={styles.label}>Knowledge</Text>
+          <AppText style={styles.label}>Knowledge</AppText>
           <TextInput
             style={styles.input}
             value={knowledge}
@@ -52,7 +53,7 @@ export default function ProfileScreen() {
             placeholder="basic / intermediate / advanced"
             placeholderTextColor={colors.textSecondary}
           />
-          <Text style={styles.label}>Motivation</Text>
+          <AppText style={styles.label}>Motivation</AppText>
           <TextInput
             style={styles.input}
             value={motivation}
@@ -64,9 +65,9 @@ export default function ProfileScreen() {
         </Card>
 
         <Card style={styles.card}>
-          <Text style={styles.label}>Appearance</Text>
+          <AppText style={styles.label}>Appearance</AppText>
           <View style={styles.switchRow}>
-            <Text style={styles.switchLabel}>Dark mode</Text>
+            <AppText style={styles.switchLabel}>Dark mode</AppText>
             <Switch
               value={darkMode}
               onValueChange={setDarkMode}
@@ -74,7 +75,7 @@ export default function ProfileScreen() {
               thumbColor={colors.background}
             />
           </View>
-          <Text style={styles.caption}>Light mode is coming soon.</Text>
+          <AppText style={styles.caption}>Light mode is coming soon.</AppText>
         </Card>
       </ScrollView>
     </SafeAreaView>

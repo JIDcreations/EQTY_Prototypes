@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import AppText from './AppText';
 
 export default function BottomSheet({ visible, title, onClose, children }) {
   const insets = useSafeAreaInsets();
@@ -80,7 +81,7 @@ export default function BottomSheet({ visible, title, onClose, children }) {
           >
             <View style={styles.handle} />
             <View style={styles.headerRow}>
-              {title ? <Text style={styles.title}>{title}</Text> : <View />}
+              {title ? <AppText style={styles.title}>{title}</AppText> : <View />}
               <Pressable onPress={handleClose} style={styles.closeButton}>
                 <Ionicons name="close" size={20} color={colors.textSecondary} />
               </Pressable>

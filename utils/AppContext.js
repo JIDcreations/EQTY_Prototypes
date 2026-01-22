@@ -1,10 +1,23 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { defaultProgress, defaultUserContext } from '../data/defaults';
-import { getNextLessonId } from './helpers';
 import {
+  defaultAuthUser,
+  defaultOnboardingContext,
+  defaultPreferences,
+  defaultProgress,
+  defaultUserContext,
+} from '../data/defaults';
+import { deriveUserContextFromOnboarding, getNextLessonId, getTextScale } from './helpers';
+import {
+  clearAuthUser,
+  loadAuthUser,
+  loadOnboardingContext,
+  loadPreferences,
   loadProgress,
   loadReflections,
   loadUserContext,
+  saveAuthUser,
+  saveOnboardingContext,
+  savePreferences,
   saveProgress,
   saveReflections,
   saveUserContext,
@@ -13,6 +26,9 @@ import {
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
+  const [authUser, setAuthUser] = useState(defaultAuthUser);
+  const [onboardingContext, setOnboardingContext] = useState(defaultOnboardingContext);
+  const [preferences, setPreferences] = useState(defaultPreferences);
   const [userContext, setUserContext] = useState(defaultUserContext);
   const [progress, setProgress] = useState(defaultProgress);
   const [reflections, setReflections] = useState([]);
@@ -21,12 +37,25 @@ export function AppProvider({ children }) {
   useEffect(() => {
     let isMounted = true;
     async function bootstrap() {
-      const [storedContext, storedProgress, storedReflections] = await Promise.all([
+      const [
+        storedAuthUser,
+        storedOnboarding,
+        storedPreferences,
+        storedContext,
+        storedProgress,
+        storedReflections,
+      ] = await Promise.all([
+        loadAuthUser(),
+        loadOnboardingContext(),
+        loadPreferences(),
         loadUserContext(),
         loadProgress(),
         loadReflections(),
       ]);
       if (isMounted) {
+        setAuthUser(storedAuthUser);
+        setOnboardingContext(storedOnboarding);
+        setPreferences(storedPreferences);
         setUserContext(storedContext);
         setProgress(storedProgress);
         setReflections(storedReflections);
@@ -38,6 +67,32 @@ export function AppProvider({ children }) {
       isMounted = false;
     };
   }, []);
+
+  const updateAuthUser = async (updates) => {
+    const base = authUser || defaultAuthUser;
+    const next = { ...base, ...updates };
+    setAuthUser(next);
+    await saveAuthUser(next);
+  };
+
+  const logOut = async () => {
+    setAuthUser(null);
+    await clearAuthUser();
+  };
+
+  const updateOnboardingContext = async (updates) => {
+    const next = { ...onboardingContext, ...updates };
+    setOnboardingContext(next);
+    await saveOnboardingContext(next);
+    const derived = deriveUserContextFromOnboarding(next);
+    await updateUserContext(derived);
+  };
+
+  const updatePreferences = async (updates) => {
+    const next = { ...preferences, ...updates };
+    setPreferences(next);
+    await savePreferences(next);
+  };
 
   const updateUserContext = async (updates) => {
     const next = { ...userContext, ...updates };
@@ -77,16 +132,24 @@ export function AppProvider({ children }) {
 
   const value = useMemo(
     () => ({
+      authUser,
+      onboardingContext,
+      preferences,
       userContext,
       progress,
       reflections,
       isReady,
+      textScale: getTextScale(preferences?.textSize),
+      updateAuthUser,
+      updateOnboardingContext,
+      updatePreferences,
+      logOut,
       updateUserContext,
       updateProgress,
       addReflection,
       completeLesson,
     }),
-    [userContext, progress, reflections, isReady]
+    [authUser, onboardingContext, preferences, userContext, progress, reflections, isReady]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

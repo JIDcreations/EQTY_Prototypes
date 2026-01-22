@@ -1,7 +1,8 @@
 import React, { useContext, useMemo } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { glossaryTerms } from '../data/glossary';
 import { colors } from '../theme/colors';
+import AppText from './AppText';
 import { GlossaryContext } from './GlossaryProvider';
 
 const glossaryIndex = buildGlossaryIndex(glossaryTerms);
@@ -54,11 +55,11 @@ export default function GlossaryText({
   const handlePress = onPressTerm || glossary?.openTerm;
 
   return (
-    <Text style={style} {...textProps}>
+    <AppText style={style} {...textProps}>
       {parts.map((part, index) => {
         if (!part.term) return part.text;
         return (
-          <Text
+          <AppText
             key={`${part.text}-${index}`}
             style={[styles.term, termStyle]}
             onPress={(event) => {
@@ -68,10 +69,10 @@ export default function GlossaryText({
             }}
           >
             {part.text}
-          </Text>
+          </AppText>
         );
       })}
-    </Text>
+    </AppText>
   );
 }
 

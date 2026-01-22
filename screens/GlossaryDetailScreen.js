@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import { glossaryTerms } from '../data/glossary';
@@ -31,15 +32,15 @@ export default function GlossaryDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>{term.term}</Text>
-          <Text style={styles.subtitle}>{term.definition}</Text>
+          <AppText style={styles.title}>{term.term}</AppText>
+          <AppText style={styles.subtitle}>{term.definition}</AppText>
         </View>
 
         <Card style={styles.explainCard}>
-          <Text style={styles.cardTitle}>Explain for me</Text>
-          <Text style={styles.cardText}>
+          <AppText style={styles.cardTitle}>Explain for me</AppText>
+          <AppText style={styles.cardText}>
             {explanation || 'Tap below for a tailored explanation.'}
-          </Text>
+          </AppText>
           <PrimaryButton
             label="Explain for me"
             onPress={() => setExplanation(getGlossaryExplanation(term, userContext))}
