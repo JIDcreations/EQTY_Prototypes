@@ -1,16 +1,52 @@
-import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
+import { PrimaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
+import SettingsRow from '../components/SettingsRow';
+import Toast from '../components/Toast';
 import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import useToast from '../utils/useToast';
+
+const CONTACT_CHANNELS = [
+  {
+    label: 'In-app chat',
+    subtitle: 'Fastest response. Weekdays 09:00 to 17:00.',
+  },
+  {
+    label: 'Email support',
+    subtitle: 'support@example.com. Replies within 24 hours.',
+  },
+  {
+    label: 'Phone line',
+    subtitle: '+1 (555) 014-2030 for account access issues.',
+  },
+];
+
+const SUPPORT_CHECKLIST = [
+  'Your account email or username.',
+  'What you were trying to do when it happened.',
+  'Device model and OS version.',
+  'Screenshots or screen recordings if possible.',
+];
 
 export default function ContactSupportScreen({ navigation }) {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const toast = useToast();
+  const canSend = subject.trim().length > 0 && message.trim().length > 0;
+
+  const handleSend = () => {
+    toast.show('Support request sent');
+    setSubject('');
+    setMessage('');
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -18,15 +54,66 @@ export default function ContactSupportScreen({ navigation }) {
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <SettingsHeader title="Contact support" onBack={() => navigation.goBack()} />
+        <SettingsHeader
+          title="Contact support"
+          subtitle="We usually reply within 24 hours."
+          onBack={() => navigation.goBack()}
+        />
         <Card style={styles.card}>
-          <AppText style={styles.title}>Contact support</AppText>
+          <AppText style={styles.sectionTitle}>Contact options</AppText>
+          <View style={styles.list}>
+            {CONTACT_CHANNELS.map((channel, index) => (
+              <SettingsRow
+                key={channel.label}
+                label={channel.label}
+                subtitle={channel.subtitle}
+                isLast={index === CONTACT_CHANNELS.length - 1}
+              />
+            ))}
+          </View>
+        </Card>
+        <Card style={styles.card}>
+          <AppText style={styles.sectionTitle}>Before you reach out</AppText>
           <AppText style={styles.text}>
-            Need help? Our support channel will open here for the prototype.
+            Including these details helps us resolve your request faster:
           </AppText>
+          <View style={styles.bulletList}>
+            {SUPPORT_CHECKLIST.map((item) => (
+              <AppText key={item} style={styles.bulletText}>
+                - {item}
+              </AppText>
+            ))}
+          </View>
+        </Card>
+        <Card style={styles.card}>
+          <AppText style={styles.sectionTitle}>Send a request</AppText>
+          <AppText style={styles.label}>Subject</AppText>
+          <TextInput
+            value={subject}
+            onChangeText={setSubject}
+            placeholder="Short summary"
+            placeholderTextColor={colors.textSecondary}
+            style={styles.input}
+          />
+          <AppText style={styles.label}>Message</AppText>
+          <TextInput
+            value={message}
+            onChangeText={setMessage}
+            placeholder="Describe what you need help with"
+            placeholderTextColor={colors.textSecondary}
+            style={[styles.input, styles.messageInput]}
+            multiline
+            textAlignVertical="top"
+          />
+          <AppText style={styles.helperText}>
+            Please do not include passwords or sensitive financial details.
+          </AppText>
+          <PrimaryButton label="Send message" onPress={handleSend} disabled={!canSend} />
         </Card>
       </ScrollView>
+      <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
     </SafeAreaView>
   );
 }
@@ -47,12 +134,46 @@ const createStyles = (colors) =>
       paddingBottom: spacing.xxxl,
     },
     card: {
-      gap: spacing.sm,
+      gap: spacing.md,
     },
-    title: {
+    sectionTitle: {
       fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
+      fontSize: typography.h2,
       color: colors.textPrimary,
+    },
+    list: {
+      gap: spacing.xs,
+    },
+    bulletList: {
+      gap: spacing.xs,
+    },
+    bulletText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    label: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+    },
+    input: {
+      borderRadius: 14,
+      padding: spacing.sm,
+      backgroundColor: colors.surfaceActive,
+      color: colors.textPrimary,
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+    },
+    messageInput: {
+      minHeight: 120,
+    },
+    helperText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+      lineHeight: 20,
     },
     text: {
       fontFamily: typography.fontFamilyMedium,
