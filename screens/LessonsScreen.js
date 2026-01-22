@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
+import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { lessons, modules } from '../data/curriculum';
@@ -38,8 +39,8 @@ export default function LessonsScreen() {
         {modulesWithLessons.map((module) => (
           <View key={module.id} style={styles.module}>
             <View style={styles.moduleHeader}>
-              <Text style={styles.moduleTitle}>{module.title}</Text>
-              <Text style={styles.moduleSubtitle}>{module.description}</Text>
+              <GlossaryText text={module.title} style={styles.moduleTitle} />
+              <GlossaryText text={module.description} style={styles.moduleSubtitle} />
             </View>
             <View style={styles.moduleLessons}>
               {module.lessons.map((lesson) => {
@@ -62,14 +63,17 @@ export default function LessonsScreen() {
                   >
                     <Card style={styles.lessonCard}>
                       <View style={styles.lessonRow}>
-                        <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                        <GlossaryText text={lesson.title} style={styles.lessonTitle} />
                         <Tag label={statusLabel} tone={status === 'current' ? 'accent' : 'default'} />
                       </View>
-                      <Text style={styles.lessonDescription}>{lesson.shortDescription}</Text>
+                      <GlossaryText
+                        text={lesson.shortDescription}
+                        style={styles.lessonDescription}
+                      />
                       {status === 'completed' ? (
                         <View style={styles.completedRow}>
                           <Ionicons name="checkmark-circle" size={16} color={colors.accent} />
-                          <Text style={styles.completedText}>Lesson finished</Text>
+                          <GlossaryText text="Lesson finished" style={styles.completedText} />
                         </View>
                       ) : null}
                     </Card>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import GlossaryText from './GlossaryText';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
@@ -7,8 +8,8 @@ import { typography } from '../theme/typography';
 export default function SectionTitle({ title, subtitle }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <GlossaryText text={title} style={styles.title} />
+      {subtitle ? <GlossaryText text={subtitle} style={styles.subtitle} /> : null}
     </View>
   );
 }

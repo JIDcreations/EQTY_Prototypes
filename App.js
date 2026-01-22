@@ -12,6 +12,7 @@ import { colors } from './theme/colors';
 import { spacing } from './theme/spacing';
 import { typography } from './theme/typography';
 import { AppProvider, useApp } from './utils/AppContext';
+import { GlossaryProvider } from './components/GlossaryProvider';
 import HomeScreen from './screens/HomeScreen';
 import LessonsScreen from './screens/LessonsScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
@@ -85,10 +86,12 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
       <AppProvider>
         <SafeAreaProvider>
-          <NavigationContainer>
-            <StatusBar style="light" />
-            <RootStack />
-          </NavigationContainer>
+          <GlossaryProvider>
+            <NavigationContainer>
+              <StatusBar style="light" />
+              <RootStack />
+            </NavigationContainer>
+          </GlossaryProvider>
         </SafeAreaProvider>
       </AppProvider>
     </GestureHandlerRootView>

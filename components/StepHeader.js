@@ -5,8 +5,16 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import ProgressBar from './ProgressBar';
+import GlossaryText from './GlossaryText';
 
-export default function StepHeader({ step, total, title, onBack }) {
+export default function StepHeader({ step, total, title, onBack, onPressTerm }) {
+  const isPlainTitle = typeof title === 'string' || typeof title === 'number';
+  const titleNode = isPlainTitle ? (
+    <GlossaryText text={String(title)} style={styles.title} onPressTerm={onPressTerm} />
+  ) : (
+    title
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
@@ -15,7 +23,7 @@ export default function StepHeader({ step, total, title, onBack }) {
         </Pressable>
         <Text style={styles.stepText}>{`Step ${step} of ${total}`}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
+      {titleNode}
       <ProgressBar progress={step / total} />
     </View>
   );

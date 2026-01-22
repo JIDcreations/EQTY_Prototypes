@@ -95,10 +95,15 @@ export default function GlossaryScreen() {
           <Text style={styles.sheetLabel}>Example</Text>
           <Text style={styles.sheetText}>{selectedTerm?.example}</Text>
         </View>
-        <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
-          <Ionicons name="logo-youtube" size={18} color={colors.accent} />
-          <Text style={styles.learnMoreText}>Learn more on YouTube</Text>
-        </Pressable>
+        {selectedTerm?.learnMoreUrl ? (
+          <View style={styles.sheetSection}>
+            <Text style={styles.sheetLabel}>Learn more</Text>
+            <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
+              <Ionicons name="logo-youtube" size={18} color={colors.accent} />
+              <Text style={styles.learnMoreText}>Learn more on YouTube</Text>
+            </Pressable>
+          </View>
+        ) : null}
       </BottomSheet>
     </SafeAreaView>
   );
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    paddingTop: spacing.sm,
+    paddingTop: spacing.xs,
   },
   learnMoreText: {
     fontFamily: typography.fontFamilyDemi,

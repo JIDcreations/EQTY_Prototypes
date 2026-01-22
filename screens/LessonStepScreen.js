@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from '../components/BottomSheet';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
+import { useGlossary } from '../components/GlossaryProvider';
+import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
 import StepHeader from '../components/StepHeader';
 import { lessonContent } from '../data/lessonContent';
@@ -31,6 +33,7 @@ export default function LessonStepScreen() {
   const route = useRoute();
   const { lessonId, step = 1, entrySource } = route.params || {};
   const { userContext, addReflection, completeLesson } = useApp();
+  const glossary = useGlossary();
 
   const content = lessonContent[lessonId] || lessonContent.lesson_1;
   const stepTitle = useMemo(() => {
@@ -68,16 +71,37 @@ export default function LessonStepScreen() {
     }
   };
 
+  const handleTermPress = (term) => {
+    if (glossary?.openTerm) glossary.openTerm(term);
+  };
+
   return (
     <LessonStepContainer>
-      <StepHeader step={step} total={TOTAL_STEPS} title={stepTitle} onBack={() => navigation.goBack()} />
+      <StepHeader
+        step={step}
+        total={TOTAL_STEPS}
+        title={stepTitle}
+        onBack={() => navigation.goBack()}
+        onPressTerm={handleTermPress}
+      />
 
-      {step === 1 && <ConceptStep content={content} onNext={handleNext} />}
-      {step === 2 && <VisualizationStep content={content} onNext={handleNext} />}
-      {step === 3 && (
-        <ScenarioStep content={content} userContext={userContext} onNext={handleNext} />
+      {step === 1 && (
+        <ConceptStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
       )}
-      {step === 4 && <ExerciseStep content={content} onNext={handleNext} />}
+      {step === 2 && (
+        <VisualizationStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
+      )}
+      {step === 3 && (
+        <ScenarioStep
+          content={content}
+          userContext={userContext}
+          onNext={handleNext}
+          onPressTerm={handleTermPress}
+        />
+      )}
+      {step === 4 && (
+        <ExerciseStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
+      )}
       {step === 5 && (
         <ReflectionStep
           content={content}
@@ -85,38 +109,54 @@ export default function LessonStepScreen() {
             await addReflection(text, lessonId);
             handleNext();
           }}
+          onPressTerm={handleTermPress}
         />
       )}
-      {step === 6 && <SummaryStep content={content} onComplete={handleComplete} />}
+      {step === 6 && (
+        <SummaryStep content={content} onComplete={handleComplete} onPressTerm={handleTermPress} />
+      )}
+
     </LessonStepContainer>
   );
 }
 
-function ConceptStep({ content, onNext }) {
+function ConceptStep({ content, onNext, onPressTerm }) {
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.conceptCard}>
-        <Text style={styles.bodyText}>{content?.steps?.concept?.body}</Text>
+      <Card active style={styles.conceptCard}>
+        <GlossaryText
+          text={content?.steps?.concept?.body}
+          style={styles.bodyText}
+          onPressTerm={onPressTerm}
+        />
         <View style={styles.visualHint}>
           <View style={[styles.hintBar, { height: 8 }]} />
           <View style={[styles.hintBar, { height: 14 }]} />
           <View style={[styles.hintBar, { height: 22 }]} />
           <View style={[styles.hintBar, { height: 30 }]} />
         </View>
-        <Text style={styles.caption}>{content?.steps?.concept?.visualHint}</Text>
+        <GlossaryText
+          text={content?.steps?.concept?.visualHint}
+          style={styles.caption}
+          onPressTerm={onPressTerm}
+        />
       </Card>
       <PrimaryButton label="Next" onPress={onNext} />
     </View>
   );
 }
 
-function VisualizationStep({ content, onNext }) {
+function VisualizationStep({ content, onNext, onPressTerm }) {
   const [selected, setSelected] = useState(null);
 
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.visualCard}>
-        <Text style={styles.bodyText}>{content?.steps?.visualization?.title}</Text>
+      <Card active style={styles.visualCard}>
+        <GlossaryText
+          text={content?.steps?.visualization?.title}
+          style={styles.bodyText}
+          onPressTerm={onPressTerm}
+        />
         <Text style={styles.caption}>Tap elements to explore</Text>
         <View style={styles.segmentRow}>
           {content?.steps?.visualization?.segments?.map((segment) => (
@@ -125,7 +165,11 @@ function VisualizationStep({ content, onNext }) {
               style={[styles.segment, { flex: segment.value * 10 }]}
               onPress={() => setSelected(segment)}
             >
-              <Text style={styles.segmentLabel}>{segment.label}</Text>
+              <GlossaryText
+                text={segment.label}
+                style={styles.segmentLabel}
+                onPressTerm={onPressTerm}
+              />
             </Pressable>
           ))}
         </View>
@@ -143,15 +187,15 @@ function VisualizationStep({ content, onNext }) {
   );
 }
 
-function ScenarioStep({ content, userContext, onNext }) {
+function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
   const variantKey = getScenarioVariant(userContext);
   const variant = content?.steps?.scenario?.variants?.[variantKey];
   const [selected, setSelected] = useState(null);
 
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.scenarioCard}>
-        <Text style={styles.bodyText}>{variant?.prompt}</Text>
+      <Card active style={styles.scenarioCard}>
+        <GlossaryText text={variant?.prompt} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.optionList}>
           {variant?.options?.map((option) => {
             const isActive = selected === option;
@@ -161,18 +205,24 @@ function ScenarioStep({ content, userContext, onNext }) {
                 style={[styles.option, isActive && styles.optionActive]}
                 onPress={() => setSelected(option)}
               >
-                <Text style={[styles.optionText, isActive && styles.optionTextActive]}>
-                  {option}
-                </Text>
+                <GlossaryText
+                  text={option}
+                  style={[styles.optionText, isActive && styles.optionTextActive]}
+                  onPressTerm={onPressTerm}
+                />
               </Pressable>
             );
           })}
         </View>
       </Card>
       {selected ? (
-        <Card style={styles.insightCard}>
+        <Card active style={styles.insightCard}>
           <Text style={styles.insightTitle}>Insight</Text>
-          <Text style={styles.caption}>{variant?.insight}</Text>
+          <GlossaryText
+            text={variant?.insight}
+            style={styles.caption}
+            onPressTerm={onPressTerm}
+          />
         </Card>
       ) : null}
       <PrimaryButton label="Continue" onPress={onNext} disabled={!selected} />
@@ -180,13 +230,13 @@ function ScenarioStep({ content, userContext, onNext }) {
   );
 }
 
-function ExerciseStep({ content, onNext }) {
+function ExerciseStep({ content, onNext, onPressTerm }) {
   const exercise = content?.steps?.exercise;
 
   if (!exercise) {
     return (
       <View style={styles.stepBody}>
-        <Card style={styles.exerciseCard}>
+        <Card active style={styles.exerciseCard}>
           <Text style={styles.bodyText}>No exercise is available for this lesson.</Text>
         </Card>
         <PrimaryButton label="Continue" onPress={onNext} />
@@ -196,18 +246,18 @@ function ExerciseStep({ content, onNext }) {
 
   switch (exercise.type) {
     case 'sequence':
-      return <SequenceExercise exercise={exercise} onNext={onNext} />;
+      return <SequenceExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
     case 'choice':
-      return <ChoiceExercise exercise={exercise} onNext={onNext} />;
+      return <ChoiceExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
     case 'multi':
-      return <MultiExercise exercise={exercise} onNext={onNext} />;
+      return <MultiExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
     case 'tradeoff':
     default:
-      return <TradeoffExercise exercise={exercise} onNext={onNext} />;
+      return <TradeoffExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
   }
 }
 
-function SequenceExercise({ exercise, onNext }) {
+function SequenceExercise({ exercise, onNext, onPressTerm }) {
   const { description, items = [], correctOrder = [], feedback = {} } = exercise;
   const [order, setOrder] = useState([]);
 
@@ -229,8 +279,8 @@ function SequenceExercise({ exercise, onNext }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.exerciseCard}>
-        <Text style={styles.bodyText}>{description}</Text>
+      <Card active style={styles.exerciseCard}>
+        <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <Text style={styles.exerciseLabel}>Your order</Text>
         <View style={styles.sequenceList}>
           {order.length === 0 ? (
@@ -247,7 +297,11 @@ function SequenceExercise({ exercise, onNext }) {
                   <View style={styles.sequenceIndex}>
                     <Text style={styles.sequenceIndexText}>{index + 1}</Text>
                   </View>
-                  <Text style={styles.sequenceText}>{item?.label}</Text>
+                  <GlossaryText
+                    text={item?.label}
+                    style={styles.sequenceText}
+                    onPressTerm={onPressTerm}
+                  />
                 </Pressable>
               );
             })
@@ -263,7 +317,11 @@ function SequenceExercise({ exercise, onNext }) {
                 onPress={() => handleAdd(item.id)}
                 style={[styles.option, isSelected && styles.optionDisabled]}
               >
-                <Text style={styles.optionText}>{item.label}</Text>
+                <GlossaryText
+                  text={item.label}
+                  style={styles.optionText}
+                  onPressTerm={onPressTerm}
+                />
               </Pressable>
             );
           })}
@@ -273,7 +331,7 @@ function SequenceExercise({ exercise, onNext }) {
       {message ? (
         <Card active style={styles.insightCard}>
           <Text style={styles.insightTitle}>{isCorrect ? 'Aligned' : 'Recheck the flow'}</Text>
-          <Text style={styles.caption}>{message}</Text>
+          <GlossaryText text={message} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
       ) : null}
 
@@ -285,7 +343,7 @@ function SequenceExercise({ exercise, onNext }) {
   );
 }
 
-function ChoiceExercise({ exercise, onNext }) {
+function ChoiceExercise({ exercise, onNext, onPressTerm }) {
   const { description, options = [], revealTitle = 'Outcome' } = exercise;
   const [selectedId, setSelectedId] = useState(null);
   const selected = options.find((option) => option.id === selectedId);
@@ -294,8 +352,8 @@ function ChoiceExercise({ exercise, onNext }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.exerciseCard}>
-        <Text style={styles.bodyText}>{description}</Text>
+      <Card active style={styles.exerciseCard}>
+        <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.optionList}>
           {options.map((option) => {
             const isActive = option.id === selectedId;
@@ -305,9 +363,11 @@ function ChoiceExercise({ exercise, onNext }) {
                 style={[styles.option, isActive && styles.optionActive]}
                 onPress={() => setSelectedId(option.id)}
               >
-                <Text style={[styles.optionText, isActive && styles.optionTextActive]}>
-                  {option.label}
-                </Text>
+                <GlossaryText
+                  text={option.label}
+                  style={[styles.optionText, isActive && styles.optionTextActive]}
+                  onPressTerm={onPressTerm}
+                />
               </Pressable>
             );
           })}
@@ -317,7 +377,7 @@ function ChoiceExercise({ exercise, onNext }) {
       {selected ? (
         <Card active style={styles.insightCard}>
           <Text style={styles.insightTitle}>{selected.revealTitle || revealTitle}</Text>
-          <Text style={styles.caption}>{selected.reveal}</Text>
+          <GlossaryText text={selected.reveal} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
       ) : null}
 
@@ -329,7 +389,7 @@ function ChoiceExercise({ exercise, onNext }) {
   );
 }
 
-function TradeoffExercise({ exercise, onNext }) {
+function TradeoffExercise({ exercise, onNext, onPressTerm }) {
   const {
     description,
     sliders = [],
@@ -400,12 +460,16 @@ function TradeoffExercise({ exercise, onNext }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.exerciseCard}>
-        <Text style={styles.bodyText}>{description}</Text>
+      <Card active style={styles.exerciseCard}>
+        <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.exerciseSection}>
           {sliders.map((slider) => (
             <View key={slider.id} style={styles.sliderRow}>
-              <Text style={styles.sliderTitle}>{slider.label}</Text>
+              <GlossaryText
+                text={slider.label}
+                style={styles.sliderTitle}
+                onPressTerm={onPressTerm}
+              />
               <Text style={styles.sliderValue}>
                 {formatSliderValue(slider, values[slider.id])}
               </Text>
@@ -421,8 +485,16 @@ function TradeoffExercise({ exercise, onNext }) {
               />
               {slider.leftLabel || slider.rightLabel ? (
                 <View style={styles.sliderHintRow}>
-                  <Text style={styles.sliderHintText}>{slider.leftLabel}</Text>
-                  <Text style={styles.sliderHintText}>{slider.rightLabel}</Text>
+                  <GlossaryText
+                    text={slider.leftLabel}
+                    style={styles.sliderHintText}
+                    onPressTerm={onPressTerm}
+                  />
+                  <GlossaryText
+                    text={slider.rightLabel}
+                    style={styles.sliderHintText}
+                    onPressTerm={onPressTerm}
+                  />
                 </View>
               ) : null}
             </View>
@@ -443,9 +515,15 @@ function TradeoffExercise({ exercise, onNext }) {
             <View style={styles.scoreTrack}>
               <View style={[styles.scoreFill, { width: `${score}%` }]} />
             </View>
-            {insightText ? <Text style={styles.caption}>{insightText}</Text> : null}
+            {insightText ? (
+              <GlossaryText text={insightText} style={styles.caption} onPressTerm={onPressTerm} />
+            ) : null}
             {exercise.resultHint ? (
-              <Text style={styles.caption}>{exercise.resultHint}</Text>
+              <GlossaryText
+                text={exercise.resultHint}
+                style={styles.caption}
+                onPressTerm={onPressTerm}
+              />
             ) : null}
           </View>
         ) : null}
@@ -459,7 +537,7 @@ function TradeoffExercise({ exercise, onNext }) {
   );
 }
 
-function MultiExercise({ exercise, onNext }) {
+function MultiExercise({ exercise, onNext, onPressTerm }) {
   const {
     description,
     options = [],
@@ -493,8 +571,8 @@ function MultiExercise({ exercise, onNext }) {
 
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.exerciseCard}>
-        <Text style={styles.bodyText}>{description}</Text>
+      <Card active style={styles.exerciseCard}>
+        <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
         <View style={styles.optionList}>
           {options.map((option) => {
             const isActive = selectedIds.includes(option.id);
@@ -504,9 +582,11 @@ function MultiExercise({ exercise, onNext }) {
                 style={[styles.option, isActive && styles.optionActive]}
                 onPress={() => toggle(option.id)}
               >
-                <Text style={[styles.optionText, isActive && styles.optionTextActive]}>
-                  {option.label}
-                </Text>
+                <GlossaryText
+                  text={option.label}
+                  style={[styles.optionText, isActive && styles.optionTextActive]}
+                  onPressTerm={onPressTerm}
+                />
               </Pressable>
             );
           })}
@@ -519,7 +599,9 @@ function MultiExercise({ exercise, onNext }) {
           <Text style={styles.resultLabel}>{scoreLabel}</Text>
           <Text style={styles.resultValue}>{`${Math.round(remaining)}${unit}`}</Text>
         </View>
-        {insightText ? <Text style={styles.caption}>{insightText}</Text> : null}
+        {insightText ? (
+          <GlossaryText text={insightText} style={styles.caption} onPressTerm={onPressTerm} />
+        ) : null}
         {hasSelection ? (
           <View style={styles.impactList}>
             {selectedIds.map((id) => {
@@ -528,13 +610,17 @@ function MultiExercise({ exercise, onNext }) {
               return (
                 <View key={id} style={styles.impactRow}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.accent} />
-                  <Text style={styles.impactText}>{option.detail}</Text>
+                  <GlossaryText
+                    text={option.detail}
+                    style={styles.impactText}
+                    onPressTerm={onPressTerm}
+                  />
                 </View>
               );
             })}
           </View>
         ) : (
-          <Text style={styles.caption}>{emptyMessage}</Text>
+          <GlossaryText text={emptyMessage} style={styles.caption} onPressTerm={onPressTerm} />
         )}
       </Card>
 
@@ -546,7 +632,7 @@ function MultiExercise({ exercise, onNext }) {
   );
 }
 
-function ReflectionStep({ content, onSubmit }) {
+function ReflectionStep({ content, onSubmit, onPressTerm }) {
   const [text, setText] = useState('');
 
   return (
@@ -554,8 +640,12 @@ function ReflectionStep({ content, onSubmit }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.stepBody}
     >
-      <Card style={styles.reflectionCard}>
-        <Text style={styles.bodyText}>{content?.steps?.reflection?.question}</Text>
+      <Card active style={styles.reflectionCard}>
+        <GlossaryText
+          text={content?.steps?.reflection?.question}
+          style={styles.bodyText}
+          onPressTerm={onPressTerm}
+        />
         <TextInput
           style={styles.input}
           value={text}
@@ -570,16 +660,20 @@ function ReflectionStep({ content, onSubmit }) {
   );
 }
 
-function SummaryStep({ content, onComplete }) {
+function SummaryStep({ content, onComplete, onPressTerm }) {
   return (
     <View style={styles.stepBody}>
-      <Card style={styles.summaryCard}>
+      <Card active style={styles.summaryCard}>
         <Text style={styles.bodyText}>Key takeaways</Text>
         <View style={styles.takeawayList}>
           {content?.steps?.summary?.takeaways?.map((item) => (
             <View key={item} style={styles.takeawayRow}>
               <Ionicons name="checkmark-circle" size={18} color={colors.accent} />
-              <Text style={styles.takeawayText}>{item}</Text>
+              <GlossaryText
+                text={item}
+                style={styles.takeawayText}
+                onPressTerm={onPressTerm}
+              />
             </View>
           ))}
         </View>
@@ -638,11 +732,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   segment: {
-    backgroundColor: colors.surfaceActive,
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.textPrimary,
+    backgroundColor: 'transparent',
   },
   segmentLabel: {
     fontFamily: typography.fontFamilyMedium,
@@ -664,12 +760,14 @@ const styles = StyleSheet.create({
   option: {
     padding: spacing.sm,
     borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
+    borderWidth: 1,
+    borderColor: colors.textPrimary,
+    backgroundColor: 'transparent',
   },
   optionActive: {
-    backgroundColor: 'rgba(198, 146, 29, 0.18)',
-    borderWidth: 1,
-    borderColor: colors.accent,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: colors.textPrimary,
   },
   optionText: {
     fontFamily: typography.fontFamilyMedium,
@@ -708,7 +806,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.sm,
     borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
+    borderWidth: 1,
+    borderColor: colors.textPrimary,
+    backgroundColor: 'transparent',
   },
   sequenceIndex: {
     width: 24,
@@ -808,7 +908,9 @@ const styles = StyleSheet.create({
     minHeight: 120,
     borderRadius: 16,
     padding: spacing.md,
-    backgroundColor: colors.surfaceActive,
+    borderWidth: 1,
+    borderColor: colors.textPrimary,
+    backgroundColor: 'transparent',
     color: colors.textPrimary,
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.body,

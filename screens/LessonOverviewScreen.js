@@ -1,9 +1,10 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
+import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { lessonContent } from '../data/lessonContent';
@@ -41,31 +42,31 @@ export default function LessonOverviewScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>{lesson.title}</Text>
-          <Text style={styles.subtitle}>{lesson.shortDescription}</Text>
+          <GlossaryText text={lesson.title} style={styles.title} />
+          <GlossaryText text={lesson.shortDescription} style={styles.subtitle} />
           <View style={styles.tagRow}>
             {isCurrent ? <Tag label="Current" tone="accent" /> : null}
             {isCompleted ? <Tag label="Completed" /> : null}
           </View>
         </View>
 
-        <Card style={styles.overviewCard}>
+        <Card active style={styles.overviewCard}>
           <SectionTitle title="Lesson structure" subtitle="6 guided steps" />
           <View style={styles.stepList}>
             {stepLabels.map((label, index) => (
               <View key={label} style={styles.stepRow}>
                 <View style={styles.stepIndex}>
-                  <Text style={styles.stepNumber}>{index + 1}</Text>
+                  <GlossaryText text={index + 1} style={styles.stepNumber} />
                 </View>
-                <Text style={styles.stepLabel}>{label}</Text>
+                <GlossaryText text={label} style={styles.stepLabel} />
               </View>
             ))}
           </View>
         </Card>
 
         <Card active style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>{content?.steps?.concept?.title}</Text>
-          <Text style={styles.summaryText}>{content?.steps?.concept?.body}</Text>
+          <GlossaryText text={content?.steps?.concept?.title} style={styles.summaryTitle} />
+          <GlossaryText text={content?.steps?.concept?.body} style={styles.summaryText} />
         </Card>
 
         <View style={styles.buttonStack}>
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: colors.surfaceActive,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
 import { PrimaryButton } from '../components/Button';
+import GlossaryText from '../components/GlossaryText';
 import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
@@ -37,15 +38,18 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Home</Text>
-          <Text style={styles.subtitle}>Your investing journey</Text>
+          <GlossaryText text="Home" style={styles.title} />
+          <GlossaryText text="Your investing journey" style={styles.subtitle} />
         </View>
 
         <Card style={styles.progressCard}>
           <View style={styles.progressRow}>
             <View>
-              <Text style={styles.progressLabel}>Overall progress</Text>
-              <Text style={styles.progressValue}>{`${completedCount} of ${totalLessons} lessons completed`}</Text>
+              <GlossaryText text="Overall progress" style={styles.progressLabel} />
+              <GlossaryText
+                text={`${completedCount} of ${totalLessons} lessons completed`}
+                style={styles.progressValue}
+              />
             </View>
             <Ionicons name="analytics" size={20} color={colors.accent} />
           </View>
@@ -55,8 +59,8 @@ export default function HomeScreen() {
         <Card active style={styles.heroCard}>
           <View style={styles.heroHeader}>
             <Tag label="Current lesson" tone="accent" />
-            <Text style={styles.heroTitle}>{currentLesson?.title}</Text>
-            <Text style={styles.heroSubtitle}>{currentLesson?.shortDescription}</Text>
+            <GlossaryText text={currentLesson?.title} style={styles.heroTitle} />
+            <GlossaryText text={currentLesson?.shortDescription} style={styles.heroSubtitle} />
           </View>
           <PrimaryButton
             label="Continue lesson"
@@ -82,8 +86,8 @@ export default function HomeScreen() {
               }
             >
               <Card style={styles.lessonCard}>
-                <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                <Text style={styles.lessonDescription}>{lesson.shortDescription}</Text>
+                <GlossaryText text={lesson.title} style={styles.lessonTitle} />
+                <GlossaryText text={lesson.shortDescription} style={styles.lessonDescription} />
               </Card>
             </Pressable>
           ))}
