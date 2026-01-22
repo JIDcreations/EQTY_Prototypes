@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "EQTY",
+    "slug": "eqty",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#12161C"
+      }
+    }
+  }
+}
