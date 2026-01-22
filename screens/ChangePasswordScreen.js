@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
@@ -33,7 +33,7 @@ export default function ChangePasswordScreen({ navigation }) {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsHeader title="Change password" onBack={() => navigation.goBack()} />
+        <SettingsHeader title="Reset password" onBack={() => navigation.goBack()} />
         <Card style={styles.card}>
           <View style={styles.field}>
             <AppText style={styles.label}>Current password</AppText>
@@ -68,6 +68,12 @@ export default function ChangePasswordScreen({ navigation }) {
               style={styles.input}
             />
           </View>
+          <Pressable
+            onPress={() => navigation.navigate('ResetPassword')}
+            style={styles.forgotRow}
+          >
+            <AppText style={styles.forgotText}>Forgot password? Send reset link</AppText>
+          </Pressable>
         </Card>
         <View style={styles.actions}>
           <PrimaryButton label="Save changes" onPress={handleSave} disabled={!canSave} />
@@ -112,6 +118,15 @@ const createStyles = (colors) =>
       color: colors.textPrimary,
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.body,
+    },
+    forgotRow: {
+      alignSelf: 'flex-start',
+      marginTop: spacing.xs,
+    },
+    forgotText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.accent,
     },
     actions: {
       gap: spacing.md,

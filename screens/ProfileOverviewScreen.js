@@ -123,10 +123,6 @@ export default function ProfileOverviewScreen() {
               label="Email address"
               value={authUser?.email || '—'}
               onPress={() => navigation.navigate('EditEmail')}
-            />
-            <SettingsRow
-              label="Reset password"
-              onPress={() => navigation.navigate('ResetPassword')}
               isLast
             />
           </Card>
@@ -135,7 +131,7 @@ export default function ProfileOverviewScreen() {
         <SettingsSection title="Security">
           <Card style={styles.card}>
             <SettingsRow
-              label="Change password"
+              label="Reset password"
               onPress={() => navigation.navigate('ChangePassword')}
             />
             <SettingsRow
