@@ -28,7 +28,7 @@ export default function OnboardingStack() {
         name="OnboardingQuestionExperience"
         component={OnboardingQuestionScreen}
         initialParams={{
-          question: 'What experience do you already have with investing?',
+          question: 'What have you already done in terms of investing?',
           field: 'experienceAnswer',
           step: 1,
           total: 3,
@@ -39,7 +39,7 @@ export default function OnboardingStack() {
         name="OnboardingQuestionKnowledge"
         component={OnboardingQuestionScreen}
         initialParams={{
-          question: 'What do you already understand about investing?',
+          question: 'What do you already know about investing today?',
           field: 'knowledgeAnswer',
           step: 2,
           total: 3,

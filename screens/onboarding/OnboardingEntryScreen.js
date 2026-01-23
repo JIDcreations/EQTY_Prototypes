@@ -4,6 +4,7 @@ import AppText from '../../components/AppText';
 import BottomSheet from '../../components/BottomSheet';
 import OnboardingAuthButton from '../../components/OnboardingAuthButton';
 import OnboardingScreen from '../../components/OnboardingScreen';
+import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
@@ -33,19 +34,29 @@ export default function OnboardingEntryScreen({ navigation }) {
     <OnboardingScreen>
       <View style={styles.container}>
         <View style={styles.header}>
-          <AppText style={styles.kicker}>Start here</AppText>
-          <AppText style={styles.title}>Let’s build your EQTY account</AppText>
+          <AppText style={styles.logo}>EQTY</AppText>
+          <View style={styles.kickerRow}>
+            <View style={styles.kickerDot} />
+            <AppText style={styles.kicker}>Start here</AppText>
+          </View>
+          <AppText style={styles.title}>Create your EQTY account</AppText>
           <AppText style={styles.subtitle}>
             A quick setup unlocks the calm, personalized learning experience.
           </AppText>
         </View>
 
-        <View style={styles.actions}>
-          <PrimaryButton label="Get started" onPress={() => setSheetVisible(true)} />
-          <Pressable onPress={() => navigation.navigate('OnboardingLogin')}>
-            <AppText style={styles.link}>I already have an account</AppText>
-          </Pressable>
-        </View>
+        <OnboardingStackedCard>
+          <View style={styles.cardHeader}>
+            <AppText style={styles.cardTitle}>Get started</AppText>
+            <AppText style={styles.cardSubtitle}>Choose a sign-up path.</AppText>
+          </View>
+          <View style={styles.actions}>
+            <PrimaryButton label="Get started" onPress={() => setSheetVisible(true)} />
+            <Pressable onPress={() => navigation.navigate('OnboardingLogin')}>
+              <AppText style={styles.link}>I already have an account</AppText>
+            </Pressable>
+          </View>
+        </OnboardingStackedCard>
       </View>
 
       <BottomSheet
@@ -85,6 +96,26 @@ const createStyles = (colors) =>
       gap: spacing.sm,
       maxWidth: 320,
     },
+    logo: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: 34,
+      color: colors.textPrimary,
+      letterSpacing: 6,
+      textShadowColor: 'rgba(255, 213, 0, 0.2)',
+      textShadowOffset: { width: 0, height: 6 },
+      textShadowRadius: 14,
+    },
+    kickerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    kickerDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.accent,
+    },
     kicker: {
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.small,
@@ -103,6 +134,19 @@ const createStyles = (colors) =>
       fontSize: typography.body,
       color: colors.textSecondary,
       lineHeight: 22,
+    },
+    cardHeader: {
+      gap: 4,
+    },
+    cardTitle: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: typography.h2,
+      color: colors.textPrimary,
+    },
+    cardSubtitle: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
     },
     actions: {
       gap: spacing.md,

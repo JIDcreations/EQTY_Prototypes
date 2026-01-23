@@ -1,7 +1,16 @@
 import React, { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AppText from '../../components/AppText';
 import OnboardingScreen from '../../components/OnboardingScreen';
+import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
@@ -27,52 +36,76 @@ export default function OnboardingEmailScreen({ navigation }) {
   return (
     <OnboardingScreen scroll contentContainerStyle={styles.scrollContent}>
       <KeyboardAvoidingView
-        style={styles.form}
+        style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.header}>
-          <AppText style={styles.title}>Create with email</AppText>
-          <AppText style={styles.subtitle}>No real authentication required for this demo.</AppText>
-        </View>
+        <View style={styles.layout}>
+          <View style={styles.topArea}>
+            <View style={styles.topRow}>
+              <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+              </Pressable>
+              <AppText style={styles.logo}>EQTY</AppText>
+            </View>
+          </View>
 
-        <View style={styles.fields}>
-          <View style={styles.field}>
-            <AppText style={styles.label}>Email</AppText>
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              placeholderTextColor={colors.textSecondary}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.field}>
-            <AppText style={styles.label}>Password</AppText>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              placeholderTextColor={colors.textSecondary}
-              secureTextEntry
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.field}>
-            <AppText style={styles.label}>Confirm password</AppText>
-            <TextInput
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              placeholder="••••••••"
-              placeholderTextColor={colors.textSecondary}
-              secureTextEntry
-              style={styles.input}
-            />
-          </View>
-        </View>
+          <OnboardingStackedCard>
+            <View style={styles.cardHeader}>
+              <View style={styles.badge}>
+                <View style={styles.badgeDot} />
+                <AppText style={styles.badgeText}>Email sign up</AppText>
+              </View>
+              <AppText style={styles.title}>Create with email</AppText>
+              <AppText style={styles.subtitle}>
+                No real authentication required for this demo.
+              </AppText>
+            </View>
 
-        <PrimaryButton label="Continue" onPress={handleContinue} />
+            <View style={styles.fields}>
+              <View style={styles.field}>
+                <AppText style={styles.label}>Email</AppText>
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="you@example.com"
+                  placeholderTextColor={colors.textSecondary}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  style={styles.input}
+                />
+              </View>
+              <View style={styles.field}>
+                <AppText style={styles.label}>Password</AppText>
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="••••••••"
+                  placeholderTextColor={colors.textSecondary}
+                  secureTextEntry
+                  style={styles.input}
+                />
+              </View>
+              <View style={styles.field}>
+                <AppText style={styles.label}>Confirm password</AppText>
+                <TextInput
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  placeholder="••••••••"
+                  placeholderTextColor={colors.textSecondary}
+                  secureTextEntry
+                  style={styles.input}
+                />
+              </View>
+            </View>
+
+            <View style={styles.ctaBlock}>
+              <PrimaryButton label="Sign up" onPress={handleContinue} />
+              <Pressable onPress={() => navigation.navigate('OnboardingLogin')}>
+                <AppText style={styles.loginLink}>Already have an account?</AppText>
+              </Pressable>
+            </View>
+          </OnboardingStackedCard>
+        </View>
       </KeyboardAvoidingView>
     </OnboardingScreen>
   );
@@ -81,13 +114,74 @@ export default function OnboardingEmailScreen({ navigation }) {
 const createStyles = (colors) =>
   StyleSheet.create({
     scrollContent: {
-      gap: spacing.xl,
+      flexGrow: 1,
+      paddingBottom: spacing.xxl,
     },
-    form: {
-      gap: spacing.lg,
+    keyboard: {
+      flex: 1,
     },
-    header: {
+    layout: {
+      flex: 1,
+      justifyContent: 'space-between',
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    topArea: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    topRow: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+      minHeight: 48,
+    },
+    logo: {
+      fontFamily: typography.fontFamilyDemi,
+      fontSize: 32,
+      color: colors.textPrimary,
+      letterSpacing: 6,
+      textShadowColor: 'rgba(255, 213, 0, 0.2)',
+      textShadowOffset: { width: 0, height: 6 },
+      textShadowRadius: 14,
+    },
+    backButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'absolute',
+      left: 0,
+    },
+    cardHeader: {
       gap: spacing.xs,
+    },
+    badge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      alignSelf: 'flex-start',
+      backgroundColor: colors.surfaceActive,
+      borderRadius: 999,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderWidth: 1,
+      borderColor: colors.surfaceActive,
+    },
+    badgeDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.accent,
+    },
+    badgeText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: 11,
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 1.2,
     },
     title: {
       fontFamily: typography.fontFamilyDemi,
@@ -118,5 +212,15 @@ const createStyles = (colors) =>
       color: colors.textPrimary,
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.body,
+    },
+    ctaBlock: {
+      gap: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    loginLink: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.small,
+      color: colors.textSecondary,
+      textAlign: 'center',
     },
   });

@@ -14,20 +14,26 @@ export default function OnboardingScreen({
   scroll = false,
   contentContainerStyle,
   style,
+  gradientColors,
+  showGlow = true,
 }) {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const gradientColors =
+  const resolvedGradientColors =
     variant === 'accent'
       ? [colors.background, ACCENT_GLOW_SOFT, colors.surfaceActive]
       : [colors.background, colors.surface, colors.surfaceActive];
 
   if (scroll) {
     return (
-      <LinearGradient colors={gradientColors} style={[styles.gradient, style]}>
-        <View pointerEvents="none" style={styles.glowTop} />
-        <View pointerEvents="none" style={styles.glowMid} />
-        <View pointerEvents="none" style={styles.glowBottom} />
+      <LinearGradient colors={gradientColors || resolvedGradientColors} style={[styles.gradient, style]}>
+        {showGlow ? (
+          <>
+            <View pointerEvents="none" style={styles.glowTop} />
+            <View pointerEvents="none" style={styles.glowMid} />
+            <View pointerEvents="none" style={styles.glowBottom} />
+          </>
+        ) : null}
         <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
           <ScrollView
             style={styles.scroll}
@@ -43,10 +49,14 @@ export default function OnboardingScreen({
   }
 
   return (
-    <LinearGradient colors={gradientColors} style={[styles.gradient, style]}>
-      <View pointerEvents="none" style={styles.glowTop} />
-      <View pointerEvents="none" style={styles.glowMid} />
-      <View pointerEvents="none" style={styles.glowBottom} />
+    <LinearGradient colors={gradientColors || resolvedGradientColors} style={[styles.gradient, style]}>
+      {showGlow ? (
+        <>
+          <View pointerEvents="none" style={styles.glowTop} />
+          <View pointerEvents="none" style={styles.glowMid} />
+          <View pointerEvents="none" style={styles.glowBottom} />
+        </>
+      ) : null}
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <View style={[styles.content, contentContainerStyle]}>{children}</View>
       </SafeAreaView>

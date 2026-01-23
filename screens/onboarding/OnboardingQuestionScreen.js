@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AppText from '../../components/AppText';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
+import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
@@ -23,13 +25,25 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
 
   return (
     <OnboardingScreen scroll contentContainerStyle={styles.scrollContent}>
-      <OnboardingProgress
-        current={step}
-        total={total}
-        label={`Question 0${step}`}
-      />
-      <View style={styles.content}>
-        <AppText style={styles.title}>{question}</AppText>
+      <View style={styles.headerRow}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+        </Pressable>
+        <OnboardingProgress
+          current={step}
+          total={total}
+          label={`Question 0${step}`}
+          style={styles.progress}
+        />
+      </View>
+      <OnboardingStackedCard>
+        <View style={styles.cardHeader}>
+          <View style={styles.badge}>
+            <View style={styles.badgeDot} />
+            <AppText style={styles.badgeText}>Your perspective</AppText>
+          </View>
+          <AppText style={styles.title}>{question}</AppText>
+        </View>
         <TextInput
           value={answer}
           onChangeText={setAnswer}
@@ -38,8 +52,8 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
           multiline
           style={styles.input}
         />
-      </View>
-      <PrimaryButton label="Next" onPress={handleNext} />
+        <PrimaryButton label="Next" onPress={handleNext} />
+      </OnboardingStackedCard>
     </OnboardingScreen>
   );
 }
@@ -49,8 +63,49 @@ const createStyles = (colors) =>
     scrollContent: {
       gap: spacing.xl,
     },
-    content: {
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: spacing.md,
+    },
+    backButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    progress: {
+      flex: 1,
+    },
+    cardHeader: {
+      gap: spacing.sm,
+    },
+    badge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      alignSelf: 'flex-start',
+      backgroundColor: colors.surfaceActive,
+      borderRadius: 999,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderWidth: 1,
+      borderColor: colors.surfaceActive,
+    },
+    badgeDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.accent,
+    },
+    badgeText: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: 11,
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 1.2,
     },
     title: {
       fontFamily: typography.fontFamilyDemi,
