@@ -22,20 +22,24 @@ export default function OnboardingPositioningScreen({ navigation }) {
         <View style={styles.container}>
           <View pointerEvents="none" style={styles.accentOrbTop} />
           <View pointerEvents="none" style={styles.accentOrbBottom} />
-          <OnboardingProgress current={2} total={3} label="Step 02" />
-          <OnboardingStackedCard>
-            <View style={styles.cardHeader}>
-              <View style={styles.badge}>
-                <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>EQTY positioning</AppText>
+          <View style={styles.header}>
+            <OnboardingProgress current={2} total={3} label="Step 02" />
+          </View>
+          <View style={styles.content}>
+            <OnboardingStackedCard>
+              <View style={styles.cardHeader}>
+                <View style={styles.badge}>
+                  <View style={styles.badgeDot} />
+                  <AppText style={styles.badgeText}>EQTY positioning</AppText>
+                </View>
+                <AppText style={styles.title}>Build to understand investing</AppText>
               </View>
-              <AppText style={styles.title}>Build to understand investing</AppText>
-            </View>
-            <AppText style={styles.subtitle}>
-              Clear lessons, calm pacing, and context that grows with you.
-            </AppText>
-            <AppText style={styles.tapHint}>Tap to continue</AppText>
-          </OnboardingStackedCard>
+              <AppText style={styles.subtitle}>
+                Clear lessons, calm pacing, and context that grows with you.
+              </AppText>
+              <AppText style={styles.tapHint}>Tap to continue</AppText>
+            </OnboardingStackedCard>
+          </View>
         </View>
       </OnboardingGesture>
     </OnboardingScreen>
@@ -46,8 +50,16 @@ const createStyles = (colors) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: 'space-between',
       paddingBottom: spacing.xl,
+      paddingTop: spacing.xl,
+    },
+    header: {
+      paddingBottom: spacing.xl,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'center',
+      transform: [{ translateY: -10 }],
     },
     cardHeader: {
       gap: spacing.sm,

@@ -22,21 +22,25 @@ export default function OnboardingAIDisclaimerScreen({ navigation }) {
         <View style={styles.container}>
           <View pointerEvents="none" style={styles.accentOrbTop} />
           <View pointerEvents="none" style={styles.accentOrbBottom} />
-          <OnboardingProgress current={3} total={3} label="Step 03" />
-          <OnboardingStackedCard>
-            <View style={styles.cardHeader}>
-              <View style={styles.badge}>
-                <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>AI transparency</AppText>
+          <View style={styles.header}>
+            <OnboardingProgress current={3} total={3} label="Step 03" />
+          </View>
+          <View style={styles.content}>
+            <OnboardingStackedCard>
+              <View style={styles.cardHeader}>
+                <View style={styles.badge}>
+                  <View style={styles.badgeDot} />
+                  <AppText style={styles.badgeText}>AI transparency</AppText>
+                </View>
+                <AppText style={styles.title}>How AI works in EQTY</AppText>
               </View>
-              <AppText style={styles.title}>How AI works in EQTY</AppText>
-            </View>
-            <AppText style={styles.subtitle}>
-              AI adapts explanations and examples.
-              {'\n'}No advice, no predictions.
-            </AppText>
-            <AppText style={styles.tapHint}>Tap to continue</AppText>
-          </OnboardingStackedCard>
+              <AppText style={styles.subtitle}>
+                AI adapts explanations and examples.
+                {'\n'}No advice, no predictions.
+              </AppText>
+              <AppText style={styles.tapHint}>Tap to continue</AppText>
+            </OnboardingStackedCard>
+          </View>
         </View>
       </OnboardingGesture>
     </OnboardingScreen>
@@ -47,8 +51,16 @@ const createStyles = (colors) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: 'space-between',
       paddingBottom: spacing.xl,
+      paddingTop: spacing.xl,
+    },
+    header: {
+      paddingBottom: spacing.xl,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'center',
+      transform: [{ translateY: -10 }],
     },
     cardHeader: {
       gap: spacing.sm,
