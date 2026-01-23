@@ -1,22 +1,6 @@
-import { Platform } from 'react-native';
-
-const fontFamilyBase = Platform.select({
-  ios: 'AvenirNext-Regular',
-  android: 'System',
-  default: 'System',
-});
-
-const fontFamilyMedium = Platform.select({
-  ios: 'AvenirNext-Medium',
-  android: 'System',
-  default: 'System',
-});
-
-const fontFamilyDemi = Platform.select({
-  ios: 'AvenirNext-DemiBold',
-  android: 'System',
-  default: 'System',
-});
+const fontFamilyBase = 'Inter-Regular';
+const fontFamilyMedium = 'Inter-Medium';
+const fontFamilyDemi = 'FilsonPro-Bold';
 
 export const typography = {
   fontFamilyBase,

@@ -64,7 +64,6 @@ export default function ProfileOverviewScreen() {
         style: 'destructive',
         onPress: async () => {
           await logOut();
-          navigation.replace('LoggedOut');
         },
       },
     ]);

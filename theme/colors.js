@@ -4,7 +4,7 @@ export const darkColors = {
   surfaceActive: '#1E2738',
   textPrimary: '#F2F4F6',
   textSecondary: '#ACB4BF',
-  accent: '#C6921D',
+  accent: '#FFD500',
   divider: '#1E2738',
 };
 

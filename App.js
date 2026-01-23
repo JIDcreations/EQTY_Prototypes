@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { spacing } from './theme/spacing';
 import { typography } from './theme/typography';
@@ -17,6 +18,7 @@ import HomeScreen from './screens/HomeScreen';
 import LessonsScreen from './screens/LessonsScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
 import ProfileStack from './navigation/ProfileStack';
+import OnboardingStack from './navigation/OnboardingStack';
 import LessonOverviewScreen from './screens/LessonOverviewScreen';
 import LessonStepScreen from './screens/LessonStepScreen';
 import GlossaryDetailScreen from './screens/GlossaryDetailScreen';
@@ -66,19 +68,27 @@ function Tabs() {
 }
 
 function RootStack() {
-  const { isReady } = useApp();
+  const { isReady, authUser, preferences } = useApp();
   const colors = useThemeColors();
 
   if (!isReady) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
+  const showOnboarding = !preferences?.hasOnboarded || !authUser;
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Tabs" component={Tabs} />
-      <Stack.Screen name="LessonOverview" component={LessonOverviewScreen} />
-      <Stack.Screen name="LessonStep" component={LessonStepScreen} />
-      <Stack.Screen name="GlossaryDetail" component={GlossaryDetailScreen} />
+      {showOnboarding ? (
+        <Stack.Screen name="Onboarding" component={OnboardingStack} />
+      ) : (
+        <>
+          <Stack.Screen name="Tabs" component={Tabs} />
+          <Stack.Screen name="LessonOverview" component={LessonOverviewScreen} />
+          <Stack.Screen name="LessonStep" component={LessonStepScreen} />
+          <Stack.Screen name="GlossaryDetail" component={GlossaryDetailScreen} />
+        </>
+      )}
     </Stack.Navigator>
   );
 }
@@ -118,6 +128,17 @@ function AppShell() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    'Inter-Regular': require('./assets/fonts/Inter,Playfair_Display,Poppins,Zeyada/Inter/static/Inter_24pt-Regular.ttf'),
+    'Inter-Medium': require('./assets/fonts/Inter,Playfair_Display,Poppins,Zeyada/Inter/static/Inter_24pt-Medium.ttf'),
+    'Inter-SemiBold': require('./assets/fonts/Inter,Playfair_Display,Poppins,Zeyada/Inter/static/Inter_24pt-SemiBold.ttf'),
+    'FilsonPro-Bold': require('./assets/fonts/filson-pro/FilsonProBold.otf'),
+  });
+
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, backgroundColor: '#12161C' }} />;
+  }
+
   return (
     <AppProvider>
       <AppShell />

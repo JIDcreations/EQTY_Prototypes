@@ -20,6 +20,7 @@ export const defaultPreferences = {
   language: 'English',
   appearance: 'Dark',
   textSize: 'Default',
+  hasOnboarded: false,
 };
 
 export const defaultProgress = {

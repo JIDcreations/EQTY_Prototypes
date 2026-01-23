@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { useApp } from '../utils/AppContext';
+import { typography } from '../theme/typography';
 
 function scaleTextStyle(style, scale) {
   const flattened = StyleSheet.flatten(style);
@@ -18,7 +19,16 @@ function scaleTextStyle(style, scale) {
 export default function AppText({ style, children, ...props }) {
   const { textScale } = useApp();
   const scaledStyle = useMemo(
-    () => scaleTextStyle(style, textScale || 1),
+    () =>
+      scaleTextStyle(
+        [
+          {
+            fontFamily: typography.fontFamilyBase,
+          },
+          style,
+        ],
+        textScale || 1
+      ),
     [style, textScale]
   );
 
