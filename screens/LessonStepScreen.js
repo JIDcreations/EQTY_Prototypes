@@ -1,13 +1,23 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
+  Dimensions,
   KeyboardAvoidingView,
   Linking,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   TextInput,
   View,
 } from 'react-native';
+import Animated, {
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,6 +51,7 @@ export default function LessonStepScreen() {
   const { userContext, addReflection, completeLesson } = useApp();
   const glossary = useGlossary();
   const isIntroConcept = lessonId === 'lesson_0' && step === 1;
+  const isIntroVisualization = lessonId === 'lesson_0' && step === 2;
 
   const content = lessonContent[lessonId] || lessonContent.lesson_0;
   const stepTitle = useMemo(() => {
@@ -90,9 +101,21 @@ export default function LessonStepScreen() {
         title={stepTitle}
         onBack={() => navigation.goBack()}
         onPressTerm={handleTermPress}
-        stepLabel={isIntroConcept ? 'STEP 1 · CONCEPT' : null}
-        progressText={isIntroConcept ? `1/${TOTAL_STEPS}` : null}
-        showTitle={!isIntroConcept}
+        stepLabel={
+          isIntroConcept
+            ? 'STEP 1 · CONCEPT'
+            : isIntroVisualization
+            ? 'STEP 2 · VISUALISATION'
+            : null
+        }
+        progressText={
+          isIntroConcept
+            ? `1/${TOTAL_STEPS}`
+            : isIntroVisualization
+            ? `2/${TOTAL_STEPS}`
+            : null
+        }
+        showTitle={!isIntroConcept && !isIntroVisualization}
       />
 
       {step === 1 && (
@@ -104,7 +127,12 @@ export default function LessonStepScreen() {
         />
       )}
       {step === 2 && (
-        <VisualizationStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
+        <VisualizationStep
+          content={content}
+          lessonId={lessonId}
+          onNext={handleNext}
+          onPressTerm={handleTermPress}
+        />
       )}
       {step === 3 && (
         <ScenarioStep
@@ -267,9 +295,343 @@ function IntroConceptStep({ onNext }) {
   );
 }
 
-function VisualizationStep({ content, onNext, onPressTerm }) {
+function IntroVisualizationStep({ onNext }) {
+  const { styles } = useLessonStepStyles();
+  const steps = [
+    {
+      id: 'goal',
+      label: 'Goal definition',
+      question: 'Where am I going?',
+      why: 'Goals are about direction, not choice yet.',
+      visual: VisualGoal,
+    },
+    {
+      id: 'risk',
+      label: 'Individual risk analysis',
+      question: 'How much instability can I handle?',
+      why: 'Risk is tolerance for movement, not danger.',
+      visual: VisualRisk,
+    },
+    {
+      id: 'strategy',
+      label: 'Financial investment strategy',
+      question: 'How do I translate intent into rules?',
+      why: 'Strategy reduces complexity, it does not add it.',
+      visual: VisualStrategy,
+    },
+    {
+      id: 'allocation',
+      label: 'Capital allocation',
+      question: 'How is my money spread?',
+      why: 'Allocation is structure, not math at this stage.',
+      visual: VisualAllocation,
+    },
+    {
+      id: 'vehicle',
+      label: 'Investment vehicle',
+      question: 'What tool executes the plan?',
+      why: 'Vehicles are means, not strategy.',
+      visual: VisualVehicle,
+    },
+    {
+      id: 'execution',
+      label: 'Execution',
+      question: 'When do I act?',
+      why: 'Execution is final, not iterative.',
+      visual: VisualExecution,
+    },
+  ];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(2);
+  const { height } = Dimensions.get('window');
+  const viewportHeight = Math.max(360, height - 320);
+  const snapInterval = viewportHeight + spacing.md;
+
+  const handleScroll = (event) => {
+    const offset = event.nativeEvent.contentOffset?.y || 0;
+    const index = Math.min(steps.length - 1, Math.max(0, Math.round(offset / snapInterval)));
+    setActiveIndex(index);
+    setVisibleCount((prev) => Math.max(prev, Math.min(steps.length, index + 2)));
+  };
+
+  return (
+    <View style={styles.stepBody}>
+      <AppText style={styles.journeyTitle}>From goal to execution</AppText>
+      <AppText style={styles.journeySubtitle}>
+        Each decision naturally leads to the next.
+      </AppText>
+      <ScrollView
+        style={[styles.journeyPager, { height: viewportHeight }]}
+        contentContainerStyle={styles.journeyPagerContent}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        snapToInterval={snapInterval}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        pagingEnabled
+      >
+        {steps.slice(0, visibleCount).map((step, index) => {
+          const isActive = index === activeIndex;
+          const Visual = step.visual;
+          return (
+            <Animated.View
+              key={step.id}
+              entering={FadeInDown.delay(index * 80).duration(260)}
+              style={[
+                styles.journeyPage,
+                { height: viewportHeight },
+                !isActive && styles.journeyPageDim,
+                isActive && styles.journeyPageActive,
+              ]}
+            >
+              <View pointerEvents="none" style={styles.journeyGlow} />
+              <View style={styles.journeyHeaderRow}>
+                <View style={styles.journeyStepChip}>
+                  <AppText style={styles.journeyStepText}>
+                    {`${index + 1}`.padStart(2, '0')}
+                  </AppText>
+                </View>
+                <View style={styles.journeyAccent} />
+              </View>
+              <AppText
+                style={[styles.journeyLabel, isActive && styles.journeyLabelActive]}
+              >
+                {`Step ${index + 1} — ${step.label}`}
+              </AppText>
+              <AppText style={styles.journeyQuestion}>
+                {`Question answered: "${step.question}"`}
+              </AppText>
+              <View style={styles.journeyVisual}>
+                {Visual ? <Visual /> : null}
+              </View>
+              <AppText style={styles.journeyWhy}>{step.why}</AppText>
+            </Animated.View>
+          );
+        })}
+      </ScrollView>
+      <PrimaryButton label="Next" onPress={onNext} />
+    </View>
+  );
+}
+
+function VisualGoal() {
+  const { styles } = useLessonStepStyles();
+  const drift = useSharedValue(0);
+
+  useEffect(() => {
+    drift.value = withRepeat(
+      withTiming(1, { duration: 6000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [drift]);
+
+  const ringStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 0.96 + drift.value * 0.08 }],
+    opacity: 0.4 + drift.value * 0.2,
+  }));
+
+  const ringSoftStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 0.9 + drift.value * 0.06 }],
+    opacity: 0.25 + drift.value * 0.15,
+  }));
+
+  return (
+    <View style={styles.visualFrame}>
+      <View style={styles.goalHorizon} />
+      <View style={styles.goalLine} />
+      <View style={[styles.goalDot, { bottom: 102 }]} />
+      <Animated.View style={[styles.goalRing, { bottom: 84 }, ringStyle]} />
+      <Animated.View
+        style={[styles.goalRing, styles.goalRingSoft, { bottom: 72 }, ringSoftStyle]}
+      />
+    </View>
+  );
+}
+
+function VisualRisk() {
+  const { styles } = useLessonStepStyles();
+  const wave = useSharedValue(0);
+
+  useEffect(() => {
+    wave.value = withRepeat(
+      withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [wave]);
+
+  const topStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -4 - wave.value * 6 }, { scaleX: 1.02 }],
+  }));
+
+  const bottomStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: 4 + wave.value * 6 }, { scaleX: 1.02 }],
+  }));
+
+  return (
+    <View style={styles.visualFrame}>
+      <View style={styles.riskLine} />
+      <Animated.View style={[styles.riskBand, topStyle]} />
+      <Animated.View style={[styles.riskBand, styles.riskBandSoft, bottomStyle]} />
+    </View>
+  );
+}
+
+function VisualStrategy() {
+  const { styles } = useLessonStepStyles();
+  const merge = useSharedValue(0);
+
+  useEffect(() => {
+    merge.value = withRepeat(
+      withTiming(1, { duration: 2800, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [merge]);
+
+  const lineStyle = (offset) =>
+    useAnimatedStyle(() => ({
+      transform: [{ translateX: offset * (1 - merge.value) }],
+      opacity: 0.5 + merge.value * 0.4,
+    }));
+
+  const lineA = lineStyle(-24);
+  const lineB = lineStyle(0);
+  const lineC = lineStyle(24);
+
+  return (
+    <View style={styles.visualFrame}>
+      <View style={styles.strategyLines}>
+        <Animated.View style={[styles.strategyLine, { top: 14 }, lineA]} />
+        <Animated.View style={[styles.strategyLine, styles.strategyLineBold, { top: 40 }, lineB]} />
+        <Animated.View style={[styles.strategyLine, { top: 66 }, lineC]} />
+      </View>
+    </View>
+  );
+}
+
+function VisualAllocation() {
+  const { styles } = useLessonStepStyles();
+  const settle = useSharedValue(0);
+
+  useEffect(() => {
+    settle.value = withRepeat(
+      withTiming(1, { duration: 2400, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [settle]);
+
+  const blockStyle = (shift) =>
+    useAnimatedStyle(() => ({
+      transform: [{ translateX: shift * (1 - settle.value) }],
+    }));
+
+  return (
+    <View style={styles.visualFrame}>
+      <View style={styles.allocationRow}>
+        <Animated.View
+          style={[
+            styles.allocationBlock,
+            styles.allocationBlockStrong,
+            { width: '78%' },
+            blockStyle(-6),
+          ]}
+        />
+        <Animated.View
+          style={[styles.allocationBlock, { width: '56%' }, blockStyle(8)]}
+        />
+        <Animated.View
+          style={[styles.allocationBlock, { width: '70%' }, blockStyle(-4)]}
+        />
+        <Animated.View
+          style={[
+            styles.allocationBlock,
+            styles.allocationBlockStrong,
+            { width: '46%' },
+            blockStyle(6),
+          ]}
+        />
+      </View>
+    </View>
+  );
+}
+
+function VisualVehicle() {
+  const { styles } = useLessonStepStyles();
+  const snap = useSharedValue(0);
+
+  useEffect(() => {
+    snap.value = withRepeat(
+      withTiming(1, { duration: 1800, easing: Easing.out(Easing.quad) }),
+      -1,
+      true
+    );
+  }, [snap]);
+
+  const nodeStyle = (x, y) =>
+    useAnimatedStyle(() => ({
+      transform: [
+        { translateX: x * (1 - snap.value) },
+        { translateY: y * (1 - snap.value) },
+      ],
+    }));
+
+  const nodeA = nodeStyle(-16, -12);
+  const nodeB = nodeStyle(12, -6);
+  const nodeC = nodeStyle(-10, 14);
+
+  return (
+    <View style={styles.visualFrame}>
+      <View style={styles.vehicleFrame}>
+        <Animated.View style={[styles.vehicleNode, { top: 40, left: 40 }, nodeA]} />
+        <Animated.View
+          style={[styles.vehicleNode, styles.vehicleNodeActive, { top: 40, right: 40 }, nodeB]}
+        />
+        <Animated.View style={[styles.vehicleNode, { bottom: 40, left: 70 }, nodeC]} />
+      </View>
+    </View>
+  );
+}
+
+function VisualExecution() {
+  const { styles } = useLessonStepStyles();
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withTiming(1, {
+      duration: 900,
+      easing: Easing.out(Easing.quad),
+    });
+  }, [progress]);
+
+  const lineStyle = useAnimatedStyle(() => ({
+    width: `${30 + progress.value * 70}%`,
+  }));
+
+  const dotStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+  }));
+
+  return (
+    <View style={styles.visualFrame}>
+      <View style={[styles.executionLine, { width: '100%' }]} />
+      <Animated.View style={[styles.executionLine, styles.executionLineActive, lineStyle]} />
+      <Animated.View style={[styles.executionDot, { right: 0 }, dotStyle]} />
+    </View>
+  );
+}
+
+function VisualizationStep({ content, lessonId, onNext, onPressTerm }) {
   const { styles } = useLessonStepStyles();
   const [selected, setSelected] = useState(null);
+
+  if (lessonId === 'lesson_0') {
+    return <IntroVisualizationStep onNext={onNext} />;
+  }
 
   return (
     <View style={styles.stepBody}>
@@ -886,6 +1248,222 @@ const createStyles = (colors) =>
   visualCard: {
     gap: spacing.md,
   },
+  journeyTitle: {
+    fontFamily: typography.fontFamilyDemi,
+    color: colors.textPrimary,
+    fontSize: typography.h1,
+  },
+  journeySubtitle: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  journeyPager: {
+    marginTop: spacing.sm,
+  },
+  journeyPagerContent: {
+    paddingBottom: spacing.md,
+  },
+  journeyPage: {
+    borderRadius: 22,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+    gap: spacing.md,
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  journeyPageActive: {
+    borderColor: toRgba(colors.accent, 0.45),
+    backgroundColor: colors.surfaceActive,
+  },
+  journeyPageDim: {
+    opacity: 0.45,
+  },
+  journeyGlow: {
+    position: 'absolute',
+    top: -40,
+    right: -20,
+    width: 140,
+    height: 140,
+    borderRadius: 999,
+    backgroundColor: toRgba(colors.accent, 0.12),
+  },
+  journeyHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  journeyStepChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+  },
+  journeyStepText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small,
+    color: colors.textSecondary,
+    letterSpacing: 1,
+  },
+  journeyAccent: {
+    width: 24,
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: toRgba(colors.accent, 0.4),
+  },
+  journeyLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+  },
+  journeyLabelActive: {
+    color: colors.textPrimary,
+  },
+  journeyQuestion: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
+  },
+  journeyWhy: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
+  },
+  journeyVisual: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+    padding: spacing.md,
+    height: 190,
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  visualFrame: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  goalHorizon: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    bottom: 22,
+    height: 1,
+    backgroundColor: toRgba(colors.textSecondary, 0.35),
+  },
+  goalLine: {
+    position: 'absolute',
+    width: 1,
+    height: 80,
+    bottom: 22,
+    backgroundColor: toRgba(colors.textSecondary, 0.4),
+  },
+  goalDot: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.accent,
+  },
+  goalRing: {
+    position: 'absolute',
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1,
+    borderColor: toRgba(colors.accent, 0.35),
+  },
+  goalRingSoft: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderColor: toRgba(colors.textSecondary, 0.2),
+  },
+  riskLine: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    height: 1,
+    backgroundColor: toRgba(colors.textSecondary, 0.4),
+  },
+  riskBand: {
+    width: '70%',
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: toRgba(colors.textSecondary, 0.18),
+  },
+  riskBandSoft: {
+    backgroundColor: toRgba(colors.textSecondary, 0.12),
+  },
+  strategyLines: {
+    width: '80%',
+    height: 90,
+    justifyContent: 'center',
+  },
+  strategyLine: {
+    position: 'absolute',
+    height: 2,
+    width: '80%',
+    borderRadius: 999,
+    backgroundColor: toRgba(colors.textSecondary, 0.35),
+  },
+  strategyLineBold: {
+    backgroundColor: toRgba(colors.textPrimary, 0.6),
+  },
+  allocationRow: {
+    width: '100%',
+    gap: spacing.sm,
+  },
+  allocationBlock: {
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: toRgba(colors.textSecondary, 0.25),
+  },
+  allocationBlockStrong: {
+    backgroundColor: toRgba(colors.textPrimary, 0.4),
+  },
+  vehicleFrame: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: toRgba(colors.textSecondary, 0.35),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  vehicleNode: {
+    position: 'absolute',
+    width: 18,
+    height: 18,
+    borderRadius: 6,
+    backgroundColor: toRgba(colors.textSecondary, 0.3),
+  },
+  vehicleNodeActive: {
+    backgroundColor: toRgba(colors.accent, 0.5),
+  },
+  executionLine: {
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: toRgba(colors.textSecondary, 0.4),
+  },
+  executionLineActive: {
+    backgroundColor: colors.accent,
+  },
+  executionDot: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.accent,
+  },
   processCard: {
     gap: spacing.md,
   },
@@ -1188,3 +1766,12 @@ const createStyles = (colors) =>
     fontSize: typography.body,
   },
   });
+
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
