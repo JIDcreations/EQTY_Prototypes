@@ -236,7 +236,16 @@ function IntroConceptStep({ onNext }) {
                       styles.processNode,
                       isActive && styles.processNodeActive,
                     ]}
-                  />
+                  >
+                    <AppText
+                      style={[
+                        styles.processNodeText,
+                        isActive && styles.processNodeTextActive,
+                      ]}
+                    >
+                      {steps.findIndex((item) => item.id === step.id) + 1}
+                    </AppText>
+                  </View>
                 </View>
                 <View style={styles.processCopy}>
                   <AppText
@@ -915,21 +924,31 @@ const createStyles = (colors) =>
     paddingVertical: spacing.sm,
   },
   processNodeWrap: {
-    width: 22,
+    width: 24,
     alignItems: 'center',
     marginTop: 2,
   },
   processNode: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.textSecondary,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.surfaceActive,
     borderWidth: 1,
     borderColor: colors.divider,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   processNodeActive: {
     backgroundColor: colors.accent,
     borderColor: colors.accent,
+  },
+  processNodeText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small - 1,
+    color: colors.textSecondary,
+  },
+  processNodeTextActive: {
+    color: colors.background,
   },
   processCopy: {
     flex: 1,
