@@ -25,7 +25,7 @@ export const defaultPreferences = {
 
 export const defaultProgress = {
   completedLessonIds: [],
-  currentLessonId: 'lesson_1',
+  currentLessonId: 'lesson_0',
 };
 
 export const defaultReflections = [];

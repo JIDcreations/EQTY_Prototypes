@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
@@ -29,9 +30,10 @@ export default function HomeScreen() {
 
   const greeting = getGreeting();
   const displayName = getDisplayName(authUser);
+  const moduleNumber = currentModule?.id?.split('_')[1];
   const moduleLabel =
     currentModuleIndex >= 0 && currentModule
-      ? `Module ${currentModuleIndex + 1} ${currentModule.title}`
+      ? `Module ${moduleNumber ?? currentModuleIndex} ${currentModule.title}`
       : 'Module focus';
   const moduleDescription = currentModule?.description || 'Build the foundation for today.';
   const motivation = formatSentence(userContext?.motivation, 'invest with confidence.');
@@ -87,8 +89,8 @@ export default function HomeScreen() {
               style={styles.heroMetaText}
             />
           </View>
-          <GlossaryText text={currentLesson?.title} style={styles.heroTitle} />
-          <GlossaryText text={currentLesson?.shortDescription} style={styles.heroSubtitle} />
+          <AppText style={styles.heroTitle}>{currentLesson?.title}</AppText>
+          <AppText style={styles.heroSubtitle}>{currentLesson?.shortDescription}</AppText>
           <PrimaryButton
             label="Start lesson"
             onPress={() =>

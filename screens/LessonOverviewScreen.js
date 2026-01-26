@@ -32,7 +32,7 @@ export default function LessonOverviewScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const lesson = lessons.find((item) => item.id === lessonId) || lessons[0];
-  const content = lessonContent[lesson.id] || lessonContent.lesson_1;
+  const content = lessonContent[lesson.id] || lessonContent.lesson_0;
   const isCompleted = progress.completedLessonIds.includes(lesson.id);
   const isCurrent = progress.currentLessonId === lesson.id;
 

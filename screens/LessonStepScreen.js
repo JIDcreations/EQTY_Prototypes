@@ -41,7 +41,7 @@ export default function LessonStepScreen() {
   const { userContext, addReflection, completeLesson } = useApp();
   const glossary = useGlossary();
 
-  const content = lessonContent[lessonId] || lessonContent.lesson_1;
+  const content = lessonContent[lessonId] || lessonContent.lesson_0;
   const stepTitle = useMemo(() => {
     if (!content) return `Step ${step}`;
     switch (step) {

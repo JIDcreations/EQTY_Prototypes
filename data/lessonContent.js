@@ -1,20 +1,21 @@
 export const lessonContent = {
-  lesson_1: {
+  lesson_0: {
     title: 'Investing as a Process',
-    shortDescription: 'See investing as a sequence, not a single action.',
+    shortDescription:
+      'Investing is a structured decision-making process, not a single action.',
     steps: {
       concept: {
-        title: 'Investing is a chain of decisions',
+        title: 'A structured chain of decisions',
         body:
-          'Investing is not one action. It is a sequence of choices that build on each other, from goal to risk to allocation. Buying or selling is only the final step.',
-        visualHint: 'The order matters more than the moment.',
+          'Investing is not one action. It is a structured decision-making process with clear steps that build on each other. Buying or selling is only the final step, after you define the target, understand the drivers, choose a strategy, and set the allocation.',
+        visualHint: 'Process first, action last.',
       },
       visualization: {
-        title: 'The EQTY decision flow',
+        title: 'The EQTY process map',
         segments: [
           {
             id: 'segment_1',
-            label: 'Goal',
+            label: 'Target',
             value: 0.22,
             description: 'Define what the money should achieve.',
           },
@@ -28,7 +29,7 @@ export const lessonContent = {
             id: 'segment_3',
             label: 'Strategy',
             value: 0.2,
-            description: 'Turn the goal into rules you can follow.',
+            description: 'Turn the target into rules you can follow.',
           },
           {
             id: 'segment_4',
@@ -40,7 +41,7 @@ export const lessonContent = {
             id: 'segment_5',
             label: 'Execution',
             value: 0.18,
-            description: 'Only then do you place an order.',
+            description: 'Only then do you place the order.',
           },
         ],
       },
@@ -49,56 +50,63 @@ export const lessonContent = {
         variants: {
           new: {
             prompt:
-              'You open the app and want to buy something quickly. What is your first move?',
-            options: ['Define a goal', 'Pick a product', 'Wait for market news'],
+              'A headline makes a stock look exciting. What is your first move?',
+            options: ['Define your target', 'Buy quickly', 'Check social media'],
             insight:
-              'Starting with the goal keeps every later step aligned and reduces impulse.',
+              'Starting with the target keeps every later step aligned and reduces impulse.',
           },
           growing: {
             prompt:
-              'You are deciding between two ETFs. Which step keeps you grounded?',
-            options: ['Check your goal and horizon', 'Follow the trend', 'Copy a popular list'],
+              'You are comparing two funds. Which step keeps the decision grounded?',
+            options: [
+              'Check your target and horizon',
+              'Follow recent performance',
+              'Copy a popular list',
+            ],
             insight:
-              'A clear goal and horizon prevent decisions from drifting with noise.',
+              'A clear target and horizon prevent decisions from drifting with noise.',
           },
           seasoned: {
             prompt:
-              'You are ready to execute but the plan feels vague. What do you revisit?',
+              'You are ready to execute, but the plan feels vague. What do you revisit?',
             options: ['Strategy and allocation', 'Order type only', 'Short-term headlines'],
             insight:
-              'Execution makes sense only when strategy and allocation are clear.',
+              'Execution makes sense only when the earlier steps are clear.',
           },
         },
       },
       exercise: {
         type: 'sequence',
-        description: 'Place the actions in the order that EQTY follows.',
+        description: 'Place the EQTY steps in the correct order.',
         items: [
-          { id: 'goal', label: 'Define the goal' },
-          { id: 'drivers', label: 'Assess risk and resources' },
+          { id: 'target', label: 'Define the target' },
+          { id: 'drivers', label: 'Assess drivers and constraints' },
+          { id: 'strategy', label: 'Choose a strategy' },
           { id: 'allocation', label: 'Set the allocation' },
           { id: 'execution', label: 'Execute the order' },
         ],
-        correctOrder: ['goal', 'drivers', 'allocation', 'execution'],
+        correctOrder: ['target', 'drivers', 'strategy', 'allocation', 'execution'],
         feedback: {
-          correct: 'Execution belongs at the end, after the goal and constraints are clear.',
+          correct:
+            'Execution belongs at the end, after the target and constraints are clear.',
           incorrect:
             'Notice how skipping steps removes the logic that protects you from impulse.',
         },
       },
       reflection: {
-        question: 'Which step do you tend to rush or skip?'
+        question: 'Which step helps you slow down before acting?',
       },
       summary: {
         takeaways: [
-          'Investing is a sequence of decisions, not a single act.',
-          'Buying or selling is only the final step.',
-          'Clarity early reduces impulsive choices later.',
+          'Investing is a structured process, not a single action.',
+          'Buying or selling comes only after the earlier steps.',
+          'Understanding the full process reduces impulsive decisions.',
+          'The EQTY framework runs from target definition to execution.',
         ],
       },
     },
   },
-  lesson_2: {
+  lesson_1: {
     title: 'Why Do I Want to Invest?',
     shortDescription: 'Goals give every decision direction.',
     steps: {
@@ -194,7 +202,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_3: {
+  lesson_2: {
     title: 'Types of Investment Goals',
     shortDescription: 'Goal type shapes risk, time, and strategy.',
     steps: {
@@ -283,7 +291,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_4: {
+  lesson_3: {
     title: 'What Does Risk Really Mean?',
     shortDescription: 'Risk includes emotions, not just numbers.',
     steps: {
@@ -390,7 +398,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_5: {
+  lesson_4: {
     title: 'Risk Capacity vs Risk Tolerance',
     shortDescription: 'Ability and comfort are different limits.',
     steps: {
@@ -482,7 +490,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_6: {
+  lesson_5: {
     title: 'Understanding Financial Resources',
     shortDescription: 'Invest only what you can truly spare.',
     steps: {
@@ -590,7 +598,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_7: {
+  lesson_6: {
     title: 'Understanding Time Horizon',
     shortDescription: 'Time changes what risk means.',
     steps: {
@@ -699,7 +707,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_8: {
+  lesson_7: {
     title: 'What Is an Investment Strategy?',
     shortDescription: 'Strategy creates coherence before products.',
     steps: {
@@ -807,7 +815,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_9: {
+  lesson_8: {
     title: 'Liquidity',
     shortDescription: 'Access to cash shapes choices.',
     steps: {
@@ -906,7 +914,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_10: {
+  lesson_9: {
     title: 'Sustainability and Ethics',
     shortDescription: 'Values define your investable universe.',
     steps: {
@@ -1014,7 +1022,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_11: {
+  lesson_10: {
     title: 'Dividend Strategy',
     shortDescription: 'Income and growth must align with goals.',
     steps: {
@@ -1109,7 +1117,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_12: {
+  lesson_11: {
     title: 'Cost Structure',
     shortDescription: 'Costs quietly reduce outcomes.',
     steps: {
@@ -1219,7 +1227,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_13: {
+  lesson_12: {
     title: 'Strategy Brought Together',
     shortDescription: 'Balance forces into one consistent plan.',
     steps: {
@@ -1327,7 +1335,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_14: {
+  lesson_13: {
     title: 'What Is Capital Allocation?',
     shortDescription: 'Allocation drives outcomes more than picking.',
     steps: {
@@ -1435,7 +1443,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_15: {
+  lesson_14: {
     title: 'Core Asset Categories',
     shortDescription: 'Cash, bonds, and equities have distinct roles.',
     steps: {
@@ -1521,7 +1529,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_16: {
+  lesson_15: {
     title: 'Diversification Within Equities',
     shortDescription: 'Reduce dependency inside equities.',
     steps: {
@@ -1617,7 +1625,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_17: {
+  lesson_16: {
     title: 'Allocation Examples',
     shortDescription: 'Different timelines need different mixes.',
     steps: {
@@ -1703,7 +1711,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_18: {
+  lesson_17: {
     title: 'What Are Investment Vehicles?',
     shortDescription: 'Vehicles are tools, not decisions.',
     steps: {
@@ -1795,7 +1803,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_19: {
+  lesson_18: {
     title: 'Equities',
     shortDescription: 'Ownership exposure and long-term growth.',
     steps: {
@@ -1887,7 +1895,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_20: {
+  lesson_19: {
     title: 'Bonds',
     shortDescription: 'Stability through lending.',
     steps: {
@@ -1978,7 +1986,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_21: {
+  lesson_20: {
     title: 'ETFs',
     shortDescription: 'Built-in diversification and efficiency.',
     steps: {
@@ -2068,7 +2076,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_22: {
+  lesson_21: {
     title: 'Alternative Investment Vehicles',
     shortDescription: 'High volatility and limited fit.',
     steps: {
@@ -2177,7 +2185,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_23: {
+  lesson_22: {
     title: 'What Does Execution Mean?',
     shortDescription: 'Execution is the technical final step.',
     steps: {
@@ -2260,7 +2268,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_24: {
+  lesson_23: {
     title: 'Orders and Transaction Costs',
     shortDescription: 'Order types and costs change outcomes.',
     steps: {
@@ -2352,7 +2360,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_25: {
+  lesson_24: {
     title: 'Why Execution Comes Last',
     shortDescription: 'Acting early increases risk.',
     steps: {
@@ -2460,7 +2468,7 @@ export const lessonContent = {
       },
     },
   },
-  lesson_26: {
+  lesson_25: {
     title: 'Understanding the Full Investment Process',
     shortDescription: 'Rebuild the full model end-to-end.',
     steps: {

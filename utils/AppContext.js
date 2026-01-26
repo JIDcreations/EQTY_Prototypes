@@ -24,6 +24,7 @@ import {
 } from './storage';
 
 const AppContext = createContext(null);
+const RESET_PROGRESS_ON_LAUNCH = true;
 
 export function AppProvider({ children }) {
   const [authUser, setAuthUser] = useState(defaultAuthUser);
@@ -57,8 +58,14 @@ export function AppProvider({ children }) {
         setOnboardingContext(storedOnboarding);
         setPreferences(storedPreferences);
         setUserContext(storedContext);
-        setProgress(storedProgress);
-        setReflections(storedReflections);
+        const nextProgress = RESET_PROGRESS_ON_LAUNCH ? defaultProgress : storedProgress;
+        const nextReflections = RESET_PROGRESS_ON_LAUNCH ? [] : storedReflections;
+        setProgress(nextProgress);
+        setReflections(nextReflections);
+        if (RESET_PROGRESS_ON_LAUNCH) {
+          await saveProgress(nextProgress);
+          await saveReflections(nextReflections);
+        }
         setIsReady(true);
       }
     }
