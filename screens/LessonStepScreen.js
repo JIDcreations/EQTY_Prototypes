@@ -40,6 +40,7 @@ export default function LessonStepScreen() {
   const { lessonId, step = 1, entrySource } = route.params || {};
   const { userContext, addReflection, completeLesson } = useApp();
   const glossary = useGlossary();
+  const isIntroConcept = lessonId === 'lesson_0' && step === 1;
 
   const content = lessonContent[lessonId] || lessonContent.lesson_0;
   const stepTitle = useMemo(() => {
@@ -89,10 +90,18 @@ export default function LessonStepScreen() {
         title={stepTitle}
         onBack={() => navigation.goBack()}
         onPressTerm={handleTermPress}
+        stepLabel={isIntroConcept ? 'STEP 1 · CONCEPT' : null}
+        progressText={isIntroConcept ? `1/${TOTAL_STEPS}` : null}
+        showTitle={!isIntroConcept}
       />
 
       {step === 1 && (
-        <ConceptStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
+        <ConceptStep
+          content={content}
+          lessonId={lessonId}
+          onNext={handleNext}
+          onPressTerm={handleTermPress}
+        />
       )}
       {step === 2 && (
         <VisualizationStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
@@ -126,8 +135,12 @@ export default function LessonStepScreen() {
   );
 }
 
-function ConceptStep({ content, onNext, onPressTerm }) {
+function ConceptStep({ content, lessonId, onNext, onPressTerm }) {
   const { styles } = useLessonStepStyles();
+
+  if (lessonId === 'lesson_0') {
+    return <IntroConceptStep onNext={onNext} />;
+  }
 
   return (
     <View style={styles.stepBody}>
@@ -148,6 +161,97 @@ function ConceptStep({ content, onNext, onPressTerm }) {
           style={styles.caption}
           onPressTerm={onPressTerm}
         />
+      </Card>
+      <PrimaryButton label="Next" onPress={onNext} />
+    </View>
+  );
+}
+
+function IntroConceptStep({ onNext }) {
+  const { styles } = useLessonStepStyles();
+  const steps = [
+    {
+      id: 'goal',
+      label: 'Goal definition',
+      detail: 'Clarify what the money should achieve.',
+    },
+    {
+      id: 'risk',
+      label: 'Individual risk analysis',
+      detail: 'Define risk capacity, tolerance, and time horizon.',
+    },
+    {
+      id: 'strategy',
+      label: 'Financial investment strategy',
+      detail: 'Translate the goal into guiding rules.',
+    },
+    {
+      id: 'allocation',
+      label: 'Capital allocation',
+      detail: 'Decide how capital is distributed across assets.',
+    },
+    {
+      id: 'vehicle',
+      label: 'Investment vehicle',
+      detail: 'Select the instruments that fit the allocation.',
+    },
+    {
+      id: 'execution',
+      label: 'Execution',
+      detail: 'Place the order only after the process is clear.',
+    },
+  ];
+  const [activeId, setActiveId] = useState(steps[0].id);
+  const paragraph =
+    'Investing is not a single action. It is a sequence of decisions that build on each other. Buying or selling only happens at the final step.';
+
+  return (
+    <View style={styles.stepBody}>
+      <Card style={styles.conceptCard}>
+        <View style={styles.introHeader}>
+          <View style={styles.introAccent} />
+          <AppText style={styles.introLabel}>Definition</AppText>
+        </View>
+        <AppText style={styles.introTitle}>What is investing as a process?</AppText>
+        <AppText style={styles.introText}>{paragraph}</AppText>
+      </Card>
+      <Card style={styles.processCard}>
+        <View style={styles.processHeader}>
+          <AppText style={styles.processTitle}>Process overview</AppText>
+          <AppText style={styles.processHint}>Tap a step to see its role.</AppText>
+        </View>
+        <View style={styles.processList}>
+          <View pointerEvents="none" style={styles.processRail} />
+          {steps.map((step) => {
+            const isActive = step.id === activeId;
+            return (
+              <Pressable
+                key={step.id}
+                onPress={() => setActiveId(step.id)}
+                style={styles.processRow}
+              >
+                <View style={styles.processNodeWrap}>
+                  <View
+                    style={[
+                      styles.processNode,
+                      isActive && styles.processNodeActive,
+                    ]}
+                  />
+                </View>
+                <View style={styles.processCopy}>
+                  <AppText
+                    style={[styles.processLabel, isActive && styles.processLabelActive]}
+                  >
+                    {step.label}
+                  </AppText>
+                  {isActive ? (
+                    <AppText style={styles.processDetail}>{step.detail}</AppText>
+                  ) : null}
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
       </Card>
       <PrimaryButton label="Next" onPress={onNext} />
     </View>
@@ -719,6 +823,35 @@ const createStyles = (colors) =>
   conceptCard: {
     gap: spacing.md,
   },
+  introHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  introAccent: {
+    width: 18,
+    height: 2,
+    backgroundColor: colors.accent,
+    borderRadius: 999,
+  },
+  introLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+  },
+  introTitle: {
+    fontFamily: typography.fontFamilyDemi,
+    color: colors.textPrimary,
+    fontSize: typography.h1,
+  },
+  introText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
   bodyText: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textPrimary,
@@ -743,6 +876,78 @@ const createStyles = (colors) =>
   },
   visualCard: {
     gap: spacing.md,
+  },
+  processCard: {
+    gap: spacing.md,
+  },
+  processHeader: {
+    gap: spacing.xs,
+  },
+  processTitle: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textPrimary,
+    fontSize: typography.small,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  processHint: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+  },
+  processList: {
+    position: 'relative',
+    gap: 0,
+    paddingLeft: spacing.xs,
+  },
+  processRail: {
+    position: 'absolute',
+    left: 10,
+    top: 8,
+    bottom: 8,
+    width: 2,
+    backgroundColor: colors.divider,
+  },
+  processRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  processNodeWrap: {
+    width: 22,
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  processNode: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.textSecondary,
+    borderWidth: 1,
+    borderColor: colors.divider,
+  },
+  processNodeActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  processCopy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  processLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+  },
+  processLabelActive: {
+    color: colors.textPrimary,
+  },
+  processDetail: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
   },
   segmentRow: {
     flexDirection: 'row',
