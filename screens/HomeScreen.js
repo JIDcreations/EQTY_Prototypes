@@ -29,13 +29,9 @@ export default function HomeScreen() {
 
   const greeting = getGreeting();
   const displayName = getDisplayName(authUser);
-  const dateLabel = getDateLabel();
-  const moduleEyebrow =
-    currentModuleIndex >= 0 ? `Module ${currentModuleIndex + 1}` : 'Module';
-  const moduleTitle = currentModule?.title || 'Module focus';
   const moduleLabel =
     currentModuleIndex >= 0 && currentModule
-      ? `${moduleEyebrow} · ${moduleTitle}`
+      ? `Module ${currentModuleIndex + 1} ${currentModule.title}`
       : 'Module focus';
   const moduleDescription = currentModule?.description || 'Build the foundation for today.';
   const motivation = formatSentence(userContext?.motivation, 'invest with confidence.');
@@ -73,21 +69,15 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <GlossaryText text="EQTY" style={styles.brand} />
-            <GlossaryText text={dateLabel} style={styles.dateText} />
-          </View>
           <View style={styles.headerMainRow}>
             <View style={styles.headerGreeting}>
-              <GlossaryText text={greeting} style={styles.greeting} />
+              <GlossaryText text={`${greeting},`} style={styles.greeting} />
               <GlossaryText text={displayName} style={styles.name} />
             </View>
           </View>
-          <View style={styles.moduleBlock}>
-            <GlossaryText text={moduleEyebrow} style={styles.moduleEyebrow} />
-            <GlossaryText text={moduleTitle} style={styles.moduleTitle} numberOfLines={2} />
-          </View>
         </View>
+
+        <GlossaryText text={moduleLabel} style={styles.moduleLabel} numberOfLines={2} />
 
         <Card style={styles.heroCard}>
           <View style={styles.heroMetaRow}>
@@ -172,12 +162,6 @@ const createStyles = (colors) =>
     header: {
       gap: spacing.sm,
     },
-    headerTop: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: spacing.md,
-    },
     headerMainRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
@@ -185,20 +169,6 @@ const createStyles = (colors) =>
     headerGreeting: {
       flex: 1,
       gap: spacing.xs,
-    },
-    moduleBlock: {
-      gap: spacing.xs,
-    },
-    brand: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      letterSpacing: 2,
-    },
-    dateText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
     },
     greeting: {
       fontFamily: typography.fontFamilyMedium,
@@ -211,17 +181,12 @@ const createStyles = (colors) =>
       color: colors.textPrimary,
       lineHeight: 40,
     },
-    moduleEyebrow: {
+    moduleLabel: {
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.small,
       color: colors.textSecondary,
-      letterSpacing: 1.4,
-      textTransform: 'uppercase',
-    },
-    moduleTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      textAlign: 'left',
+      letterSpacing: 0.4,
     },
     heroCard: {
       borderRadius: 28,
@@ -341,13 +306,6 @@ const getGreeting = () => {
   if (hour < 18) return 'Good afternoon';
   return 'Good evening';
 };
-
-const getDateLabel = () =>
-  new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
 
 const getDisplayName = (authUser) => {
   const raw =
