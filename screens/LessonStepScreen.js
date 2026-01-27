@@ -1,12 +1,16 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
+  Animated,
+  Easing,
   KeyboardAvoidingView,
+  LayoutAnimation,
   Linking,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
+  UIManager,
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -464,96 +468,332 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
   const keyInsight =
     variant?.keyInsight ||
     'The process prevents impulsive action by forcing clarity before execution.';
-  const planSteps = ['Goal', 'Risk', 'Strategy', 'Allocation', 'Vehicle', 'Execution'];
-  const noPlanSteps = ['Goal missing', 'Risk missing', 'Execution'];
+  const [mode, setMode] = useState('plan');
+  const [activeMissing, setActiveMissing] = useState(null);
+  const [showOutcome, setShowOutcome] = useState(false);
+  const [outcomeMounted, setOutcomeMounted] = useState(false);
+  const outcomeAnim = useState(() => new Animated.Value(0))[0];
+  const steps = [
+    { id: 'goal', label: 'Goal' },
+    { id: 'risk', label: 'Risk' },
+    { id: 'strategy', label: 'Strategy' },
+    { id: 'allocation', label: 'Allocation' },
+    { id: 'vehicle', label: 'Vehicle' },
+    { id: 'execution', label: 'Execution' },
+  ];
+  const missingIds = mode === 'no-plan' ? ['goal', 'risk', 'strategy'] : [];
+  const activeMissingIndex = activeMissing
+    ? steps.findIndex((step) => step.id === activeMissing)
+    : -1;
+
+  useEffect(() => {
+    if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showOutcome) {
+      setOutcomeMounted(true);
+      outcomeAnim.setValue(0);
+      Animated.timing(outcomeAnim, {
+        toValue: 1,
+        duration: 220,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+    } else if (outcomeMounted) {
+      Animated.timing(outcomeAnim, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setOutcomeMounted(false);
+      });
+    }
+  }, [showOutcome, outcomeMounted, outcomeAnim]);
+
+  const applyAnimation = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  };
+
+  const handleToggle = (nextMode) => {
+    if (nextMode === mode) return;
+    applyAnimation();
+    setMode(nextMode);
+    setActiveMissing(null);
+  };
+
+  const handleMissingPress = (id) => {
+    if (mode !== 'no-plan') return;
+    applyAnimation();
+    setActiveMissing((prev) => (prev === id ? null : id));
+  };
+
+  const handleExecutionPress = () => {
+    applyAnimation();
+    setShowOutcome((prev) => !prev);
+  };
 
   return (
     <View style={styles.stepBody}>
-      <View style={styles.scenarioVisual}>
-        <View style={styles.scenarioPanel}>
-          <View style={styles.scenarioPanelHeader}>
-            <AppText style={styles.scenarioPanelTitle}>With a plan</AppText>
-            <View style={styles.scenarioBadge}>
-              <AppText style={styles.scenarioBadgeText}>Stable decisions</AppText>
-            </View>
-          </View>
-          <View style={styles.scenarioRail}>
-            {planSteps.map((label, index) => {
-              const isLast = index === planSteps.length - 1;
-              const isExecution = label === 'Execution';
-              return (
-                <View key={label} style={styles.scenarioRailRow}>
-                  <View style={styles.scenarioRailTrack}>
-                    <View
-                      style={[
-                        styles.scenarioNode,
-                        isExecution && styles.scenarioNodeActive,
-                      ]}
-                    />
-                    {!isLast ? <View style={styles.scenarioRailLine} /> : null}
-                  </View>
-                  <AppText
-                    style={[
-                      styles.scenarioRailLabel,
-                      isExecution && styles.scenarioRailLabelStrong,
-                    ]}
-                  >
-                    {label}
-                  </AppText>
-                </View>
-              );
-            })}
+      <View style={styles.scenarioToggle}>
+        <Pressable
+          onPress={() => handleToggle('plan')}
+          style={[
+            styles.scenarioToggleOption,
+            mode === 'plan' && styles.scenarioToggleOptionActive,
+          ]}
+        >
+          <AppText
+            style={[
+              styles.scenarioToggleText,
+              mode === 'plan' && styles.scenarioToggleTextActive,
+            ]}
+          >
+            With a plan
+          </AppText>
+        </Pressable>
+        <Pressable
+          onPress={() => handleToggle('no-plan')}
+          style={[
+            styles.scenarioToggleOption,
+            mode === 'no-plan' && styles.scenarioToggleOptionActive,
+          ]}
+        >
+          <AppText
+            style={[
+              styles.scenarioToggleText,
+              mode === 'no-plan' && styles.scenarioToggleTextActive,
+            ]}
+          >
+            Without a plan
+          </AppText>
+        </Pressable>
+      </View>
+
+      <View style={styles.scenarioPanel}>
+        <View style={styles.scenarioPanelHeader}>
+          <AppText style={styles.scenarioPanelTitle}>Process rail</AppText>
+          <View
+            style={[
+              styles.scenarioBadge,
+              mode === 'no-plan' && styles.scenarioBadgeMuted,
+            ]}
+          >
+            <AppText style={styles.scenarioBadgeText}>
+              {mode === 'plan' ? 'Stable decisions' : 'Reactive decisions'}
+            </AppText>
           </View>
         </View>
-
-        <View style={styles.scenarioPanel}>
-          <View style={styles.scenarioPanelHeader}>
-            <AppText style={styles.scenarioPanelTitle}>Without a plan</AppText>
-            <View style={[styles.scenarioBadge, styles.scenarioBadgeMuted]}>
-              <AppText style={styles.scenarioBadgeText}>Reactive decisions</AppText>
-            </View>
-          </View>
-          <View style={styles.scenarioRail}>
-            {noPlanSteps.map((label, index) => {
-              const isLast = index === noPlanSteps.length - 1;
-              const isExecution = label === 'Execution';
-              const isMissing = label.includes('missing');
-              return (
-                <View key={label} style={styles.scenarioRailRow}>
-                  <View style={styles.scenarioRailTrack}>
+        <View style={styles.scenarioRail}>
+          {steps.map((step, index) => {
+            const isExecution = step.id === 'execution';
+            const isMissing = missingIds.includes(step.id);
+            const isLast = index === steps.length - 1;
+            const isDegraded =
+              activeMissingIndex >= 0 && index > activeMissingIndex && mode === 'no-plan';
+            const label = isMissing ? `${step.label} missing` : step.label;
+            const showJump = isExecution && mode === 'no-plan';
+            const showConsequence = isMissing && activeMissing === step.id;
+            const showExecutionHint = isExecution && !showOutcome;
+            const isInteractive = isExecution || isMissing;
+            const RowWrapper = isInteractive ? Pressable : View;
+            return (
+              <RowWrapper
+                key={step.id}
+                onPress={
+                  isExecution
+                    ? handleExecutionPress
+                    : isMissing
+                    ? () => handleMissingPress(step.id)
+                    : undefined
+                }
+                style={styles.scenarioRailRow}
+              >
+                <View style={styles.scenarioRailTrack}>
+                  <View
+                    style={[
+                      styles.scenarioNode,
+                      isExecution && styles.scenarioNodeActive,
+                      isMissing && styles.scenarioNodeMissing,
+                      isDegraded && styles.scenarioNodeDegraded,
+                    ]}
+                  />
+                  {!isLast ? (
                     <View
                       style={[
-                        styles.scenarioNode,
-                        isExecution && styles.scenarioNodeActive,
-                        isMissing && styles.scenarioNodeMissing,
+                        styles.scenarioRailLine,
+                        mode === 'no-plan' && styles.scenarioRailLineBroken,
+                        isDegraded && styles.scenarioRailLineDegraded,
                       ]}
                     />
-                    {!isLast ? (
-                      <View style={styles.scenarioRailLineBroken} />
-                    ) : null}
-                  </View>
+                  ) : null}
+                </View>
+                <View style={styles.scenarioRailLabelColumn}>
                   <View style={styles.scenarioRailLabelRow}>
                     <AppText
                       style={[
                         styles.scenarioRailLabel,
                         isMissing && styles.scenarioRailLabelMuted,
                         isExecution && styles.scenarioRailLabelStrong,
+                        isDegraded && styles.scenarioRailLabelDegraded,
                       ]}
                     >
                       {label}
                     </AppText>
-                    {isExecution ? (
-                      <Ionicons name="arrow-down" size={14} color={colors.accent} />
+                    {showJump ? (
+                      <Ionicons name="arrow-forward" size={14} color={colors.accent} />
+                    ) : null}
+                    {isExecution && activeMissingIndex >= 0 ? (
+                      <View style={styles.scenarioPrematureBadge}>
+                        <AppText style={styles.scenarioPrematureText}>Premature</AppText>
+                      </View>
                     ) : null}
                   </View>
+                  {showExecutionHint ? (
+                    <AppText style={styles.scenarioTapHint}>Tap execution to see outcome</AppText>
+                  ) : null}
+                  {showConsequence ? (
+                    <AppText style={styles.scenarioConsequence}>
+                      Downstream steps weaken; execution becomes premature.
+                    </AppText>
+                  ) : null}
                 </View>
-              );
-            })}
-          </View>
+              </RowWrapper>
+            );
+          })}
         </View>
+        {outcomeMounted ? (
+          <Animated.View
+            style={[
+              styles.scenarioOutcome,
+              {
+                opacity: outcomeAnim,
+                transform: [
+                  {
+                    translateY: outcomeAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [10, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <OutcomeChart mode={mode} />
+          </Animated.View>
+        ) : null}
       </View>
       <AppText style={styles.scenarioInsightLine}>{keyInsight}</AppText>
       <PrimaryButton label="Next" onPress={onNext} />
+    </View>
+  );
+}
+
+function OutcomeChart({ mode }) {
+  const { styles } = useLessonStepStyles();
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const lineAnim = useState(() => new Animated.Value(1))[0];
+  const points =
+    mode === 'plan'
+      ? [
+          { x: 0, y: 68 },
+          { x: 18, y: 62 },
+          { x: 36, y: 56 },
+          { x: 54, y: 52 },
+          { x: 72, y: 44 },
+          { x: 90, y: 36 },
+          { x: 100, y: 32 },
+        ]
+      : [
+          { x: 0, y: 60 },
+          { x: 18, y: 40 },
+          { x: 36, y: 78 },
+          { x: 54, y: 34 },
+          { x: 72, y: 86 },
+          { x: 90, y: 48 },
+          { x: 100, y: 58 },
+        ];
+
+  useEffect(() => {
+    lineAnim.setValue(0);
+    Animated.timing(lineAnim, {
+      toValue: 1,
+      duration: 320,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, [mode, lineAnim]);
+
+  const segments = useMemo(() => {
+    if (!size.width || !size.height) return [];
+    return points.slice(0, -1).map((point, index) => {
+      const next = points[index + 1];
+      const x1 = (point.x / 100) * size.width;
+      const y1 = (point.y / 100) * size.height;
+      const x2 = (next.x / 100) * size.width;
+      const y2 = (next.y / 100) * size.height;
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      const angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
+      return { x: x1, y: y1, length, angle, key: `seg-${index}` };
+    });
+  }, [points, size]);
+
+  return (
+    <View style={styles.outcomePanel}>
+      <View style={styles.outcomeHeader}>
+        <AppText style={styles.outcomeLabel}>
+          {mode === 'plan' ? 'Stable outcome' : 'Reactive outcome'}
+        </AppText>
+      </View>
+      <View
+        style={styles.outcomeChart}
+        onLayout={(event) =>
+          setSize({
+            width: event.nativeEvent.layout.width,
+            height: event.nativeEvent.layout.height,
+          })
+        }
+      >
+        <Animated.View
+          style={[
+            styles.outcomeLine,
+            {
+              opacity: lineAnim,
+              transform: [
+                {
+                  translateY: lineAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [6, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {segments.map((segment) => (
+            <View
+              key={segment.key}
+              style={[
+                styles.outcomeLineSegment,
+                {
+                  width: segment.length,
+                  left: segment.x,
+                  top: segment.y,
+                  transform: [{ rotate: `${segment.angle}deg` }],
+                },
+              ]}
+            />
+          ))}
+        </Animated.View>
+      </View>
+      <AppText style={styles.outcomeCaption}>
+        {mode === 'plan'
+          ? 'Clarity before execution keeps outcomes steadier.'
+          : 'Skipping steps makes outcomes more reactive.'}
+      </AppText>
     </View>
   );
 }
@@ -1409,8 +1649,35 @@ const createStyles = (colors) =>
   scenarioCard: {
     gap: spacing.md,
   },
-  scenarioVisual: {
-    gap: spacing.md,
+  scenarioToggle: {
+    flexDirection: 'row',
+    padding: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: toRgba(colors.textSecondary, 0.45),
+    backgroundColor: colors.surface,
+    marginTop: spacing.md,
+  },
+  scenarioToggleOption: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scenarioToggleOptionActive: {
+    backgroundColor: colors.surfaceActive,
+    borderWidth: 1,
+    borderColor: toRgba(colors.textSecondary, 0.35),
+  },
+  scenarioToggleText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 0.6,
+  },
+  scenarioToggleTextActive: {
+    color: colors.textPrimary,
   },
   scenarioPanel: {
     padding: spacing.md,
@@ -1469,6 +1736,9 @@ const createStyles = (colors) =>
   scenarioNodeActive: {
     backgroundColor: colors.accent,
   },
+  scenarioNodeDegraded: {
+    opacity: 0.4,
+  },
   scenarioNodeMissing: {
     backgroundColor: 'transparent',
     borderWidth: 1,
@@ -1482,13 +1752,14 @@ const createStyles = (colors) =>
     backgroundColor: toRgba(colors.textSecondary, 0.5),
   },
   scenarioRailLineBroken: {
-    width: 2,
-    height: 18,
-    marginTop: 4,
+    backgroundColor: 'transparent',
     borderRadius: 1,
     borderWidth: 1,
     borderStyle: 'dashed',
     borderColor: toRgba(colors.textSecondary, 0.5),
+  },
+  scenarioRailLineDegraded: {
+    opacity: 0.4,
   },
   scenarioRailLabel: {
     fontFamily: typography.fontFamilyMedium,
@@ -1501,10 +1772,85 @@ const createStyles = (colors) =>
   scenarioRailLabelStrong: {
     color: colors.accent,
   },
+  scenarioRailLabelDegraded: {
+    color: toRgba(colors.textSecondary, 0.6),
+  },
   scenarioRailLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+  },
+  scenarioRailLabelColumn: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  scenarioConsequence: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
+  },
+  scenarioPrematureBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: toRgba(colors.accent, 0.6),
+  },
+  scenarioPrematureText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.accent,
+    fontSize: typography.small - 1,
+    letterSpacing: 0.4,
+  },
+  scenarioTapHint: {
+    fontFamily: typography.fontFamilyMedium,
+    color: toRgba(colors.textSecondary, 0.8),
+    fontSize: typography.small - 1,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  scenarioOutcome: {
+    marginTop: spacing.md,
+  },
+  outcomePanel: {
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  outcomeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  outcomeLabel: {
+    fontFamily: typography.fontFamilyDemi,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+  },
+  outcomeChart: {
+    height: 120,
+    borderRadius: 14,
+    backgroundColor: colors.surfaceActive,
+    overflow: 'hidden',
+  },
+  outcomeLine: {
+    flex: 1,
+  },
+  outcomeLineSegment: {
+    position: 'absolute',
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: colors.textSecondary,
+  },
+  outcomeCaption: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
   },
   scenarioInsightLine: {
     fontFamily: typography.fontFamilyMedium,
