@@ -39,10 +39,11 @@ export default function LessonStepScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { lessonId, step = 1, entrySource } = route.params || {};
-  const { userContext, addReflection, completeLesson } = useApp();
+  const { userContext, onboardingContext, addReflection, completeLesson } = useApp();
   const glossary = useGlossary();
   const isIntroConcept = lessonId === 'lesson_0' && step === 1;
   const isIntroVisualization = lessonId === 'lesson_0' && step === 2;
+  const isIntroScenario = lessonId === 'lesson_0' && step === 3;
 
   const content = lessonContent[lessonId] || lessonContent.lesson_0;
   const stepTitle = useMemo(() => {
@@ -103,6 +104,8 @@ export default function LessonStepScreen() {
             ? 'STEP 1 · CONCEPT'
             : isIntroVisualization
             ? 'STEP 2 · VISUALISATION'
+            : isIntroScenario
+            ? 'STEP 3 · SCENARIO'
             : null
         }
         progressText={
@@ -110,6 +113,8 @@ export default function LessonStepScreen() {
             ? `1/${TOTAL_STEPS}`
             : isIntroVisualization
             ? `2/${TOTAL_STEPS}`
+            : isIntroScenario
+            ? `3/${TOTAL_STEPS}`
             : null
         }
         showTitle={!isIntroConcept && !isIntroVisualization}
@@ -131,14 +136,21 @@ export default function LessonStepScreen() {
           onPressTerm={handleTermPress}
         />
       )}
-      {step === 3 && (
+      {step === 3 && (lessonId === 'lesson_0' ? (
+        <IntroScenarioStep
+          content={content}
+          onboardingContext={onboardingContext}
+          userContext={userContext}
+          onNext={handleNext}
+        />
+      ) : (
         <ScenarioStep
           content={content}
           userContext={userContext}
           onNext={handleNext}
           onPressTerm={handleTermPress}
         />
-      )}
+      ))}
       {step === 4 && (
         <ExerciseStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
       )}
@@ -413,6 +425,135 @@ function IntroVisualizationStep({ onNext }) {
           </View>
         </ScrollView>
       </View>
+    </View>
+  );
+}
+
+function getScenarioVariantFromOnboarding(onboardingContext, userContext) {
+  const experienceText = (onboardingContext?.experienceAnswer || '').toLowerCase();
+  const knowledgeText = (onboardingContext?.knowledgeAnswer || '').toLowerCase();
+
+  if (/(seasoned|professional|advisor|decade|advanced)/.test(experienceText)) {
+    return 'seasoned';
+  }
+  if (/(year|years|portfolio|stock|stocks|crypto|etf|bond|fund|index|broker|app|trade|trading)/.test(experienceText)) {
+    return 'growing';
+  }
+  if (/(none|nothing|new|starting|beginner)/.test(experienceText)) {
+    return 'new';
+  }
+
+  if (/(advanced|expert|professional)/.test(knowledgeText)) {
+    return 'seasoned';
+  }
+  if (/(intermediate|familiar|comfortable|some)/.test(knowledgeText)) {
+    return 'growing';
+  }
+  if (/(basic|new|beginner|none)/.test(knowledgeText)) {
+    return 'new';
+  }
+
+  return userContext?.experience || 'new';
+}
+
+function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) {
+  const { styles, colors } = useLessonStepStyles();
+  const scenario = content?.steps?.scenario;
+  const variantKey = getScenarioVariantFromOnboarding(onboardingContext, userContext);
+  const variant = scenario?.variants?.[variantKey] || scenario?.variants?.new;
+  const keyInsight =
+    variant?.keyInsight ||
+    'The process prevents impulsive action by forcing clarity before execution.';
+  const planSteps = ['Goal', 'Risk', 'Strategy', 'Allocation', 'Vehicle', 'Execution'];
+  const noPlanSteps = ['Goal missing', 'Risk missing', 'Execution'];
+
+  return (
+    <View style={styles.stepBody}>
+      <View style={styles.scenarioVisual}>
+        <View style={styles.scenarioPanel}>
+          <View style={styles.scenarioPanelHeader}>
+            <AppText style={styles.scenarioPanelTitle}>With a plan</AppText>
+            <View style={styles.scenarioBadge}>
+              <AppText style={styles.scenarioBadgeText}>Stable decisions</AppText>
+            </View>
+          </View>
+          <View style={styles.scenarioRail}>
+            {planSteps.map((label, index) => {
+              const isLast = index === planSteps.length - 1;
+              const isExecution = label === 'Execution';
+              return (
+                <View key={label} style={styles.scenarioRailRow}>
+                  <View style={styles.scenarioRailTrack}>
+                    <View
+                      style={[
+                        styles.scenarioNode,
+                        isExecution && styles.scenarioNodeActive,
+                      ]}
+                    />
+                    {!isLast ? <View style={styles.scenarioRailLine} /> : null}
+                  </View>
+                  <AppText
+                    style={[
+                      styles.scenarioRailLabel,
+                      isExecution && styles.scenarioRailLabelStrong,
+                    ]}
+                  >
+                    {label}
+                  </AppText>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.scenarioPanel}>
+          <View style={styles.scenarioPanelHeader}>
+            <AppText style={styles.scenarioPanelTitle}>Without a plan</AppText>
+            <View style={[styles.scenarioBadge, styles.scenarioBadgeMuted]}>
+              <AppText style={styles.scenarioBadgeText}>Reactive decisions</AppText>
+            </View>
+          </View>
+          <View style={styles.scenarioRail}>
+            {noPlanSteps.map((label, index) => {
+              const isLast = index === noPlanSteps.length - 1;
+              const isExecution = label === 'Execution';
+              const isMissing = label.includes('missing');
+              return (
+                <View key={label} style={styles.scenarioRailRow}>
+                  <View style={styles.scenarioRailTrack}>
+                    <View
+                      style={[
+                        styles.scenarioNode,
+                        isExecution && styles.scenarioNodeActive,
+                        isMissing && styles.scenarioNodeMissing,
+                      ]}
+                    />
+                    {!isLast ? (
+                      <View style={styles.scenarioRailLineBroken} />
+                    ) : null}
+                  </View>
+                  <View style={styles.scenarioRailLabelRow}>
+                    <AppText
+                      style={[
+                        styles.scenarioRailLabel,
+                        isMissing && styles.scenarioRailLabelMuted,
+                        isExecution && styles.scenarioRailLabelStrong,
+                      ]}
+                    >
+                      {label}
+                    </AppText>
+                    {isExecution ? (
+                      <Ionicons name="arrow-down" size={14} color={colors.accent} />
+                    ) : null}
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+      <AppText style={styles.scenarioInsightLine}>{keyInsight}</AppText>
+      <PrimaryButton label="Next" onPress={onNext} />
     </View>
   );
 }
@@ -1267,6 +1408,109 @@ const createStyles = (colors) =>
   },
   scenarioCard: {
     gap: spacing.md,
+  },
+  scenarioVisual: {
+    gap: spacing.md,
+  },
+  scenarioPanel: {
+    padding: spacing.md,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+    gap: spacing.md,
+  },
+  scenarioPanelHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  scenarioPanelTitle: {
+    fontFamily: typography.fontFamilyDemi,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+  },
+  scenarioBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: toRgba(colors.accent, 0.6),
+    backgroundColor: toRgba(colors.accent, 0.12),
+  },
+  scenarioBadgeMuted: {
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  scenarioBadgeText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small - 1,
+    letterSpacing: 0.6,
+  },
+  scenarioRail: {
+    gap: spacing.sm,
+  },
+  scenarioRailRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
+  scenarioRailTrack: {
+    alignItems: 'center',
+    width: 18,
+  },
+  scenarioNode: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.textSecondary,
+  },
+  scenarioNodeActive: {
+    backgroundColor: colors.accent,
+  },
+  scenarioNodeMissing: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: toRgba(colors.textSecondary, 0.6),
+  },
+  scenarioRailLine: {
+    width: 2,
+    height: 18,
+    marginTop: 4,
+    backgroundColor: toRgba(colors.textSecondary, 0.5),
+  },
+  scenarioRailLineBroken: {
+    width: 2,
+    height: 18,
+    marginTop: 4,
+    borderRadius: 1,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: toRgba(colors.textSecondary, 0.5),
+  },
+  scenarioRailLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+  },
+  scenarioRailLabelMuted: {
+    color: colors.textSecondary,
+  },
+  scenarioRailLabelStrong: {
+    color: colors.accent,
+  },
+  scenarioRailLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  scenarioInsightLine: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
   },
   optionList: {
     gap: spacing.sm,

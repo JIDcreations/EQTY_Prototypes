@@ -46,32 +46,33 @@ export const lessonContent = {
         ],
       },
       scenario: {
-        title: 'Start with the process',
+        title: 'Plan vs no plan',
         variants: {
           new: {
-            prompt:
-              'A headline makes a stock look exciting. What is your first move?',
-            options: ['Define your target', 'Buy quickly', 'Check social media'],
-            insight:
-              'Starting with the target keeps every later step aligned and reduces impulse.',
+            narrative: [
+              'A person wants to start investing but has not placed a first trade yet.',
+              'A headline creates urgency, yet the goal, risk limits, and time horizon are still undefined.',
+              'The process begins by clarifying the target before tools or markets are chosen.',
+            ],
+            keyInsight:
+              'The process slows action so the first decision is made with clarity.',
           },
           growing: {
-            prompt:
-              'You are comparing two funds. Which step keeps the decision grounded?',
-            options: [
-              'Check your target and horizon',
-              'Follow recent performance',
-              'Copy a popular list',
+            narrative: [
+              'Someone has tried a broker app and made a few ETF or crypto moves.',
+              'Choices start to stack up without a consistent target or risk boundary.',
+              'The process pauses to define drivers and strategy before any new allocation.',
             ],
-            insight:
-              'A clear target and horizon prevent decisions from drifting with noise.',
+            keyInsight:
+              'Consistency comes from clear targets and constraints, not from the latest picks.',
           },
           seasoned: {
-            prompt:
-              'You are ready to execute, but the plan feels vague. What do you revisit?',
-            options: ['Strategy and allocation', 'Order type only', 'Short-term headlines'],
-            insight:
-              'Execution makes sense only when the earlier steps are clear.',
+            narrative: [
+              'An investor has executed before but wants a repeatable structure.',
+              'A new opportunity appears, yet the plan feels uneven across cycles.',
+              'The process re-centers on target, drivers, and allocation before execution.',
+            ],
+            keyInsight: 'Structure creates consistency across changing conditions.',
           },
         },
       },
