@@ -59,7 +59,7 @@ export default function LessonStepScreen() {
       case 1:
         return content.steps.concept.title;
       case 2:
-        return lessonId === 'lesson_0' ? null : content.steps.visualization.title;
+        return lessonId === 'lesson_0' ? 'From goal to execution' : content.steps.visualization.title;
       case 3:
         return content.steps.scenario.title;
       case 4:
@@ -67,7 +67,7 @@ export default function LessonStepScreen() {
       case 5:
         return content?.steps?.reflection?.title || 'Reflection';
       case 6:
-        return 'Summary';
+        return 'The full investing process';
       default:
         return `Step ${step}`;
     }
@@ -138,7 +138,7 @@ export default function LessonStepScreen() {
             ? `6/${TOTAL_STEPS}`
             : null
         }
-        showTitle={!isIntroSummary}
+        showTitle
       />
 
       {step === 1 && (
@@ -210,7 +210,7 @@ function ConceptStep({ content, lessonId, onNext, onPressTerm }) {
   const { styles } = useLessonStepStyles();
 
   if (lessonId === 'lesson_0') {
-    return <IntroConceptStep onNext={onNext} />;
+    return <IntroConceptStep content={content} onNext={onNext} />;
   }
 
   return (
@@ -238,8 +238,9 @@ function ConceptStep({ content, lessonId, onNext, onPressTerm }) {
   );
 }
 
-function IntroConceptStep({ onNext }) {
+function IntroConceptStep({ content, onNext }) {
   const { styles } = useLessonStepStyles();
+  const intro = content?.steps?.concept?.intro;
   const steps = [
     {
       id: 'goal',
@@ -278,6 +279,7 @@ function IntroConceptStep({ onNext }) {
 
   return (
     <View style={styles.stepBody}>
+      {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
       <Card style={styles.conceptCard}>
         <View style={styles.introHeader}>
           <View style={styles.introAccent} />
@@ -406,7 +408,6 @@ function IntroVisualizationStep({ onNext }) {
   return (
     <View style={[styles.stepBody, styles.journeyBody]}>
       <View style={styles.journeyContent}>
-        <AppText style={styles.journeyTitle}>From goal to execution</AppText>
         <AppText style={styles.journeySubtitle}>
           Each decision naturally leads to the next.
         </AppText>
@@ -493,6 +494,7 @@ function getScenarioVariantFromOnboarding(onboardingContext, userContext) {
 function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) {
   const { styles, colors } = useLessonStepStyles();
   const scenario = content?.steps?.scenario;
+  const intro = scenario?.intro;
   const variantKey = getScenarioVariantFromOnboarding(onboardingContext, userContext);
   const variant = scenario?.variants?.[variantKey] || scenario?.variants?.new;
   const keyInsight =
@@ -568,6 +570,7 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
 
   return (
     <View style={styles.stepBody}>
+      {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
       <View style={styles.scenarioToggle}>
         <Pressable
           onPress={() => handleToggle('plan')}
@@ -1544,6 +1547,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
   const { colors, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
   const [response, setResponse] = useState(null);
+  const intro = content?.steps?.reflection?.intro;
 
   const buildResponse = (input) => {
     const normalized = (input || '').toLowerCase().trim();
@@ -1608,6 +1612,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 72 : 0}
       style={[styles.stepBody, styles.reflectionBody]}
     >
+      {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
       <ScrollView
         style={styles.reflectionScroll}
         contentContainerStyle={styles.reflectionScrollContent}
@@ -1745,9 +1750,6 @@ function IntroSummaryStep({ content, onComplete }) {
   return (
     <View style={[styles.stepBody, styles.summaryBody]}>
       <View style={styles.summaryHeaderBlock}>
-        <AppText style={styles.summaryTitle}>
-          {content?.steps?.summary?.title || 'The full investing process'}
-        </AppText>
         <AppText style={styles.summarySubtitle}>
           {content?.steps?.summary?.subtitle ||
             'Execution is the final step — not the starting point.'}
@@ -1856,6 +1858,12 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyDemi,
     color: colors.textPrimary,
     fontSize: typography.h1,
+  },
+  stepIntro: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
   },
   introText: {
     fontFamily: typography.fontFamilyMedium,

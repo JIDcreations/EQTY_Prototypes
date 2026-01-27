@@ -6,6 +6,7 @@ export const lessonContent = {
     steps: {
       concept: {
         title: 'A structured chain of decisions',
+        intro: 'Investing works when each decision builds on the previous one.',
         body:
           'Investing is not one action. It is a structured decision-making process with clear steps that build on each other. Buying or selling is only the final step, after you define the target, understand the drivers, choose a strategy, and set the allocation.',
         visualHint: 'Process first, action last.',
@@ -47,6 +48,7 @@ export const lessonContent = {
       },
       scenario: {
         title: 'Plan vs no plan',
+        intro: 'See how planning shapes execution before any action is taken.',
         variants: {
           new: {
             narrative: [
@@ -98,6 +100,7 @@ export const lessonContent = {
       },
       reflection: {
         title: 'Your takeaway',
+        intro: 'Capture the shift in how you think about execution.',
         question: 'What changed in how you think about execution after this lesson?',
         placeholder: 'Example: I see why execution should come last.',
       },

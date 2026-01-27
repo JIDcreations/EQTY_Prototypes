@@ -34,10 +34,10 @@ export default function StepHeader({
         <Pressable onPress={onBack} style={styles.backButton}>
           <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
         </Pressable>
-        <AppText style={styles.stepText}>{progressLabel}</AppText>
       </View>
       {stepLabel ? <AppText style={styles.stepLabel}>{stepLabel}</AppText> : null}
       {showTitle ? titleNode : null}
+      <AppText style={styles.progressInline}>{progressLabel}</AppText>
       <ProgressBar progress={step / total} />
     </View>
   );
@@ -51,7 +51,7 @@ const createStyles = (colors) =>
     topRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
     },
     backButton: {
       width: 36,
@@ -61,7 +61,7 @@ const createStyles = (colors) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    stepText: {
+    progressInline: {
       fontFamily: typography.fontFamilyMedium,
       color: colors.textSecondary,
       fontSize: typography.small - 1,
