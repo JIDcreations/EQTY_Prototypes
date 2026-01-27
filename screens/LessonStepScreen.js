@@ -59,7 +59,7 @@ export default function LessonStepScreen() {
       case 1:
         return content.steps.concept.title;
       case 2:
-        return content.steps.visualization.title;
+        return lessonId === 'lesson_0' ? null : content.steps.visualization.title;
       case 3:
         return content.steps.scenario.title;
       case 4:
@@ -138,7 +138,7 @@ export default function LessonStepScreen() {
             ? `6/${TOTAL_STEPS}`
             : null
         }
-        showTitle={!isIntroVisualization && !isIntroSummary}
+        showTitle={!isIntroSummary}
       />
 
       {step === 1 && (
@@ -2066,6 +2066,11 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.small - 1,
     color: colors.textSecondary,
+    lineHeight: typography.small - 1,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
+    transform: [{ translateY: Platform.OS === 'ios' ? 0.5 : 0 }],
   },
   processNodeTextActive: {
     color: colors.background,
