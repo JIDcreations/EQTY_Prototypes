@@ -112,11 +112,12 @@ export function AppProvider({ children }) {
     await saveProgress(next);
   };
 
-  const addReflection = async (text, lessonId) => {
+  const addReflection = async (text, lessonId, response = null) => {
     const entry = {
       id: `${lessonId}_${Date.now()}`,
       lessonId,
       text,
+      response,
       createdAt: new Date().toISOString(),
     };
     const next = [entry, ...reflections];

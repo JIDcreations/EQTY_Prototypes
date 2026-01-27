@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   Animated,
   Easing,
@@ -48,6 +48,9 @@ export default function LessonStepScreen() {
   const isIntroConcept = lessonId === 'lesson_0' && step === 1;
   const isIntroVisualization = lessonId === 'lesson_0' && step === 2;
   const isIntroScenario = lessonId === 'lesson_0' && step === 3;
+  const isIntroExercise = lessonId === 'lesson_0' && step === 4;
+  const isIntroReflection = lessonId === 'lesson_0' && step === 5;
+  const isIntroSummary = lessonId === 'lesson_0' && step === 6;
 
   const content = lessonContent[lessonId] || lessonContent.lesson_0;
   const stepTitle = useMemo(() => {
@@ -60,9 +63,9 @@ export default function LessonStepScreen() {
       case 3:
         return content.steps.scenario.title;
       case 4:
-        return content.steps.exercise.title;
+        return content?.steps?.exercise?.title || 'Build the process';
       case 5:
-        return 'Reflection';
+        return content?.steps?.reflection?.title || 'Reflection';
       case 6:
         return 'Summary';
       default:
@@ -89,8 +92,10 @@ export default function LessonStepScreen() {
     if (glossary?.openTerm) glossary.openTerm(term);
   };
 
-  const disableOuterScroll = lessonId === 'lesson_0' && step === 2;
-  const containerContentStyle = disableOuterScroll ? { paddingBottom: 0 } : null;
+  const disableOuterScroll =
+    lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
+  const containerContentStyle =
+    disableOuterScroll && step === 2 ? { paddingBottom: 0 } : null;
 
   return (
     <LessonStepContainer
@@ -110,6 +115,12 @@ export default function LessonStepScreen() {
             ? 'STEP 2 · VISUALISATION'
             : isIntroScenario
             ? 'STEP 3 · SCENARIO'
+            : isIntroExercise
+            ? 'STEP 4 · EXERCISE'
+            : isIntroReflection
+            ? 'STEP 5 · REFLECTION'
+            : isIntroSummary
+            ? 'STEP 6 · SUMMARY'
             : null
         }
         progressText={
@@ -119,9 +130,15 @@ export default function LessonStepScreen() {
             ? `2/${TOTAL_STEPS}`
             : isIntroScenario
             ? `3/${TOTAL_STEPS}`
+            : isIntroExercise
+            ? `4/${TOTAL_STEPS}`
+            : isIntroReflection
+            ? `5/${TOTAL_STEPS}`
+            : isIntroSummary
+            ? `6/${TOTAL_STEPS}`
             : null
         }
-        showTitle={!isIntroConcept && !isIntroVisualization}
+        showTitle={!isIntroVisualization && !isIntroSummary}
       />
 
       {step === 1 && (
@@ -156,20 +173,33 @@ export default function LessonStepScreen() {
         />
       ))}
       {step === 4 && (
-        <ExerciseStep content={content} onNext={handleNext} onPressTerm={handleTermPress} />
+        <ExerciseStep
+          content={content}
+          lessonId={lessonId}
+          onNext={handleNext}
+          onPressTerm={handleTermPress}
+        />
       )}
       {step === 5 && (
         <ReflectionStep
           content={content}
-          onSubmit={async (text) => {
-            await addReflection(text, lessonId);
+          onSubmit={async (text, response) => {
+            await addReflection(text, lessonId, response);
             handleNext();
           }}
           onPressTerm={handleTermPress}
         />
       )}
       {step === 6 && (
-        <SummaryStep content={content} onComplete={handleComplete} onPressTerm={handleTermPress} />
+        lessonId === 'lesson_0' ? (
+          <IntroSummaryStep content={content} onComplete={handleComplete} />
+        ) : (
+          <SummaryStep
+            content={content}
+            onComplete={handleComplete}
+            onPressTerm={handleTermPress}
+          />
+        )
       )}
 
     </LessonStepContainer>
@@ -888,7 +918,7 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
   );
 }
 
-function ExerciseStep({ content, onNext, onPressTerm }) {
+function ExerciseStep({ content, lessonId, onNext, onPressTerm }) {
   const { styles } = useLessonStepStyles();
   const exercise = content?.steps?.exercise;
 
@@ -901,6 +931,10 @@ function ExerciseStep({ content, onNext, onPressTerm }) {
         <PrimaryButton label="Continue" onPress={onNext} />
       </View>
     );
+  }
+
+  if (lessonId === 'lesson_0') {
+    return <IntroExerciseStep exercise={exercise} onNext={onNext} />;
   }
 
   switch (exercise.type) {
@@ -999,6 +1033,217 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
         <SecondaryButton label="Reset" onPress={reset} />
         <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!isComplete} />
       </View>
+    </View>
+  );
+}
+
+function IntroExerciseStep({ exercise, onNext }) {
+  const { styles } = useLessonStepStyles();
+  const { items = [], correctOrder = [] } = exercise;
+  const [placements, setPlacements] = useState(
+    () => items.reduce((acc, item) => ({ ...acc, [item.id]: null }), {})
+  );
+  const [hintActive, setHintActive] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+
+  const slots = useMemo(() => {
+    const next = Array(items.length).fill(null);
+    items.forEach((item) => {
+      const slotIndex = placements[item.id];
+      if (slotIndex !== null && slotIndex !== undefined) {
+        next[slotIndex] = item;
+      }
+    });
+    return next;
+  }, [items, placements]);
+
+  const available = items.filter((item) => placements[item.id] === null);
+  const isComplete = slots.every(Boolean);
+  const isCorrect =
+    isComplete && correctOrder.every((stepId, index) => slots[index]?.id === stepId);
+  const showError = isComplete && !isCorrect;
+  const wrongSlots = showError
+    ? slots.map((item, index) => item?.id !== correctOrder[index])
+    : [];
+
+  const handlePlace = (id) => {
+    if (placements[id] !== null && placements[id] !== undefined) return;
+    const nextIndex = slots.findIndex((item) => !item);
+    if (nextIndex === -1) return;
+    setPlacements((prev) => ({ ...prev, [id]: nextIndex }));
+  };
+
+  const handleRemove = (id) => {
+    setPlacements((prev) => ({ ...prev, [id]: null }));
+  };
+
+  const handleHint = () => {
+    setHintActive(true);
+    setShowHint(true);
+    setTimeout(() => {
+      setHintActive(false);
+    }, 1500);
+  };
+
+  return (
+    <View style={[styles.stepBody, styles.exerciseBody]}>
+      <View style={styles.exerciseContent}>
+        <AppText style={styles.exerciseInstruction}>
+          Tap the steps in the correct order before execution.
+        </AppText>
+        {isComplete ? (
+          <AppText
+            style={[
+              styles.exerciseStatusText,
+              isCorrect ? styles.exerciseStatusCorrect : styles.exerciseStatusWrong,
+            ]}
+          >
+            {isCorrect
+              ? 'Correct order — you can continue.'
+              : 'Order is off — try again.'}
+          </AppText>
+        ) : null}
+
+        <View style={styles.exerciseSection}>
+          <AppText style={styles.exerciseSectionLabel}>Your process</AppText>
+          <View style={styles.exerciseSlots}>
+            {slots.map((item, index) => {
+              const isExecutionSlot = index === slots.length - 1;
+              return (
+                <View
+                  key={`slot-${index}`}
+                  style={[
+                    styles.exerciseSlot,
+                    isExecutionSlot && styles.exerciseSlotExecution,
+                    wrongSlots[index] && styles.exerciseSlotWrong,
+                    hintActive && index === 0 && styles.exerciseSlotHint,
+                  ]}
+                >
+                  <View style={styles.exerciseSlotIndex}>
+                    <AppText style={styles.exerciseSlotIndexText}>{index + 1}</AppText>
+                  </View>
+                  {item ? (
+                    <Pressable onPress={() => handleRemove(item.id)}>
+                      <View style={styles.exerciseChip}>
+                        <AppText style={styles.exerciseChipText}>{item.label}</AppText>
+                      </View>
+                    </Pressable>
+                  ) : (
+                    <AppText style={styles.exerciseSlotTextMuted}>
+                      {isExecutionSlot ? 'Execution (last)' : 'Empty slot'}
+                    </AppText>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.exerciseSection}>
+          <AppText style={styles.exerciseSectionLabel}>Available steps</AppText>
+          <View style={styles.exerciseChipList}>
+            {available.map((item) => {
+              return (
+                <Pressable key={item.id} onPress={() => handlePlace(item.id)}>
+                  <View style={styles.exerciseChip}>
+                    <AppText style={styles.exerciseChipText}>{item.label}</AppText>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.exerciseFooter}>
+        <View style={styles.exerciseActionRow}>
+          <SecondaryButton
+            label="Need a hint?"
+            onPress={handleHint}
+            style={styles.exerciseHintButton}
+          />
+          <PrimaryButton
+            label="Next"
+            onPress={onNext}
+            disabled={!isCorrect}
+            style={styles.exerciseNextButton}
+          />
+        </View>
+      </View>
+
+      <BottomSheet visible={showHint} onClose={() => setShowHint(false)} title="Hint">
+        <AppText style={styles.exerciseHintBody}>
+          Execution is never the starting point. Begin by defining the goal.
+        </AppText>
+      </BottomSheet>
+    </View>
+  );
+}
+
+function ExerciseOutcomeLine({ mode }) {
+  const { styles } = useLessonStepStyles();
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const points =
+    mode === 'stable'
+      ? [
+          { x: 0, y: 70 },
+          { x: 20, y: 62 },
+          { x: 40, y: 56 },
+          { x: 60, y: 48 },
+          { x: 80, y: 40 },
+          { x: 100, y: 34 },
+        ]
+      : [
+          { x: 0, y: 62 },
+          { x: 18, y: 42 },
+          { x: 36, y: 82 },
+          { x: 54, y: 36 },
+          { x: 72, y: 86 },
+          { x: 90, y: 46 },
+          { x: 100, y: 58 },
+        ];
+  const segments = useMemo(() => {
+    if (!size.width || !size.height) return [];
+    return points.slice(0, -1).map((point, index) => {
+      const next = points[index + 1];
+      const x1 = (point.x / 100) * size.width;
+      const y1 = (point.y / 100) * size.height;
+      const x2 = (next.x / 100) * size.width;
+      const y2 = (next.y / 100) * size.height;
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      const angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
+      return { x: x1, y: y1, length, angle, key: `ex-seg-${index}` };
+    });
+  }, [points, size]);
+
+  return (
+    <View
+      style={styles.exerciseOutcomeLine}
+      onLayout={(event) =>
+        setSize({
+          width: event.nativeEvent.layout.width,
+          height: event.nativeEvent.layout.height,
+        })
+      }
+    >
+      {segments.map((segment) => (
+        <View
+          key={segment.key}
+          style={[
+            styles.exerciseOutcomeLineSegment,
+            {
+              width: segment.length,
+              left: segment.x,
+              top: segment.y,
+              transform: [{ rotate: `${segment.angle}deg` }],
+              backgroundColor:
+                mode === 'stable'
+                  ? styles.exerciseLineStable.backgroundColor
+                  : styles.exerciseLineReactive.backgroundColor,
+            },
+          ]}
+        />
+      ))}
     </View>
   );
 }
@@ -1298,28 +1543,121 @@ function MultiExercise({ exercise, onNext, onPressTerm }) {
 function ReflectionStep({ content, onSubmit, onPressTerm }) {
   const { colors, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
+  const [response, setResponse] = useState(null);
+
+  const buildResponse = (input) => {
+    const normalized = (input || '').toLowerCase().trim();
+    if (!normalized || normalized.length < 6) {
+      return 'The lesson centers on defining each step before execution to keep decisions grounded.';
+    }
+    const structureWords = [
+      'order',
+      'sequence',
+      'step',
+      'process',
+      'structure',
+      'framework',
+      'flow',
+      'plan',
+      'planning',
+      'prior',
+      'before',
+      'clarity',
+    ];
+    const emotionWords = [
+      'fear',
+      'anxiety',
+      'panic',
+      'stress',
+      'nervous',
+      'worry',
+      'emotional',
+      'impulse',
+      'impulsive',
+      'reactive',
+      'react',
+      'fomo',
+    ];
+    const hasStructure = structureWords.some((word) => normalized.includes(word));
+    const hasEmotion = emotionWords.some((word) => normalized.includes(word));
+    if (hasStructure) {
+      return 'Noted — execution gains meaning when it follows the full sequence of steps.';
+    }
+    if (hasEmotion) {
+      return 'Noted — a defined process can reduce reactive execution by adding pause and clarity.';
+    }
+    return 'This reflection ties back to the idea that execution works best after the earlier steps are set.';
+  };
+
+  const handleBlur = () => {
+    setResponse(buildResponse(text));
+  };
+
+  const handleContinue = () => {
+    const nextResponse = response || buildResponse(text);
+    if (!response) {
+      setResponse(nextResponse);
+      return;
+    }
+    onSubmit(text, nextResponse);
+  };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.stepBody}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 72 : 0}
+      style={[styles.stepBody, styles.reflectionBody]}
     >
-      <Card style={styles.reflectionCard}>
-        <GlossaryText
-          text={content?.steps?.reflection?.question}
-          style={styles.bodyText}
-          onPressTerm={onPressTerm}
-        />
-        <TextInput
-          style={styles.input}
-          value={text}
-          onChangeText={setText}
-          placeholder="Write a short reflection"
-          placeholderTextColor={colors.textSecondary}
-          multiline
-        />
-      </Card>
-      <PrimaryButton label="Submit reflection" onPress={() => onSubmit(text)} disabled={!text} />
+      <ScrollView
+        style={styles.reflectionScroll}
+        contentContainerStyle={styles.reflectionScrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.reflectionThread}>
+          <View style={[styles.chatBubble, styles.chatBubbleSystem]}>
+            <AppText style={styles.chatLabel}>EQTY</AppText>
+            <GlossaryText
+              text={content?.steps?.reflection?.question}
+              style={styles.chatText}
+              onPressTerm={onPressTerm}
+            />
+          </View>
+          <View style={[styles.chatBubble, styles.chatBubbleUser]}>
+            <TextInput
+              style={styles.chatInput}
+              value={text}
+              onChangeText={(value) => {
+                setText(value);
+                setResponse(null);
+              }}
+              onBlur={handleBlur}
+              placeholder={
+                content?.steps?.reflection?.placeholder || 'Write a short reflection'
+              }
+              placeholderTextColor={colors.textSecondary}
+              multiline
+            />
+          </View>
+        {response ? (
+          <View style={[styles.chatBubble, styles.chatBubbleSystem]}>
+            <AppText style={styles.chatLabel}>EQTY insight</AppText>
+            <AppText style={styles.chatText}>{response}</AppText>
+          </View>
+        ) : null}
+        </View>
+      </ScrollView>
+      <View style={styles.reflectionFooter}>
+        {response ? (
+          <View style={styles.reflectionSavedPill}>
+            <Ionicons name="sparkles-outline" size={14} color={colors.textSecondary} />
+            <AppText style={styles.reflectionSavedText}>
+              Saved to personalize upcoming lessons.
+            </AppText>
+          </View>
+        ) : null}
+        <PrimaryButton label="Continue" onPress={handleContinue} />
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -1355,6 +1693,135 @@ function SummaryStep({ content, onComplete, onPressTerm }) {
       ) : null}
 
       <PrimaryButton label="Complete lesson" onPress={onComplete} />
+    </View>
+  );
+}
+
+function IntroSummaryStep({ content, onComplete }) {
+  const { colors, styles } = useLessonStepStyles();
+  const map = content?.steps?.summary?.processMap || [];
+  const stations = map.length
+    ? map
+    : [
+        {
+          id: 'target',
+          title: 'Target',
+          description: 'Define the objective and boundaries.',
+          substeps: ['Purpose', 'Time horizon', 'Goal type'],
+        },
+        {
+          id: 'drivers',
+          title: 'Drivers',
+          description: 'Clarify the risk profile and constraints.',
+          substeps: ['Risk capacity', 'Risk tolerance', 'Financial resources'],
+        },
+        {
+          id: 'strategy',
+          title: 'Financial investment strategy',
+          description: 'Set the rules for how you will invest.',
+          substeps: ['Liquidity', 'Costs', 'Ethics/ESG', 'Dividend preference'],
+        },
+        {
+          id: 'allocation',
+          title: 'Capital allocation',
+          description: 'Distribute capital across the plan.',
+          substeps: ['Asset categories', 'Diversification', 'Example allocations'],
+        },
+        {
+          id: 'vehicles',
+          title: 'Investment vehicles',
+          description: 'Select the tools that express the plan.',
+          substeps: ['Equities', 'Bonds', 'ETFs', 'Alternatives'],
+        },
+        {
+          id: 'execution',
+          title: 'Execution',
+          description: 'Execute only after every step is clear.',
+          substeps: ['Order types', 'Transaction costs', 'Execution comes last'],
+        },
+      ];
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  return (
+    <View style={[styles.stepBody, styles.summaryBody]}>
+      <View style={styles.summaryHeaderBlock}>
+        <AppText style={styles.summaryTitle}>
+          {content?.steps?.summary?.title || 'The full investing process'}
+        </AppText>
+        <AppText style={styles.summarySubtitle}>
+          {content?.steps?.summary?.subtitle ||
+            'Execution is the final step — not the starting point.'}
+        </AppText>
+        <AppText style={styles.processHint}>Tap a station to expand.</AppText>
+      </View>
+
+      <View style={styles.summaryContent}>
+        <ScrollView
+          style={styles.summaryScroll}
+          contentContainerStyle={styles.summaryScrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.processMap}>
+            <View style={styles.processLine} />
+            {stations.map((station, index) => {
+              const isActive = index === activeIndex;
+              return (
+                <View key={station.id} style={styles.processStationBlock}>
+                  <Pressable
+                    onPress={() =>
+                      setActiveIndex((prev) => (prev === index ? null : index))
+                    }
+                    style={[
+                      styles.processStationRow,
+                      isActive && styles.processStationRowActive,
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.processNode,
+                        isActive && styles.processNodeActive,
+                      ]}
+                    />
+                    <View style={styles.processStationText}>
+                      <AppText style={styles.processStationIndex}>
+                        {index + 1}
+                      </AppText>
+                      <AppText style={styles.processStationTitle}>
+                        {station.title}
+                      </AppText>
+                    </View>
+                    <View style={styles.processStationIndicator}>
+                      <Ionicons
+                        name={isActive ? 'chevron-down' : 'chevron-forward'}
+                        size={16}
+                        color={isActive ? colors.accent : colors.textSecondary}
+                      />
+                    </View>
+                  </Pressable>
+                  {isActive ? (
+                    <View style={styles.processPanel}>
+                      <AppText style={styles.processDescription}>
+                        {station.description}
+                      </AppText>
+                      <View style={styles.processSubsteps}>
+                        {station.substeps?.map((item) => (
+                          <View key={`${station.id}-${item}`} style={styles.processChip}>
+                            <AppText style={styles.processChipText}>{item}</AppText>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  ) : null}
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
+
+      <View style={styles.summaryFooter}>
+        <PrimaryButton label="Continue" onPress={onComplete} />
+      </View>
     </View>
   );
 }
@@ -1892,8 +2359,177 @@ const createStyles = (colors) =>
   exerciseCard: {
     gap: spacing.md,
   },
+  exerciseBody: {
+    flex: 1,
+  },
+  exerciseContent: {
+    gap: spacing.lg,
+  },
   exerciseSection: {
     gap: spacing.md,
+  },
+  exerciseInstruction: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  exerciseStatusText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small,
+    lineHeight: 18,
+  },
+  exerciseStatusCorrect: {
+    color: colors.textPrimary,
+  },
+  exerciseStatusWrong: {
+    color: colors.textSecondary,
+  },
+  exerciseSectionLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  exerciseSlots: {
+    gap: spacing.sm,
+  },
+  exerciseSlot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+    minHeight: 56,
+  },
+  exerciseSlotExecution: {
+    borderColor: toRgba(colors.accent, 0.6),
+  },
+  exerciseSlotWrong: {
+    borderColor: toRgba(colors.accent, 0.8),
+    backgroundColor: toRgba(colors.accent, 0.08),
+  },
+  exerciseSlotHint: {
+    borderColor: toRgba(colors.accent, 0.6),
+  },
+  exerciseSlotIndex: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  exerciseSlotIndexText: {
+    fontFamily: typography.fontFamilyDemi,
+    fontSize: typography.small,
+    color: colors.textPrimary,
+  },
+  exerciseSlotText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.body,
+    color: colors.textPrimary,
+    flex: 1,
+  },
+  exerciseSlotEmptyText: {
+    color: colors.textSecondary,
+  },
+  exerciseSlotTextMuted: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.body,
+    color: colors.textSecondary,
+    flex: 1,
+  },
+  exerciseChipList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  exerciseChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+  },
+  exerciseChipText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small,
+    color: colors.textPrimary,
+  },
+  exerciseActionRow: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: spacing.sm,
+  },
+  exerciseHintButton: {
+    width: '100%',
+  },
+  exerciseNextButton: {
+    width: '100%',
+  },
+  exerciseFooter: {
+    marginTop: 'auto',
+    gap: spacing.sm,
+  },
+  exerciseHintBody: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  exerciseOutcome: {
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+  },
+  exerciseOutcomeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  exerciseOutcomeLabel: {
+    fontFamily: typography.fontFamilyDemi,
+    fontSize: typography.body,
+    color: colors.textPrimary,
+  },
+  exerciseOutcomeChart: {
+    height: 90,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    overflow: 'hidden',
+  },
+  exerciseOutcomeLineWrap: {
+    flex: 1,
+  },
+  exerciseOutcomeLine: {
+    flex: 1,
+  },
+  exerciseOutcomeLineSegment: {
+    position: 'absolute',
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: colors.textSecondary,
+  },
+  exerciseLineStable: {
+    backgroundColor: colors.textSecondary,
+  },
+  exerciseLineReactive: {
+    backgroundColor: toRgba(colors.textSecondary, 0.7),
+  },
+  exerciseOutcomeText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
   },
   exerciseLabel: {
     fontFamily: typography.fontFamilyDemi,
@@ -2005,23 +2641,222 @@ const createStyles = (colors) =>
   exerciseActions: {
     gap: spacing.md,
   },
-  reflectionCard: {
+  reflectionThread: {
     gap: spacing.md,
   },
-  input: {
-    minHeight: 120,
-    borderRadius: 16,
-    padding: spacing.md,
-    backgroundColor: colors.surfaceActive,
+  reflectionBody: {
+    flex: 1,
+  },
+  reflectionScroll: {
+    flex: 1,
+  },
+  reflectionScrollContent: {
+    paddingBottom: spacing.md,
+  },
+  reflectionFooter: {
+    gap: spacing.sm,
+    paddingBottom: spacing.sm,
+  },
+  chatBubble: {
+    maxWidth: '92%',
+    borderRadius: 18,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     borderWidth: 1,
-    borderColor: colors.textPrimary,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+  },
+  chatBubbleSystem: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.surface,
+  },
+  chatBubbleUser: {
+    alignSelf: 'flex-end',
+    backgroundColor: colors.surfaceActive,
+  },
+  chatLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.tiny,
+    color: colors.textSecondary,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  chatText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  chatInput: {
+    minHeight: 72,
     color: colors.textPrimary,
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.body,
     textAlignVertical: 'top',
   },
+  reflectionSavedPill: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  reflectionSavedText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small,
+    color: colors.textSecondary,
+  },
   summaryCard: {
     gap: spacing.md,
+  },
+  summaryHeaderBlock: {
+    gap: spacing.xs,
+  },
+  summaryTitle: {
+    fontFamily: typography.fontFamilyDemi,
+    color: colors.textPrimary,
+    fontSize: typography.h1,
+  },
+  summarySubtitle: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  processHint: {
+    fontFamily: typography.fontFamilyMedium,
+    color: toRgba(colors.textSecondary, 0.75),
+    fontSize: typography.small,
+    letterSpacing: 0.2,
+  },
+  summaryBody: {
+    flex: 1,
+  },
+  summaryContent: {
+    gap: spacing.lg,
+    flex: 1,
+  },
+  summaryScroll: {
+    flex: 1,
+  },
+  summaryScrollContent: {
+    paddingBottom: spacing.md,
+  },
+  systemInsight: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    textAlign: 'center',
+  },
+  summaryFooter: {
+    marginTop: 'auto',
+  },
+  processMap: {
+    position: 'relative',
+    gap: spacing.md,
+    paddingLeft: spacing.lg,
+  },
+  processLine: {
+    position: 'absolute',
+    left: spacing.sm + 1,
+    top: 4,
+    bottom: 4,
+    width: 2,
+    borderRadius: 999,
+    backgroundColor: toRgba(colors.textSecondary, 0.25),
+  },
+  processStationBlock: {
+    gap: spacing.xs,
+  },
+  processStationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  processStationRowActive: {
+    backgroundColor: toRgba(colors.surfaceActive, 0.6),
+    borderRadius: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  processNode: {
+    width: 14,
+    height: 14,
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  processNodeActive: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accent,
+  },
+  processStationText: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  processStationIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+  },
+  processStationIndex: {
+    fontFamily: typography.fontFamilyDemi,
+    fontSize: typography.small,
+    color: colors.textSecondary,
+  },
+  processStationTitle: {
+    fontFamily: typography.fontFamilyDemi,
+    fontSize: typography.body,
+    color: colors.textPrimary,
+    flexShrink: 1,
+  },
+  processPanel: {
+    marginLeft: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+    gap: spacing.sm,
+  },
+  processDescription: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    lineHeight: 18,
+  },
+  processSubsteps: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  processChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surfaceActive,
+  },
+  processChipText: {
+    fontFamily: typography.fontFamilyMedium,
+    fontSize: typography.small,
+    color: colors.textPrimary,
   },
   takeawayList: {
     gap: spacing.sm,

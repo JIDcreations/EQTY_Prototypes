@@ -77,16 +77,18 @@ export const lessonContent = {
         },
       },
       exercise: {
+        title: 'Build the process',
         type: 'sequence',
-        description: 'Place the EQTY steps in the correct order.',
+        description: 'Put the steps in the right order before you execute.',
         items: [
-          { id: 'target', label: 'Define the target' },
-          { id: 'drivers', label: 'Assess drivers and constraints' },
-          { id: 'strategy', label: 'Choose a strategy' },
-          { id: 'allocation', label: 'Set the allocation' },
-          { id: 'execution', label: 'Execute the order' },
+          { id: 'target', label: 'Goal definition' },
+          { id: 'drivers', label: 'Individual risk analysis' },
+          { id: 'strategy', label: 'Financial investment strategy' },
+          { id: 'allocation', label: 'Capital allocation' },
+          { id: 'vehicle', label: 'Investment vehicle' },
+          { id: 'execution', label: 'Execution' },
         ],
-        correctOrder: ['target', 'drivers', 'strategy', 'allocation', 'execution'],
+        correctOrder: ['target', 'drivers', 'strategy', 'allocation', 'vehicle', 'execution'],
         feedback: {
           correct:
             'Execution belongs at the end, after the target and constraints are clear.',
@@ -95,9 +97,51 @@ export const lessonContent = {
         },
       },
       reflection: {
-        question: 'Which step helps you slow down before acting?',
+        title: 'Your takeaway',
+        question: 'What changed in how you think about execution after this lesson?',
+        placeholder: 'Example: I see why execution should come last.',
       },
       summary: {
+        title: 'The full investing process',
+        subtitle: 'Execution is the final step — not the starting point.',
+        processMap: [
+          {
+            id: 'target',
+            title: 'Target (Goal definition)',
+            description: 'Define the objective and the boundaries for execution.',
+            substeps: ['Purpose', 'Time horizon', 'Goal type'],
+          },
+          {
+            id: 'drivers',
+            title: 'Drivers (Individual risk analysis)',
+            description: 'Clarify the constraints that shape every decision.',
+            substeps: ['Risk capacity', 'Risk tolerance', 'Financial resources'],
+          },
+          {
+            id: 'strategy',
+            title: 'Financial investment strategy',
+            description: 'Set the rules that guide decisions under uncertainty.',
+            substeps: ['Liquidity', 'Costs', 'Ethics/ESG', 'Dividend preference'],
+          },
+          {
+            id: 'allocation',
+            title: 'Capital allocation',
+            description: 'Distribute capital across defined priorities.',
+            substeps: ['Asset categories', 'Diversification', 'Example allocations'],
+          },
+          {
+            id: 'vehicles',
+            title: 'Investment vehicles',
+            description: 'Select the tools that express the plan.',
+            substeps: ['Equities', 'Bonds', 'ETFs', 'Alternatives'],
+          },
+          {
+            id: 'execution',
+            title: 'Execution',
+            description: 'Place orders only after the system is clear.',
+            substeps: ['Order types', 'Transaction costs', 'Execution comes last'],
+          },
+        ],
         takeaways: [
           'Investing is a structured process, not a single action.',
           'Buying or selling comes only after the earlier steps.',
