@@ -295,6 +295,7 @@ function IntroConceptStep({ onNext }) {
 function IntroVisualizationStep({ onNext }) {
   const { styles } = useLessonStepStyles();
   const [cardHeight, setCardHeight] = useState(null);
+  const [expandedCards, setExpandedCards] = useState({});
   const peek = spacing.lg;
   const steps = [
     {
@@ -352,6 +353,10 @@ function IntroVisualizationStep({ onNext }) {
     setCardHeight((prev) => (prev === nextHeight ? prev : nextHeight));
   };
 
+  const toggleCard = (id) => {
+    setExpandedCards((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
     <View style={[styles.stepBody, styles.journeyBody]}>
       <View style={styles.journeyContent}>
@@ -366,8 +371,9 @@ function IntroVisualizationStep({ onNext }) {
           showsVerticalScrollIndicator={false}
         >
           {steps.map((step, index) => (
-            <View
+            <Pressable
               key={step.id}
+              onPress={() => toggleCard(step.id)}
               style={[styles.journeyPage, cardHeight ? { height: cardHeight } : null]}
             >
               <View style={styles.journeyHeaderRow}>
@@ -381,16 +387,26 @@ function IntroVisualizationStep({ onNext }) {
               <AppText style={styles.journeyLabel}>
                 {`Step ${index + 1} – ${step.label}`}
               </AppText>
-              <AppText style={styles.journeyQuestion}>{step.question}</AppText>
-              <View style={styles.journeyVisual}>
-                <View style={styles.journeyPlaceholder}>
-                  <AppText style={styles.journeyPlaceholderText}>
-                    Animation placeholder
-                  </AppText>
-                </View>
-              </View>
-              <AppText style={styles.journeyWhy}>{step.why}</AppText>
-            </View>
+              {expandedCards[step.id] ? (
+                <>
+                  <AppText style={styles.journeyDetail}>{step.detail}</AppText>
+                  <AppText style={styles.journeyTapHint}>Tap to return</AppText>
+                </>
+              ) : (
+                <>
+                  <AppText style={styles.journeyQuestion}>{step.question}</AppText>
+                  <View style={styles.journeyVisual}>
+                    <View style={styles.journeyPlaceholder}>
+                      <AppText style={styles.journeyPlaceholderText}>
+                        Animation placeholder
+                      </AppText>
+                    </View>
+                  </View>
+                  <AppText style={styles.journeyWhy}>{step.why}</AppText>
+                  <AppText style={styles.journeyTapHint}>Tap for details</AppText>
+                </>
+              )}
+            </Pressable>
           ))}
           <View style={styles.journeyNextWrap}>
             <PrimaryButton label="Next" onPress={onNext} />
@@ -1103,6 +1119,19 @@ const createStyles = (colors) =>
     color: colors.textSecondary,
     fontSize: typography.small,
     lineHeight: 18,
+  },
+  journeyDetail: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  journeyTapHint: {
+    fontFamily: typography.fontFamilyMedium,
+    color: toRgba(colors.textSecondary, 0.7),
+    fontSize: typography.small,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
   },
   journeyVisual: {
     borderRadius: 18,
