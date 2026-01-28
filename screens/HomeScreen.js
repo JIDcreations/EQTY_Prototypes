@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton } from '../components/Button';
@@ -145,10 +146,18 @@ export default function HomeScreen() {
                 <Card style={[styles.focusCard, isExpanded && styles.focusCardExpanded]}>
                   <View style={styles.focusHeader}>
                     <GlossaryText text={section.label} style={styles.focusLabel} />
-                    <GlossaryText
-                      text={isExpanded ? homeCopy.hideDetails : homeCopy.viewDetails}
-                      style={styles.focusAction}
-                    />
+                    <View style={styles.focusActionPill}>
+                      <GlossaryText
+                        text={isExpanded ? homeCopy.hideDetails : homeCopy.viewDetails}
+                        style={styles.focusActionText}
+                      />
+                      <Ionicons
+                        name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                        size={14}
+                        color={colors.textSecondary}
+                        style={styles.focusActionIcon}
+                      />
+                    </View>
                   </View>
                   <GlossaryText text={section.title} style={styles.focusTitle} />
                   <GlossaryText text={section.summary} style={styles.focusSummary} />
@@ -297,10 +306,24 @@ const createStyles = (colors) =>
       textTransform: 'uppercase',
       letterSpacing: 1.2,
     },
-    focusAction: {
+    focusActionPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: toRgba(colors.textPrimary, 0.16),
+      backgroundColor: toRgba(colors.textPrimary, 0.06),
+    },
+    focusActionText: {
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.small,
       color: colors.textSecondary,
+    },
+    focusActionIcon: {
+      marginTop: 1,
     },
     focusTitle: {
       fontFamily: typography.fontFamilyDemi,
