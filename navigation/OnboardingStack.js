@@ -7,6 +7,7 @@ import OnboardingEntryScreen from '../screens/onboarding/OnboardingEntryScreen';
 import OnboardingLoginScreen from '../screens/onboarding/OnboardingLoginScreen';
 import OnboardingEmailScreen from '../screens/onboarding/OnboardingEmailScreen';
 import OnboardingBasicInfoScreen from '../screens/onboarding/OnboardingBasicInfoScreen';
+import OnboardingLanguageScreen from '../screens/onboarding/OnboardingLanguageScreen';
 import OnboardingQuestionsIntroScreen from '../screens/onboarding/OnboardingQuestionsIntroScreen';
 import OnboardingQuestionScreen from '../screens/onboarding/OnboardingQuestionScreen';
 import OnboardingConfirmationScreen from '../screens/onboarding/OnboardingConfirmationScreen';
@@ -17,6 +18,7 @@ export default function OnboardingStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }}>
       <Stack.Screen name="OnboardingWelcome" component={OnboardingWelcomeScreen} />
+      <Stack.Screen name="OnboardingLanguage" component={OnboardingLanguageScreen} />
       <Stack.Screen name="OnboardingPositioning" component={OnboardingPositioningScreen} />
       <Stack.Screen name="OnboardingAIDisclaimer" component={OnboardingAIDisclaimerScreen} />
       <Stack.Screen name="OnboardingEntry" component={OnboardingEntryScreen} />

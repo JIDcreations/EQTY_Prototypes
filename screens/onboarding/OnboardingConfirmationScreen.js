@@ -8,11 +8,13 @@ import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingConfirmationScreen() {
-  const { updatePreferences, updateAuthUser } = useApp();
+  const { updatePreferences, updateAuthUser, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   const handleFinish = async () => {
     await updateAuthUser({});
@@ -29,16 +31,16 @@ export default function OnboardingConfirmationScreen() {
           <View style={styles.cardHeader}>
             <View style={styles.badge}>
               <View style={styles.badgeDot} />
-              <AppText style={styles.badgeText}>All set</AppText>
+              <AppText style={styles.badgeText}>{copy.confirmation.badge}</AppText>
             </View>
-            <AppText style={styles.title}>You are all set</AppText>
+            <AppText style={styles.title}>{copy.confirmation.title}</AppText>
           </View>
-          <AppText style={styles.text}>Your answers are saved in your profile.</AppText>
-          <AppText style={styles.text}>You can edit them later.</AppText>
-          <AppText style={styles.text}>
-            They are used to adapt explanations and examples.
-          </AppText>
-          <PrimaryButton label="Go to EQTY" onPress={handleFinish} />
+          {copy.confirmation.lines.map((line) => (
+            <AppText key={line} style={styles.text}>
+              {line}
+            </AppText>
+          ))}
+          <PrimaryButton label={copy.confirmation.button} onPress={handleFinish} />
         </OnboardingStackedCard>
       </View>
     </OnboardingScreen>

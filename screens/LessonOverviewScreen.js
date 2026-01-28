@@ -7,36 +7,32 @@ import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
-import { lessonContent } from '../data/lessonContent';
-import { lessons } from '../data/curriculum';
+import { useApp } from '../utils/AppContext';
+import { getLessonContent, getLessonOverviewCopy, getLocalizedLessons, formatLessonModuleLabel } from '../utils/localization';
 import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-
-const stepLabels = [
-  'Concept',
-  'Visual exploration',
-  'Scenario',
-  'Practical exercise',
-  'Reflection',
-  'Summary',
-];
 
 export default function LessonOverviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { lessonId, entrySource } = route.params || {};
+  const { preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [isStructureOpen, setIsStructureOpen] = useState(false);
-
-  const lesson = lessons.find((item) => item.id === lessonId) || lessons[0];
-  const content = lessonContent[lesson.id] || lessonContent.lesson_0;
+  const overviewCopy = useMemo(
+    () => getLessonOverviewCopy(preferences?.language),
+    [preferences?.language]
+  );
+  const localizedLessons = useMemo(
+    () => getLocalizedLessons(preferences?.language),
+    [preferences?.language]
+  );
+  const lesson = localizedLessons.find((item) => item.id === lessonId) || localizedLessons[0];
+  const content = getLessonContent(lesson.id, preferences?.language);
   const moduleNumber = lesson.moduleId?.split('_')[1];
-  const moduleLabel =
-    moduleNumber !== undefined
-      ? `Module ${moduleNumber}, Lesson ${lesson.order}`
-      : `Lesson ${lesson.order}`;
+  const moduleLabel = formatLessonModuleLabel(preferences?.language, moduleNumber, lesson.order);
   const takeaways =
     content?.steps?.summary?.takeaways?.length > 0
       ? content.steps.summary.takeaways
@@ -57,7 +53,7 @@ export default function LessonOverviewScreen() {
           </View>
 
           <Card style={styles.learnCard}>
-            <SectionTitle title="What you'll learn" subtitle="Key takeaways" />
+            <SectionTitle title={overviewCopy.whatYoullLearn} subtitle={overviewCopy.keyTakeaways} />
             <View style={styles.bulletList}>
               {takeaways.map((item, index) => (
                 <View key={`${index}-${item}`} style={styles.bulletRow}>
@@ -75,14 +71,14 @@ export default function LessonOverviewScreen() {
               onPress={() => setIsStructureOpen((prev) => !prev)}
               style={({ pressed }) => [styles.structureRow, pressed && styles.structurePressed]}
             >
-              <AppText style={styles.structureTitle}>Lesson structure</AppText>
+              <AppText style={styles.structureTitle}>{overviewCopy.lessonStructure}</AppText>
               <AppText style={styles.structureToggle}>
-                {isStructureOpen ? 'Hide' : 'Show'}
+                {isStructureOpen ? overviewCopy.hide : overviewCopy.show}
               </AppText>
             </Pressable>
             {isStructureOpen ? (
               <View style={styles.stepList}>
-                {stepLabels.map((label, index) => (
+                {overviewCopy.stepLabels.map((label, index) => (
                   <View key={label} style={styles.stepRow}>
                     <View style={styles.stepIndex}>
                       <GlossaryText text={index + 1} style={styles.stepNumber} />
@@ -97,7 +93,7 @@ export default function LessonOverviewScreen() {
 
         <View style={styles.footer}>
           <PrimaryButton
-            label="Start lesson"
+            label={overviewCopy.startLesson}
             onPress={() =>
               navigation.navigate('LessonStep', {
                 lessonId: lesson.id,
@@ -106,7 +102,7 @@ export default function LessonOverviewScreen() {
               })
             }
           />
-          <SecondaryButton label="Back" onPress={() => navigation.goBack()} />
+          <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
         </View>
       </View>
     </SafeAreaView>

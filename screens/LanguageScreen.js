@@ -9,15 +9,22 @@ import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
+import { getLanguageOptions, getSettingsCopy } from '../utils/localization';
 import useToast from '../utils/useToast';
-
-const LANGUAGES = ['English', 'Dutch', 'French', 'German'];
 
 export default function LanguageScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const toast = useToast();
+  const options = useMemo(
+    () => getLanguageOptions(preferences?.language),
+    [preferences?.language]
+  );
+  const settingsCopy = useMemo(
+    () => getSettingsCopy(preferences?.language),
+    [preferences?.language]
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -26,26 +33,28 @@ export default function LanguageScreen({ navigation }) {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsHeader title="Language" onBack={() => navigation.goBack()} />
+        <SettingsHeader title={settingsCopy.languageTitle} onBack={() => navigation.goBack()} />
         <Card style={styles.card}>
-          {LANGUAGES.map((language, index) => {
-            const isActive = preferences?.language === language;
+          {options.map((option, index) => {
+            const isActive = preferences?.language === option.value;
             return (
               <Pressable
-                key={language}
+                key={option.value}
                 onPress={() => {
-                  updatePreferences({ language });
-                  toast.show('Saved');
+                  updatePreferences({ language: option.value });
+                  toast.show(settingsCopy.saved);
                 }}
-                style={[styles.row, index !== LANGUAGES.length - 1 && styles.rowDivider]}
+                style={[styles.row, index !== options.length - 1 && styles.rowDivider]}
               >
                 <View style={styles.rowLeft}>
                   <View style={[styles.radio, isActive && styles.radioActive]}>
                     {isActive ? <View style={styles.radioDot} /> : null}
                   </View>
-                  <AppText style={styles.rowLabel}>{language}</AppText>
+                  <AppText style={styles.rowLabel}>{option.label}</AppText>
                 </View>
-                {isActive ? <AppText style={styles.activeLabel}>Selected</AppText> : null}
+                {isActive ? (
+                  <AppText style={styles.activeLabel}>{settingsCopy.selected}</AppText>
+                ) : null}
               </Pressable>
             );
           })}

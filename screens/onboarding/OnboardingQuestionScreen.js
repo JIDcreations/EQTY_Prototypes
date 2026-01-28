@@ -10,13 +10,16 @@ import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 import { useApp } from '../../utils/AppContext';
+import { formatOnboardingQuestionLabel, getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingQuestionScreen({ navigation, route }) {
   const { question, field, step, total, nextRoute } = route.params;
-  const { onboardingContext, updateOnboardingContext } = useApp();
+  const { onboardingContext, updateOnboardingContext, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [answer, setAnswer] = useState(onboardingContext?.[field] || '');
+  const localizedQuestion = copy.question.questions[field] || question;
 
   const handleNext = async () => {
     await updateOnboardingContext({ [field]: answer.trim() });
@@ -24,43 +27,51 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   };
 
   return (
-    <OnboardingScreen scroll contentContainerStyle={styles.scrollContent}>
-      <View style={styles.headerRow}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
-        </Pressable>
-        <OnboardingProgress
-          current={step}
-          total={total}
-          label={`Question 0${step}`}
-          style={styles.progress}
-        />
-      </View>
-      <OnboardingStackedCard>
-        <View style={styles.cardHeader}>
-          <View style={styles.badge}>
-            <View style={styles.badgeDot} />
-            <AppText style={styles.badgeText}>Your perspective</AppText>
-          </View>
-          <AppText style={styles.title}>{question}</AppText>
+    <OnboardingScreen contentContainerStyle={styles.screen}>
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+          </Pressable>
+          <OnboardingProgress
+            current={step}
+            total={total}
+            label={formatOnboardingQuestionLabel(preferences?.language, step)}
+            style={styles.progress}
+          />
         </View>
-        <TextInput
-          value={answer}
-          onChangeText={setAnswer}
-          placeholder="Share a few thoughts..."
-          placeholderTextColor={colors.textSecondary}
-          multiline
-          style={styles.input}
-        />
-        <PrimaryButton label="Next" onPress={handleNext} />
-      </OnboardingStackedCard>
+        <OnboardingStackedCard>
+          <View style={styles.cardHeader}>
+            <View style={styles.badge}>
+              <View style={styles.badgeDot} />
+              <AppText style={styles.badgeText}>{copy.question.badge}</AppText>
+            </View>
+            <AppText style={styles.title}>{localizedQuestion}</AppText>
+          </View>
+          <TextInput
+            value={answer}
+            onChangeText={setAnswer}
+            placeholder={copy.question.placeholder}
+            placeholderTextColor={colors.textSecondary}
+            multiline
+            style={styles.input}
+          />
+          <PrimaryButton label={copy.question.button} onPress={handleNext} />
+        </OnboardingStackedCard>
+      </View>
     </OnboardingScreen>
   );
 }
 
 const createStyles = (colors) =>
   StyleSheet.create({
-    scrollContent: {
+    screen: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+      justifyContent: 'space-between',
+      paddingBottom: spacing.xl,
       gap: spacing.xl,
     },
     headerRow: {

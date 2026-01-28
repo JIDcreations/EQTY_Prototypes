@@ -16,11 +16,13 @@ import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingBasicInfoScreen({ navigation }) {
-  const { updateAuthUser } = useApp();
+  const { updateAuthUser, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
 
@@ -52,36 +54,36 @@ export default function OnboardingBasicInfoScreen({ navigation }) {
             <View style={styles.cardHeader}>
               <View style={styles.badge}>
                 <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>Account setup</AppText>
+                <AppText style={styles.badgeText}>{copy.basicInfo.badge}</AppText>
               </View>
-              <AppText style={styles.title}>About you</AppText>
-              <AppText style={styles.subtitle}>This helps personalize your experience.</AppText>
+              <AppText style={styles.title}>{copy.basicInfo.title}</AppText>
+              <AppText style={styles.subtitle}>{copy.basicInfo.subtitle}</AppText>
             </View>
 
             <View style={styles.fields}>
               <View style={styles.field}>
-                <AppText style={styles.label}>Name</AppText>
+                <AppText style={styles.label}>{copy.basicInfo.nameLabel}</AppText>
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  placeholder="Your name"
+                  placeholder={copy.basicInfo.namePlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   style={styles.input}
                 />
               </View>
               <View style={styles.field}>
-                <AppText style={styles.label}>Date of birth</AppText>
+                <AppText style={styles.label}>{copy.basicInfo.birthLabel}</AppText>
                 <TextInput
                   value={birthdate}
                   onChangeText={setBirthdate}
-                  placeholder="DD / MM / YYYY"
+                  placeholder={copy.basicInfo.birthPlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   style={styles.input}
                 />
               </View>
             </View>
 
-            <PrimaryButton label="Create account" onPress={handleContinue} />
+            <PrimaryButton label={copy.basicInfo.button} onPress={handleContinue} />
           </OnboardingStackedCard>
         </View>
       </KeyboardAvoidingView>

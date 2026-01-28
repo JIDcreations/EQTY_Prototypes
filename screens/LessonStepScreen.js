@@ -24,12 +24,17 @@ import { useGlossary } from '../components/GlossaryProvider';
 import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
 import StepHeader from '../components/StepHeader';
-import { lessonContent } from '../data/lessonContent';
 import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
 import { getScenarioVariant } from '../utils/helpers';
+import {
+  getIntroStepLabel,
+  getIntroStepTitle,
+  getLessonContent,
+  getLessonStepCopy,
+} from '../utils/localization';
 
 const TOTAL_STEPS = 6;
 
@@ -43,7 +48,7 @@ export default function LessonStepScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { lessonId, step = 1, entrySource } = route.params || {};
-  const { userContext, onboardingContext, addReflection, completeLesson } = useApp();
+  const { userContext, onboardingContext, addReflection, completeLesson, preferences } = useApp();
   const glossary = useGlossary();
   const isIntroConcept = lessonId === 'lesson_0' && step === 1;
   const isIntroVisualization = lessonId === 'lesson_0' && step === 2;
@@ -52,26 +57,30 @@ export default function LessonStepScreen() {
   const isIntroReflection = lessonId === 'lesson_0' && step === 5;
   const isIntroSummary = lessonId === 'lesson_0' && step === 6;
 
-  const content = lessonContent[lessonId] || lessonContent.lesson_0;
+  const content = getLessonContent(lessonId, preferences?.language);
+  const copy = useMemo(() => getLessonStepCopy(preferences?.language), [preferences?.language]);
   const stepTitle = useMemo(() => {
     if (!content) return `Step ${step}`;
+    const introTitle = getIntroStepTitle(preferences?.language, step);
     switch (step) {
       case 1:
         return content.steps.concept.title;
       case 2:
-        return lessonId === 'lesson_0' ? 'From goal to execution' : content.steps.visualization.title;
+        return lessonId === 'lesson_0'
+          ? introTitle || content.steps.visualization.title
+          : content.steps.visualization.title;
       case 3:
         return content.steps.scenario.title;
       case 4:
-        return content?.steps?.exercise?.title || 'Build the process';
+        return content?.steps?.exercise?.title || introTitle || 'Build the process';
       case 5:
-        return content?.steps?.reflection?.title || 'Reflection';
+        return content?.steps?.reflection?.title || introTitle || 'Reflection';
       case 6:
-        return 'The full investing process';
+        return introTitle || 'The full investing process';
       default:
         return `Step ${step}`;
     }
-  }, [content, step]);
+  }, [content, lessonId, preferences?.language, step]);
 
   const handleNext = () => {
     if (step < TOTAL_STEPS) {
@@ -109,19 +118,7 @@ export default function LessonStepScreen() {
         onBack={() => navigation.goBack()}
         onPressTerm={handleTermPress}
         stepLabel={
-          isIntroConcept
-            ? 'STEP 1 · CONCEPT'
-            : isIntroVisualization
-            ? 'STEP 2 · VISUALISATION'
-            : isIntroScenario
-            ? 'STEP 3 · SCENARIO'
-            : isIntroExercise
-            ? 'STEP 4 · EXERCISE'
-            : isIntroReflection
-            ? 'STEP 5 · REFLECTION'
-            : isIntroSummary
-            ? 'STEP 6 · SUMMARY'
-            : null
+          lessonId === 'lesson_0' ? getIntroStepLabel(preferences?.language, step) : null
         }
         progressText={
           isIntroConcept
@@ -147,6 +144,7 @@ export default function LessonStepScreen() {
           lessonId={lessonId}
           onNext={handleNext}
           onPressTerm={handleTermPress}
+          copy={copy}
         />
       )}
       {step === 2 && (
@@ -155,6 +153,7 @@ export default function LessonStepScreen() {
           lessonId={lessonId}
           onNext={handleNext}
           onPressTerm={handleTermPress}
+          copy={copy}
         />
       )}
       {step === 3 && (lessonId === 'lesson_0' ? (
@@ -163,6 +162,7 @@ export default function LessonStepScreen() {
           onboardingContext={onboardingContext}
           userContext={userContext}
           onNext={handleNext}
+          copy={copy}
         />
       ) : (
         <ScenarioStep
@@ -170,6 +170,7 @@ export default function LessonStepScreen() {
           userContext={userContext}
           onNext={handleNext}
           onPressTerm={handleTermPress}
+          copy={copy}
         />
       ))}
       {step === 4 && (
@@ -178,6 +179,7 @@ export default function LessonStepScreen() {
           lessonId={lessonId}
           onNext={handleNext}
           onPressTerm={handleTermPress}
+          copy={copy}
         />
       )}
       {step === 5 && (
@@ -188,16 +190,18 @@ export default function LessonStepScreen() {
             handleNext();
           }}
           onPressTerm={handleTermPress}
+          copy={copy}
         />
       )}
       {step === 6 && (
         lessonId === 'lesson_0' ? (
-          <IntroSummaryStep content={content} onComplete={handleComplete} />
+          <IntroSummaryStep content={content} onComplete={handleComplete} copy={copy} />
         ) : (
           <SummaryStep
             content={content}
             onComplete={handleComplete}
             onPressTerm={handleTermPress}
+            copy={copy}
           />
         )
       )}
@@ -206,11 +210,11 @@ export default function LessonStepScreen() {
   );
 }
 
-function ConceptStep({ content, lessonId, onNext, onPressTerm }) {
+function ConceptStep({ content, lessonId, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
 
   if (lessonId === 'lesson_0') {
-    return <IntroConceptStep content={content} onNext={onNext} />;
+    return <IntroConceptStep content={content} onNext={onNext} copy={copy} />;
   }
 
   return (
@@ -233,49 +237,17 @@ function ConceptStep({ content, lessonId, onNext, onPressTerm }) {
           onPressTerm={onPressTerm}
         />
       </Card>
-      <PrimaryButton label="Next" onPress={onNext} />
+      <PrimaryButton label={copy.buttons.next} onPress={onNext} />
     </View>
   );
 }
 
-function IntroConceptStep({ content, onNext }) {
+function IntroConceptStep({ content, onNext, copy }) {
   const { styles } = useLessonStepStyles();
   const intro = content?.steps?.concept?.intro;
-  const steps = [
-    {
-      id: 'goal',
-      label: 'Goal definition',
-      detail: 'Clarify what the money should achieve.',
-    },
-    {
-      id: 'risk',
-      label: 'Individual risk analysis',
-      detail: 'Define risk capacity, tolerance, and time horizon.',
-    },
-    {
-      id: 'strategy',
-      label: 'Financial investment strategy',
-      detail: 'Translate the goal into guiding rules.',
-    },
-    {
-      id: 'allocation',
-      label: 'Capital allocation',
-      detail: 'Decide how capital is distributed across assets.',
-    },
-    {
-      id: 'vehicle',
-      label: 'Investment vehicle',
-      detail: 'Select the instruments that fit the allocation.',
-    },
-    {
-      id: 'execution',
-      label: 'Execution',
-      detail: 'Place the order only after the process is clear.',
-    },
-  ];
+  const steps = copy.introConcept.steps;
   const [activeId, setActiveId] = useState(steps[0].id);
-  const paragraph =
-    'Investing is not a single action. It is a sequence of decisions that build on each other. Buying or selling only happens at the final step.';
+  const paragraph = copy.introConcept.paragraph;
 
   return (
     <View style={styles.stepBody}>
@@ -283,15 +255,15 @@ function IntroConceptStep({ content, onNext }) {
       <Card style={styles.conceptCard}>
         <View style={styles.introHeader}>
           <View style={styles.introAccent} />
-          <AppText style={styles.introLabel}>Definition</AppText>
+          <AppText style={styles.introLabel}>{copy.introConcept.definition}</AppText>
         </View>
-        <AppText style={styles.introTitle}>What is investing as a process?</AppText>
+        <AppText style={styles.introTitle}>{copy.introConcept.title}</AppText>
         <AppText style={styles.introText}>{paragraph}</AppText>
       </Card>
       <Card style={styles.processCard}>
         <View style={styles.processHeader}>
-          <AppText style={styles.processTitle}>Process overview</AppText>
-          <AppText style={styles.processHint}>Tap a step to see its role.</AppText>
+          <AppText style={styles.processTitle}>{copy.introConcept.processTitle}</AppText>
+          <AppText style={styles.processHint}>{copy.introConcept.processHint}</AppText>
         </View>
         <View style={styles.processList}>
           <View pointerEvents="none" style={styles.processRail} />
@@ -335,66 +307,17 @@ function IntroConceptStep({ content, onNext }) {
           })}
         </View>
       </Card>
-      <PrimaryButton label="Next" onPress={onNext} />
+      <PrimaryButton label={copy.buttons.next} onPress={onNext} />
     </View>
   );
 }
 
-function IntroVisualizationStep({ onNext }) {
+function IntroVisualizationStep({ onNext, copy }) {
   const { styles } = useLessonStepStyles();
   const [cardHeight, setCardHeight] = useState(null);
   const [expandedCards, setExpandedCards] = useState({});
   const peek = spacing.lg;
-  const steps = [
-    {
-      id: 'goal',
-      label: 'Goal definition',
-      question: 'What should my money achieve?',
-      why: 'Goals are about direction, not choice yet.',
-      detail:
-        'A target defines purpose and timing before any product or ticker enters the picture.',
-    },
-    {
-      id: 'risk',
-      label: 'Individual risk analysis',
-      question: 'How much instability can I handle?',
-      why: 'Risk is tolerance for movement, not danger.',
-      detail:
-        'Risk analysis clarifies capacity, tolerance, and horizon so choices stay within your limits.',
-    },
-    {
-      id: 'strategy',
-      label: 'Financial investment strategy',
-      question: 'How do I translate intent into rules?',
-      why: 'Strategy reduces complexity, it does not add it.',
-      detail:
-        'Strategy turns goals and constraints into a repeatable rule set you can follow.',
-    },
-    {
-      id: 'allocation',
-      label: 'Capital allocation',
-      question: 'How is my money spread?',
-      why: 'Allocation is structure, not math at this stage.',
-      detail:
-        'Allocation decides how much goes where, shaping outcomes more than any single pick.',
-    },
-    {
-      id: 'vehicle',
-      label: 'Investment vehicle',
-      question: 'What tool executes the plan?',
-      why: 'Vehicles are means, not strategy.',
-      detail:
-        'Vehicles are the tools that implement allocation (funds, ETFs, bonds, equities).',
-    },
-    {
-      id: 'execution',
-      label: 'Execution',
-      question: 'When do I act?',
-      why: 'Execution is final, not iterative.',
-      detail:
-        'Execution is the final act—order type, timing, and costs—after everything else is clear.',
-    },
-  ];
+  const steps = copy.introVisualization.steps;
   const handleLayout = (event) => {
     const layoutHeight = event.nativeEvent.layout.height;
     const nextHeight = Math.max(260, layoutHeight - peek - spacing.md);
@@ -409,7 +332,7 @@ function IntroVisualizationStep({ onNext }) {
     <View style={[styles.stepBody, styles.journeyBody]}>
       <View style={styles.journeyContent}>
         <AppText style={styles.journeySubtitle}>
-          Each decision naturally leads to the next.
+          {copy.introVisualization.subtitle}
         </AppText>
         <ScrollView
           style={styles.journeyPager}
@@ -432,12 +355,12 @@ function IntroVisualizationStep({ onNext }) {
                 <View style={styles.journeyAccent} />
               </View>
               <AppText style={styles.journeyLabel}>
-                {`Step ${index + 1} – ${step.label}`}
+                {`${copy.introVisualization.stepPrefix} ${index + 1} - ${step.label}`}
               </AppText>
               {expandedCards[step.id] ? (
                 <>
                   <AppText style={styles.journeyDetail}>{step.detail}</AppText>
-                  <AppText style={styles.journeyTapHint}>Tap to return</AppText>
+                  <AppText style={styles.journeyTapHint}>{copy.labels.tapReturn}</AppText>
                 </>
               ) : (
                 <>
@@ -445,18 +368,18 @@ function IntroVisualizationStep({ onNext }) {
                   <View style={styles.journeyVisual}>
                     <View style={styles.journeyPlaceholder}>
                       <AppText style={styles.journeyPlaceholderText}>
-                        Animation placeholder
+                        {copy.labels.animationPlaceholder}
                       </AppText>
                     </View>
                   </View>
                   <AppText style={styles.journeyWhy}>{step.why}</AppText>
-                  <AppText style={styles.journeyTapHint}>Tap for details</AppText>
+                  <AppText style={styles.journeyTapHint}>{copy.labels.tapDetails}</AppText>
                 </>
               )}
             </Pressable>
           ))}
           <View style={styles.journeyNextWrap}>
-            <PrimaryButton label="Next" onPress={onNext} />
+            <PrimaryButton label={copy.buttons.next} onPress={onNext} />
           </View>
         </ScrollView>
       </View>
@@ -491,28 +414,19 @@ function getScenarioVariantFromOnboarding(onboardingContext, userContext) {
   return userContext?.experience || 'new';
 }
 
-function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) {
+function IntroScenarioStep({ content, onboardingContext, userContext, onNext, copy }) {
   const { styles, colors } = useLessonStepStyles();
   const scenario = content?.steps?.scenario;
   const intro = scenario?.intro;
   const variantKey = getScenarioVariantFromOnboarding(onboardingContext, userContext);
   const variant = scenario?.variants?.[variantKey] || scenario?.variants?.new;
-  const keyInsight =
-    variant?.keyInsight ||
-    'The process prevents impulsive action by forcing clarity before execution.';
+  const keyInsight = variant?.keyInsight || copy.introScenario.keyInsightFallback;
   const [mode, setMode] = useState('plan');
   const [activeMissing, setActiveMissing] = useState(null);
   const [showOutcome, setShowOutcome] = useState(false);
   const [outcomeMounted, setOutcomeMounted] = useState(false);
   const outcomeAnim = useState(() => new Animated.Value(0))[0];
-  const steps = [
-    { id: 'goal', label: 'Goal' },
-    { id: 'risk', label: 'Risk' },
-    { id: 'strategy', label: 'Strategy' },
-    { id: 'allocation', label: 'Allocation' },
-    { id: 'vehicle', label: 'Vehicle' },
-    { id: 'execution', label: 'Execution' },
-  ];
+  const steps = copy.introScenario.steps;
   const missingIds = mode === 'no-plan' ? ['goal', 'risk', 'strategy'] : [];
   const activeMissingIndex = activeMissing
     ? steps.findIndex((step) => step.id === activeMissing)
@@ -585,7 +499,7 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
               mode === 'plan' && styles.scenarioToggleTextActive,
             ]}
           >
-            With a plan
+            {copy.introScenario.withPlan}
           </AppText>
         </Pressable>
         <Pressable
@@ -601,14 +515,14 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
               mode === 'no-plan' && styles.scenarioToggleTextActive,
             ]}
           >
-            Without a plan
+            {copy.introScenario.withoutPlan}
           </AppText>
         </Pressable>
       </View>
 
       <View style={styles.scenarioPanel}>
         <View style={styles.scenarioPanelHeader}>
-          <AppText style={styles.scenarioPanelTitle}>Process rail</AppText>
+          <AppText style={styles.scenarioPanelTitle}>{copy.introScenario.processRail}</AppText>
           <View
             style={[
               styles.scenarioBadge,
@@ -616,7 +530,9 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
             ]}
           >
             <AppText style={styles.scenarioBadgeText}>
-              {mode === 'plan' ? 'Stable decisions' : 'Reactive decisions'}
+              {mode === 'plan'
+                ? copy.introScenario.stableDecisions
+                : copy.introScenario.reactiveDecisions}
             </AppText>
           </View>
         </View>
@@ -627,7 +543,9 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
             const isLast = index === steps.length - 1;
             const isDegraded =
               activeMissingIndex >= 0 && index > activeMissingIndex && mode === 'no-plan';
-            const label = isMissing ? `${step.label} missing` : step.label;
+            const label = isMissing
+              ? `${step.label}${copy.introScenario.missingSuffix}`
+              : step.label;
             const showJump = isExecution && mode === 'no-plan';
             const showConsequence = isMissing && activeMissing === step.id;
             const showExecutionHint = isExecution && !showOutcome;
@@ -681,16 +599,20 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
                     ) : null}
                     {isExecution && activeMissingIndex >= 0 ? (
                       <View style={styles.scenarioPrematureBadge}>
-                        <AppText style={styles.scenarioPrematureText}>Premature</AppText>
+                        <AppText style={styles.scenarioPrematureText}>
+                          {copy.introScenario.premature}
+                        </AppText>
                       </View>
                     ) : null}
                   </View>
                   {showExecutionHint ? (
-                    <AppText style={styles.scenarioTapHint}>Tap execution to see outcome</AppText>
+                    <AppText style={styles.scenarioTapHint}>
+                      {copy.introScenario.tapExecution}
+                    </AppText>
                   ) : null}
                   {showConsequence ? (
                     <AppText style={styles.scenarioConsequence}>
-                      Downstream steps weaken; execution becomes premature.
+                      {copy.introScenario.downstreamImpact}
                     </AppText>
                   ) : null}
                 </View>
@@ -715,17 +637,17 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext }) 
               },
             ]}
           >
-            <OutcomeChart mode={mode} />
+            <OutcomeChart mode={mode} copy={copy} />
           </Animated.View>
         ) : null}
       </View>
       <AppText style={styles.scenarioInsightLine}>{keyInsight}</AppText>
-      <PrimaryButton label="Next" onPress={onNext} />
+      <PrimaryButton label={copy.buttons.next} onPress={onNext} />
     </View>
   );
 }
 
-function OutcomeChart({ mode }) {
+function OutcomeChart({ mode, copy }) {
   const { styles } = useLessonStepStyles();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const lineAnim = useState(() => new Animated.Value(1))[0];
@@ -778,7 +700,7 @@ function OutcomeChart({ mode }) {
     <View style={styles.outcomePanel}>
       <View style={styles.outcomeHeader}>
         <AppText style={styles.outcomeLabel}>
-          {mode === 'plan' ? 'Stable outcome' : 'Reactive outcome'}
+          {mode === 'plan' ? copy.introScenario.stableOutcome : copy.introScenario.reactiveOutcome}
         </AppText>
       </View>
       <View
@@ -823,20 +745,18 @@ function OutcomeChart({ mode }) {
         </Animated.View>
       </View>
       <AppText style={styles.outcomeCaption}>
-        {mode === 'plan'
-          ? 'Clarity before execution keeps outcomes steadier.'
-          : 'Skipping steps makes outcomes more reactive.'}
+        {mode === 'plan' ? copy.introScenario.stableCaption : copy.introScenario.reactiveCaption}
       </AppText>
     </View>
   );
 }
 
-function VisualizationStep({ content, lessonId, onNext, onPressTerm }) {
+function VisualizationStep({ content, lessonId, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
   const [selected, setSelected] = useState(null);
 
   if (lessonId === 'lesson_0') {
-    return <IntroVisualizationStep onNext={onNext} />;
+    return <IntroVisualizationStep onNext={onNext} copy={copy} />;
   }
 
   return (
@@ -847,7 +767,7 @@ function VisualizationStep({ content, lessonId, onNext, onPressTerm }) {
           style={styles.bodyText}
           onPressTerm={onPressTerm}
         />
-        <AppText style={styles.caption}>Tap elements to explore</AppText>
+        <AppText style={styles.caption}>{copy.labels.tapElements}</AppText>
         <View style={styles.segmentRow}>
           {content?.steps?.visualization?.segments?.map((segment) => (
             <Pressable
@@ -864,7 +784,7 @@ function VisualizationStep({ content, lessonId, onNext, onPressTerm }) {
           ))}
         </View>
       </Card>
-      <PrimaryButton label="Next" onPress={onNext} />
+      <PrimaryButton label={copy.buttons.next} onPress={onNext} />
 
       <BottomSheet
         visible={!!selected}
@@ -877,7 +797,7 @@ function VisualizationStep({ content, lessonId, onNext, onPressTerm }) {
   );
 }
 
-function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
+function ScenarioStep({ content, userContext, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
   const variantKey = getScenarioVariant(userContext);
   const variant = content?.steps?.scenario?.variants?.[variantKey];
@@ -908,7 +828,7 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
       </Card>
       {selected ? (
         <Card style={styles.insightCard}>
-          <AppText style={styles.insightTitle}>Insight</AppText>
+          <AppText style={styles.insightTitle}>{copy.labels.insight}</AppText>
           <GlossaryText
             text={variant?.insight}
             style={styles.caption}
@@ -916,12 +836,12 @@ function ScenarioStep({ content, userContext, onNext, onPressTerm }) {
           />
         </Card>
       ) : null}
-      <PrimaryButton label="Continue" onPress={onNext} disabled={!selected} />
+      <PrimaryButton label={copy.buttons.continue} onPress={onNext} disabled={!selected} />
     </View>
   );
 }
 
-function ExerciseStep({ content, lessonId, onNext, onPressTerm }) {
+function ExerciseStep({ content, lessonId, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
   const exercise = content?.steps?.exercise;
 
@@ -929,31 +849,59 @@ function ExerciseStep({ content, lessonId, onNext, onPressTerm }) {
     return (
       <View style={styles.stepBody}>
         <Card style={styles.exerciseCard}>
-          <AppText style={styles.bodyText}>No exercise is available for this lesson.</AppText>
+          <AppText style={styles.bodyText}>{copy.messages.noExercise}</AppText>
         </Card>
-        <PrimaryButton label="Continue" onPress={onNext} />
+        <PrimaryButton label={copy.buttons.continue} onPress={onNext} />
       </View>
     );
   }
 
   if (lessonId === 'lesson_0') {
-    return <IntroExerciseStep exercise={exercise} onNext={onNext} />;
+    return <IntroExerciseStep exercise={exercise} onNext={onNext} copy={copy} />;
   }
 
   switch (exercise.type) {
     case 'sequence':
-      return <SequenceExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
+      return (
+        <SequenceExercise
+          exercise={exercise}
+          onNext={onNext}
+          onPressTerm={onPressTerm}
+          copy={copy}
+        />
+      );
     case 'choice':
-      return <ChoiceExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
+      return (
+        <ChoiceExercise
+          exercise={exercise}
+          onNext={onNext}
+          onPressTerm={onPressTerm}
+          copy={copy}
+        />
+      );
     case 'multi':
-      return <MultiExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
+      return (
+        <MultiExercise
+          exercise={exercise}
+          onNext={onNext}
+          onPressTerm={onPressTerm}
+          copy={copy}
+        />
+      );
     case 'tradeoff':
     default:
-      return <TradeoffExercise exercise={exercise} onNext={onNext} onPressTerm={onPressTerm} />;
+      return (
+        <TradeoffExercise
+          exercise={exercise}
+          onNext={onNext}
+          onPressTerm={onPressTerm}
+          copy={copy}
+        />
+      );
   }
 }
 
-function SequenceExercise({ exercise, onNext, onPressTerm }) {
+function SequenceExercise({ exercise, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
   const { description, items = [], correctOrder = [], feedback = {} } = exercise;
   const [order, setOrder] = useState([]);
@@ -978,10 +926,10 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
     <View style={styles.stepBody}>
       <Card style={styles.exerciseCard}>
         <GlossaryText text={description} style={styles.bodyText} onPressTerm={onPressTerm} />
-        <AppText style={styles.exerciseLabel}>Your order</AppText>
+        <AppText style={styles.exerciseLabel}>{copy.labels.yourOrder}</AppText>
         <View style={styles.sequenceList}>
           {order.length === 0 ? (
-            <AppText style={styles.caption}>Tap actions below to build the sequence.</AppText>
+            <AppText style={styles.caption}>{copy.messages.tapActions}</AppText>
           ) : (
             order.map((stepId, index) => {
               const item = items.find((entry) => entry.id === stepId);
@@ -1004,7 +952,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
             })
           )}
         </View>
-        <AppText style={styles.exerciseLabel}>Actions</AppText>
+        <AppText style={styles.exerciseLabel}>{copy.labels.actions}</AppText>
         <View style={styles.optionList}>
           {items.map((item) => {
             const isSelected = order.includes(item.id);
@@ -1027,20 +975,26 @@ function SequenceExercise({ exercise, onNext, onPressTerm }) {
 
       {message ? (
         <Card style={styles.insightCard}>
-          <AppText style={styles.insightTitle}>{isCorrect ? 'Aligned' : 'Recheck the flow'}</AppText>
+          <AppText style={styles.insightTitle}>
+            {isCorrect ? copy.labels.aligned : copy.labels.recheckFlow}
+          </AppText>
           <GlossaryText text={message} style={styles.caption} onPressTerm={onPressTerm} />
         </Card>
       ) : null}
 
       <View style={styles.exerciseActions}>
-        <SecondaryButton label="Reset" onPress={reset} />
-        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!isComplete} />
+        <SecondaryButton label={copy.buttons.reset} onPress={reset} />
+        <PrimaryButton
+          label={copy.buttons.completeExercise}
+          onPress={onNext}
+          disabled={!isComplete}
+        />
       </View>
     </View>
   );
 }
 
-function IntroExerciseStep({ exercise, onNext }) {
+function IntroExerciseStep({ exercise, onNext, copy }) {
   const { styles } = useLessonStepStyles();
   const { items = [], correctOrder = [] } = exercise;
   const [placements, setPlacements] = useState(
@@ -1091,9 +1045,7 @@ function IntroExerciseStep({ exercise, onNext }) {
   return (
     <View style={[styles.stepBody, styles.exerciseBody]}>
       <View style={styles.exerciseContent}>
-        <AppText style={styles.exerciseInstruction}>
-          Tap the steps in the correct order before execution.
-        </AppText>
+        <AppText style={styles.exerciseInstruction}>{copy.introExercise.instruction}</AppText>
         {isComplete ? (
           <AppText
             style={[
@@ -1101,14 +1053,12 @@ function IntroExerciseStep({ exercise, onNext }) {
               isCorrect ? styles.exerciseStatusCorrect : styles.exerciseStatusWrong,
             ]}
           >
-            {isCorrect
-              ? 'Correct order — you can continue.'
-              : 'Order is off — try again.'}
+            {isCorrect ? copy.messages.correctOrder : copy.messages.incorrectOrder}
           </AppText>
         ) : null}
 
         <View style={styles.exerciseSection}>
-          <AppText style={styles.exerciseSectionLabel}>Your process</AppText>
+          <AppText style={styles.exerciseSectionLabel}>{copy.labels.yourProcess}</AppText>
           <View style={styles.exerciseSlots}>
             {slots.map((item, index) => {
               const isExecutionSlot = index === slots.length - 1;
@@ -1133,7 +1083,7 @@ function IntroExerciseStep({ exercise, onNext }) {
                     </Pressable>
                   ) : (
                     <AppText style={styles.exerciseSlotTextMuted}>
-                      {isExecutionSlot ? 'Execution (last)' : 'Empty slot'}
+                      {isExecutionSlot ? copy.labels.executionLast : copy.labels.emptySlot}
                     </AppText>
                   )}
                 </View>
@@ -1143,7 +1093,7 @@ function IntroExerciseStep({ exercise, onNext }) {
         </View>
 
         <View style={styles.exerciseSection}>
-          <AppText style={styles.exerciseSectionLabel}>Available steps</AppText>
+          <AppText style={styles.exerciseSectionLabel}>{copy.labels.availableSteps}</AppText>
           <View style={styles.exerciseChipList}>
             {available.map((item) => {
               return (
@@ -1161,12 +1111,12 @@ function IntroExerciseStep({ exercise, onNext }) {
       <View style={styles.exerciseFooter}>
         <View style={styles.exerciseActionRow}>
           <SecondaryButton
-            label="Need a hint?"
+            label={copy.labels.needHint}
             onPress={handleHint}
             style={styles.exerciseHintButton}
           />
           <PrimaryButton
-            label="Next"
+            label={copy.buttons.next}
             onPress={onNext}
             disabled={!isCorrect}
             style={styles.exerciseNextButton}
@@ -1174,9 +1124,13 @@ function IntroExerciseStep({ exercise, onNext }) {
         </View>
       </View>
 
-      <BottomSheet visible={showHint} onClose={() => setShowHint(false)} title="Hint">
+      <BottomSheet
+        visible={showHint}
+        onClose={() => setShowHint(false)}
+        title={copy.labels.hint}
+      >
         <AppText style={styles.exerciseHintBody}>
-          Execution is never the starting point. Begin by defining the goal.
+          {copy.messages.hintBody}
         </AppText>
       </BottomSheet>
     </View>
@@ -1251,9 +1205,9 @@ function ExerciseOutcomeLine({ mode }) {
   );
 }
 
-function ChoiceExercise({ exercise, onNext, onPressTerm }) {
+function ChoiceExercise({ exercise, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
-  const { description, options = [], revealTitle = 'Outcome' } = exercise;
+  const { description, options = [], revealTitle = copy.labels.outcome } = exercise;
   const [selectedId, setSelectedId] = useState(null);
   const selected = options.find((option) => option.id === selectedId);
 
@@ -1291,21 +1245,25 @@ function ChoiceExercise({ exercise, onNext, onPressTerm }) {
       ) : null}
 
       <View style={styles.exerciseActions}>
-        <SecondaryButton label="Reset" onPress={reset} />
-        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!selected} />
+        <SecondaryButton label={copy.buttons.reset} onPress={reset} />
+        <PrimaryButton
+          label={copy.buttons.completeExercise}
+          onPress={onNext}
+          disabled={!selected}
+        />
       </View>
     </View>
   );
 }
 
-function TradeoffExercise({ exercise, onNext, onPressTerm }) {
+function TradeoffExercise({ exercise, onNext, onPressTerm, copy }) {
   const { colors, styles } = useLessonStepStyles();
   const {
     description,
     sliders = [],
     requiresRun = false,
-    ctaLabel = 'Reveal impact',
-    scoreLabel = 'Signal',
+    ctaLabel = copy.labels.revealImpact,
+    scoreLabel = copy.labels.signal,
     insight = {},
     insightMode = 'score',
     insightBySlider = {},
@@ -1440,23 +1398,27 @@ function TradeoffExercise({ exercise, onNext, onPressTerm }) {
       </Card>
 
       <View style={styles.exerciseActions}>
-        <SecondaryButton label="Reset" onPress={reset} />
-        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!hasRun} />
+        <SecondaryButton label={copy.buttons.reset} onPress={reset} />
+        <PrimaryButton
+          label={copy.buttons.completeExercise}
+          onPress={onNext}
+          disabled={!hasRun}
+        />
       </View>
     </View>
   );
 }
 
-function MultiExercise({ exercise, onNext, onPressTerm }) {
+function MultiExercise({ exercise, onNext, onPressTerm, copy }) {
   const { colors, styles } = useLessonStepStyles();
   const {
     description,
     options = [],
     baseScore = 100,
-    scoreLabel = 'Coverage',
+    scoreLabel = copy.labels.coverage,
     unit = '%',
     insight = {},
-    emptyMessage = 'Select items to see the impact.',
+    emptyMessage = copy.messages.selectItems,
   } = exercise;
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -1536,14 +1498,18 @@ function MultiExercise({ exercise, onNext, onPressTerm }) {
       </Card>
 
       <View style={styles.exerciseActions}>
-        <SecondaryButton label="Reset" onPress={reset} />
-        <PrimaryButton label="Complete exercise" onPress={onNext} disabled={!hasSelection} />
+        <SecondaryButton label={copy.buttons.reset} onPress={reset} />
+        <PrimaryButton
+          label={copy.buttons.completeExercise}
+          onPress={onNext}
+          disabled={!hasSelection}
+        />
       </View>
     </View>
   );
 }
 
-function ReflectionStep({ content, onSubmit, onPressTerm }) {
+function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
   const { colors, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
   const [response, setResponse] = useState(null);
@@ -1552,7 +1518,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
   const buildResponse = (input) => {
     const normalized = (input || '').toLowerCase().trim();
     if (!normalized || normalized.length < 6) {
-      return 'The lesson centers on defining each step before execution to keep decisions grounded.';
+      return copy.messages.reflectionShort;
     }
     const structureWords = [
       'order',
@@ -1585,12 +1551,12 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
     const hasStructure = structureWords.some((word) => normalized.includes(word));
     const hasEmotion = emotionWords.some((word) => normalized.includes(word));
     if (hasStructure) {
-      return 'Noted — execution gains meaning when it follows the full sequence of steps.';
+      return copy.messages.reflectionStructure;
     }
     if (hasEmotion) {
-      return 'Noted — a defined process can reduce reactive execution by adding pause and clarity.';
+      return copy.messages.reflectionEmotion;
     }
-    return 'This reflection ties back to the idea that execution works best after the earlier steps are set.';
+    return copy.messages.reflectionDefault;
   };
 
   const handleBlur = () => {
@@ -1638,7 +1604,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
               }}
               onBlur={handleBlur}
               placeholder={
-                content?.steps?.reflection?.placeholder || 'Write a short reflection'
+                content?.steps?.reflection?.placeholder || copy.messages.reflectionPlaceholder
               }
               placeholderTextColor={colors.textSecondary}
               multiline
@@ -1646,7 +1612,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
           </View>
         {response ? (
           <View style={[styles.chatBubble, styles.chatBubbleSystem]}>
-            <AppText style={styles.chatLabel}>EQTY insight</AppText>
+            <AppText style={styles.chatLabel}>{copy.labels.eqtyInsight}</AppText>
             <AppText style={styles.chatText}>{response}</AppText>
           </View>
         ) : null}
@@ -1657,22 +1623,22 @@ function ReflectionStep({ content, onSubmit, onPressTerm }) {
           <View style={styles.reflectionSavedPill}>
             <Ionicons name="sparkles-outline" size={14} color={colors.textSecondary} />
             <AppText style={styles.reflectionSavedText}>
-              Saved to personalize upcoming lessons.
+              {copy.messages.reflectionSaved}
             </AppText>
           </View>
         ) : null}
-        <PrimaryButton label="Continue" onPress={handleContinue} />
+        <PrimaryButton label={copy.buttons.continue} onPress={handleContinue} />
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-function SummaryStep({ content, onComplete, onPressTerm }) {
+function SummaryStep({ content, onComplete, onPressTerm, copy }) {
   const { colors, styles } = useLessonStepStyles();
   return (
     <View style={styles.stepBody}>
       <Card style={styles.summaryCard}>
-        <AppText style={styles.bodyText}>Key takeaways</AppText>
+        <AppText style={styles.bodyText}>{copy.labels.keyTakeaways}</AppText>
         <View style={styles.takeawayList}>
           {content?.steps?.summary?.takeaways?.map((item) => (
             <View key={item} style={styles.takeawayRow}>
@@ -1697,12 +1663,12 @@ function SummaryStep({ content, onComplete, onPressTerm }) {
         </Pressable>
       ) : null}
 
-      <PrimaryButton label="Complete lesson" onPress={onComplete} />
+      <PrimaryButton label={copy.buttons.completeLesson} onPress={onComplete} />
     </View>
   );
 }
 
-function IntroSummaryStep({ content, onComplete }) {
+function IntroSummaryStep({ content, onComplete, copy }) {
   const { colors, styles } = useLessonStepStyles();
   const map = content?.steps?.summary?.processMap || [];
   const stations = map.length
@@ -1752,9 +1718,9 @@ function IntroSummaryStep({ content, onComplete }) {
       <View style={styles.summaryHeaderBlock}>
         <AppText style={styles.summarySubtitle}>
           {content?.steps?.summary?.subtitle ||
-            'Execution is the final step — not the starting point.'}
+            'Execution is the final step - not the starting point.'}
         </AppText>
-        <AppText style={styles.processHint}>Tap a station to expand.</AppText>
+        <AppText style={styles.processHint}>{copy.labels.tapStation}</AppText>
       </View>
 
       <View style={styles.summaryContent}>
@@ -1822,7 +1788,7 @@ function IntroSummaryStep({ content, onComplete }) {
       </View>
 
       <View style={styles.summaryFooter}>
-        <PrimaryButton label="Continue" onPress={onComplete} />
+        <PrimaryButton label={copy.buttons.continue} onPress={onComplete} />
       </View>
     </View>
   );

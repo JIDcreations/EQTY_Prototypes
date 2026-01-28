@@ -8,10 +8,14 @@ import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
+import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingAIDisclaimerScreen({ navigation }) {
+  const { preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   return (
     <OnboardingScreen
@@ -23,22 +27,19 @@ export default function OnboardingAIDisclaimerScreen({ navigation }) {
           <View pointerEvents="none" style={styles.accentOrbTop} />
           <View pointerEvents="none" style={styles.accentOrbBottom} />
           <View style={styles.header}>
-            <OnboardingProgress current={3} total={3} label="Step 03" />
+            <OnboardingProgress current={3} total={3} label={copy.ai.stepLabel} />
           </View>
           <View style={styles.content}>
             <OnboardingStackedCard>
               <View style={styles.cardHeader}>
                 <View style={styles.badge}>
                   <View style={styles.badgeDot} />
-                  <AppText style={styles.badgeText}>AI transparency</AppText>
+                  <AppText style={styles.badgeText}>{copy.ai.badge}</AppText>
                 </View>
-                <AppText style={styles.title}>How AI works in EQTY</AppText>
+                <AppText style={styles.title}>{copy.ai.title}</AppText>
               </View>
-              <AppText style={styles.subtitle}>
-                AI adapts explanations and examples.
-                {'\n'}No advice, no predictions.
-              </AppText>
-              <AppText style={styles.tapHint}>Tap to continue</AppText>
+              <AppText style={styles.subtitle}>{copy.ai.subtitle}</AppText>
+              <AppText style={styles.tapHint}>{copy.ai.tapHint}</AppText>
             </OnboardingStackedCard>
           </View>
         </View>

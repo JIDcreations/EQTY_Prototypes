@@ -8,58 +8,80 @@ import { PrimaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
-import { lessons, modules } from '../data/curriculum';
+import {
+  formatHomeLessonCount,
+  formatHomeModuleLabel,
+  getHomeCopy,
+  getLocalizedLessons,
+  getLocalizedModules,
+} from '../utils/localization';
 import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
-import { getLessonById } from '../utils/helpers';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { progress, authUser, userContext } = useApp();
+  const { progress, authUser, userContext, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [expandedFocus, setExpandedFocus] = useState(null);
+  const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
 
-  const totalLessons = lessons.length;
-  const currentLesson = getLessonById(progress.currentLessonId) || lessons[0];
+  const localizedLessons = useMemo(
+    () => getLocalizedLessons(preferences?.language),
+    [preferences?.language]
+  );
+  const localizedModules = useMemo(
+    () => getLocalizedModules(preferences?.language),
+    [preferences?.language]
+  );
+  const totalLessons = localizedLessons.length;
+  const currentLesson =
+    localizedLessons.find((lesson) => lesson.id === progress.currentLessonId) ||
+    localizedLessons[0];
   const currentOrder = currentLesson?.order || 1;
-  const currentModuleIndex = modules.findIndex((module) => module.id === currentLesson?.moduleId);
-  const currentModule = modules[currentModuleIndex];
+  const currentModuleIndex = localizedModules.findIndex(
+    (module) => module.id === currentLesson?.moduleId
+  );
+  const currentModule = localizedModules[currentModuleIndex];
 
-  const greeting = getGreeting();
-  const displayName = getDisplayName(authUser);
+  const greeting = getGreeting(homeCopy);
+  const displayName = getDisplayName(authUser, homeCopy);
   const moduleNumber = currentModule?.id?.split('_')[1];
   const moduleLabel =
     currentModuleIndex >= 0 && currentModule
-      ? `Module ${moduleNumber ?? currentModuleIndex} ${currentModule.title}`
-      : 'Module focus';
-  const moduleDescription = currentModule?.description || 'Build the foundation for today.';
-  const motivation = formatSentence(userContext?.motivation, 'invest with confidence.');
+      ? formatHomeModuleLabel(
+          preferences?.language,
+          moduleNumber,
+          currentModule.title,
+          currentModuleIndex
+        )
+      : homeCopy.moduleFocus;
+  const moduleDescription = currentModule?.description || homeCopy.moduleFallbackDescription;
+  const motivation = formatSentence(userContext?.motivation, homeCopy.defaultMotivation);
 
   const focusSections = [
     {
       id: 'concept',
-      label: 'Concept',
-      title: currentLesson?.title || 'Core concept',
+      label: homeCopy.labels.concept,
+      title: currentLesson?.title || homeCopy.coreConceptFallback,
       summary: currentLesson?.shortDescription,
-      detail: `We break down ${currentLesson?.title || 'the main idea'} so you can spot the decision lever and apply it consistently.`,
+      detail: homeCopy.conceptDetail(currentLesson?.title),
     },
     {
       id: 'scenario',
-      label: 'Scenario',
-      title: 'Real-world lens',
-      summary: `${moduleLabel} applied to a practical decision.`,
-      detail: `You will walk through a realistic case that shows how ${currentLesson?.title || 'this idea'} shapes a real choice. ${moduleDescription}`,
+      label: homeCopy.labels.scenario,
+      title: homeCopy.titles.scenario,
+      summary: homeCopy.scenarioSummary(moduleLabel),
+      detail: homeCopy.scenarioDetail(currentLesson?.title, moduleDescription),
     },
     {
       id: 'exercise',
-      label: 'Exercise',
-      title: 'Personal application',
-      summary: `A short reflection aligned with your goal: ${motivation}`,
-      detail:
-        'Write down one action you can take this week to apply the lesson. Keep it small, specific, and measurable.',
+      label: homeCopy.labels.exercise,
+      title: homeCopy.titles.exercise,
+      summary: homeCopy.exerciseSummary(motivation),
+      detail: homeCopy.exerciseDetail,
     },
   ].filter((item) => item.summary);
 
@@ -83,16 +105,16 @@ export default function HomeScreen() {
 
         <Card style={styles.heroCard}>
           <View style={styles.heroMetaRow}>
-            <Tag label="TODAY'S LESSON" style={styles.heroTag} />
+            <Tag label={homeCopy.todaysLessonTag} style={styles.heroTag} />
             <GlossaryText
-              text={`Lesson ${currentOrder}/${totalLessons}`}
+              text={formatHomeLessonCount(preferences?.language, currentOrder, totalLessons)}
               style={styles.heroMetaText}
             />
           </View>
           <AppText style={styles.heroTitle}>{currentLesson?.title}</AppText>
           <AppText style={styles.heroSubtitle}>{currentLesson?.shortDescription}</AppText>
           <PrimaryButton
-            label="Start lesson"
+            label={homeCopy.startLesson}
             onPress={() =>
               navigation.navigate('LessonOverview', {
                 lessonId: currentLesson?.id,
@@ -103,10 +125,7 @@ export default function HomeScreen() {
           />
         </Card>
 
-        <SectionTitle
-          title="Today's focus"
-          subtitle="What you will cover in this lesson."
-        />
+        <SectionTitle title={homeCopy.todaysFocusTitle} subtitle={homeCopy.todaysFocusSubtitle} />
         <View style={styles.focusList}>
           {focusSections.map((section) => {
             const isExpanded = expandedFocus === section.id;
@@ -127,7 +146,7 @@ export default function HomeScreen() {
                   <View style={styles.focusHeader}>
                     <GlossaryText text={section.label} style={styles.focusLabel} />
                     <GlossaryText
-                      text={isExpanded ? 'Hide details' : 'View details'}
+                      text={isExpanded ? homeCopy.hideDetails : homeCopy.viewDetails}
                       style={styles.focusAction}
                     />
                   </View>
@@ -302,21 +321,21 @@ const createStyles = (colors) =>
     },
   });
 
-const getGreeting = () => {
+const getGreeting = (homeCopy) => {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return homeCopy.greetingMorning;
+  if (hour < 18) return homeCopy.greetingAfternoon;
+  return homeCopy.greetingEvening;
 };
 
-const getDisplayName = (authUser) => {
+const getDisplayName = (authUser, homeCopy) => {
   const raw =
     authUser?.name ||
     authUser?.username ||
     (authUser?.email ? authUser.email.split('@')[0] : '');
   const cleaned = raw.trim().replace(/[_\-.]+/g, ' ');
   const first = cleaned.split(' ').filter(Boolean)[0];
-  if (!first) return 'there';
+  if (!first) return homeCopy.defaultName;
   return first.charAt(0).toUpperCase() + first.slice(1);
 };
 

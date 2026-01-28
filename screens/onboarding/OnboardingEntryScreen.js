@@ -9,11 +9,15 @@ import { PrimaryButton } from '../../components/Button';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
+import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingEntryScreen({ navigation }) {
+  const { preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [sheetVisible, setSheetVisible] = useState(false);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   const handleApple = () => {
     setSheetVisible(false);
@@ -37,23 +41,21 @@ export default function OnboardingEntryScreen({ navigation }) {
           <AppText style={styles.logo}>EQTY</AppText>
           <View style={styles.kickerRow}>
             <View style={styles.kickerDot} />
-            <AppText style={styles.kicker}>Start here</AppText>
+            <AppText style={styles.kicker}>{copy.entry.kicker}</AppText>
           </View>
-          <AppText style={styles.title}>Create your EQTY account</AppText>
-          <AppText style={styles.subtitle}>
-            A quick setup unlocks the calm, personalized learning experience.
-          </AppText>
+          <AppText style={styles.title}>{copy.entry.title}</AppText>
+          <AppText style={styles.subtitle}>{copy.entry.subtitle}</AppText>
         </View>
 
         <OnboardingStackedCard>
           <View style={styles.cardHeader}>
-            <AppText style={styles.cardTitle}>Get started</AppText>
-            <AppText style={styles.cardSubtitle}>Choose a sign-up path.</AppText>
+            <AppText style={styles.cardTitle}>{copy.entry.cardTitle}</AppText>
+            <AppText style={styles.cardSubtitle}>{copy.entry.cardSubtitle}</AppText>
           </View>
           <View style={styles.actions}>
-            <PrimaryButton label="Get started" onPress={() => setSheetVisible(true)} />
+            <PrimaryButton label={copy.entry.button} onPress={() => setSheetVisible(true)} />
             <Pressable onPress={() => navigation.navigate('OnboardingLogin')}>
-              <AppText style={styles.link}>I already have an account</AppText>
+              <AppText style={styles.link}>{copy.entry.loginLink}</AppText>
             </Pressable>
           </View>
         </OnboardingStackedCard>
@@ -61,22 +63,22 @@ export default function OnboardingEntryScreen({ navigation }) {
 
       <BottomSheet
         visible={sheetVisible}
-        title="Create your EQTY account"
+        title={copy.entry.sheetTitle}
         onClose={() => setSheetVisible(false)}
       >
         <OnboardingAuthButton
-          label="Continue with Apple"
+          label={copy.entry.apple}
           iconName="logo-apple"
           variant="light"
           onPress={handleApple}
         />
         <OnboardingAuthButton
-          label="Continue with Google"
+          label={copy.entry.google}
           iconName="logo-google"
           onPress={handleGoogle}
         />
         <OnboardingAuthButton
-          label="Continue with email"
+          label={copy.entry.email}
           iconName="mail-outline"
           onPress={handleEmail}
         />

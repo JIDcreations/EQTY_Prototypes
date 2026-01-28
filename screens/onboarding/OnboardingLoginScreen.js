@@ -16,11 +16,13 @@ import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingLoginScreen({ navigation }) {
-  const { updateAuthUser, updatePreferences } = useApp();
+  const { updateAuthUser, updatePreferences, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -54,30 +56,30 @@ export default function OnboardingLoginScreen({ navigation }) {
             <View style={styles.cardHeader}>
               <View style={styles.badge}>
                 <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>Welcome back</AppText>
+                <AppText style={styles.badgeText}>{copy.login.badge}</AppText>
               </View>
-              <AppText style={styles.title}>Log in to EQTY</AppText>
-              <AppText style={styles.subtitle}>Use any details for this prototype.</AppText>
+              <AppText style={styles.title}>{copy.login.title}</AppText>
+              <AppText style={styles.subtitle}>{copy.login.subtitle}</AppText>
             </View>
 
             <View style={styles.fields}>
               <View style={styles.field}>
-                <AppText style={styles.label}>Username</AppText>
+                <AppText style={styles.label}>{copy.login.usernameLabel}</AppText>
                 <TextInput
                   value={username}
                   onChangeText={setUsername}
-                  placeholder="Your username"
+                  placeholder={copy.login.usernamePlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   autoCapitalize="none"
                   style={styles.input}
                 />
               </View>
               <View style={styles.field}>
-                <AppText style={styles.label}>Password</AppText>
+                <AppText style={styles.label}>{copy.login.passwordLabel}</AppText>
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="••••••••"
+                  placeholder={copy.login.passwordPlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   secureTextEntry
                   style={styles.input}
@@ -86,9 +88,9 @@ export default function OnboardingLoginScreen({ navigation }) {
             </View>
 
             <View style={styles.ctaBlock}>
-              <PrimaryButton label="Log in" onPress={handleDone} />
+              <PrimaryButton label={copy.login.button} onPress={handleDone} />
               <Pressable onPress={() => navigation.navigate('OnboardingEntry')}>
-                <AppText style={styles.loginLink}>Don’t have an account?</AppText>
+                <AppText style={styles.loginLink}>{copy.login.link}</AppText>
               </Pressable>
             </View>
           </OnboardingStackedCard>

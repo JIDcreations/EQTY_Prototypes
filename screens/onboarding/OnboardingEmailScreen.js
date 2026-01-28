@@ -16,11 +16,13 @@ import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingEmailScreen({ navigation }) {
-  const { updateAuthUser } = useApp();
+  const { updateAuthUser, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -53,21 +55,19 @@ export default function OnboardingEmailScreen({ navigation }) {
             <View style={styles.cardHeader}>
               <View style={styles.badge}>
                 <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>Email sign up</AppText>
+                <AppText style={styles.badgeText}>{copy.email.badge}</AppText>
               </View>
-              <AppText style={styles.title}>Create with email</AppText>
-              <AppText style={styles.subtitle}>
-                No real authentication required for this demo.
-              </AppText>
+              <AppText style={styles.title}>{copy.email.title}</AppText>
+              <AppText style={styles.subtitle}>{copy.email.subtitle}</AppText>
             </View>
 
             <View style={styles.fields}>
               <View style={styles.field}>
-                <AppText style={styles.label}>Email</AppText>
+                <AppText style={styles.label}>{copy.email.emailLabel}</AppText>
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="you@example.com"
+                  placeholder={copy.email.emailPlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   autoCapitalize="none"
                   keyboardType="email-address"
@@ -75,22 +75,22 @@ export default function OnboardingEmailScreen({ navigation }) {
                 />
               </View>
               <View style={styles.field}>
-                <AppText style={styles.label}>Password</AppText>
+                <AppText style={styles.label}>{copy.email.passwordLabel}</AppText>
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="••••••••"
+                  placeholder={copy.email.passwordPlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   secureTextEntry
                   style={styles.input}
                 />
               </View>
               <View style={styles.field}>
-                <AppText style={styles.label}>Confirm password</AppText>
+                <AppText style={styles.label}>{copy.email.confirmLabel}</AppText>
                 <TextInput
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
-                  placeholder="••••••••"
+                  placeholder={copy.email.confirmPlaceholder}
                   placeholderTextColor={colors.textSecondary}
                   secureTextEntry
                   style={styles.input}
@@ -99,9 +99,9 @@ export default function OnboardingEmailScreen({ navigation }) {
             </View>
 
             <View style={styles.ctaBlock}>
-              <PrimaryButton label="Sign up" onPress={handleContinue} />
+              <PrimaryButton label={copy.email.button} onPress={handleContinue} />
               <Pressable onPress={() => navigation.navigate('OnboardingLogin')}>
-                <AppText style={styles.loginLink}>Already have an account?</AppText>
+                <AppText style={styles.loginLink}>{copy.email.link}</AppText>
               </Pressable>
             </View>
           </OnboardingStackedCard>

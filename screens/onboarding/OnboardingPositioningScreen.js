@@ -8,10 +8,14 @@ import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
+import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingPositioningScreen({ navigation }) {
+  const { preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   return (
     <OnboardingScreen
@@ -23,21 +27,19 @@ export default function OnboardingPositioningScreen({ navigation }) {
           <View pointerEvents="none" style={styles.accentOrbTop} />
           <View pointerEvents="none" style={styles.accentOrbBottom} />
           <View style={styles.header}>
-            <OnboardingProgress current={2} total={3} label="Step 02" />
+            <OnboardingProgress current={2} total={3} label={copy.positioning.stepLabel} />
           </View>
           <View style={styles.content}>
             <OnboardingStackedCard>
               <View style={styles.cardHeader}>
                 <View style={styles.badge}>
                   <View style={styles.badgeDot} />
-                  <AppText style={styles.badgeText}>EQTY positioning</AppText>
+                  <AppText style={styles.badgeText}>{copy.positioning.badge}</AppText>
                 </View>
-                <AppText style={styles.title}>Build to understand investing</AppText>
+                <AppText style={styles.title}>{copy.positioning.title}</AppText>
               </View>
-              <AppText style={styles.subtitle}>
-                Clear lessons, calm pacing, and context that grows with you.
-              </AppText>
-              <AppText style={styles.tapHint}>Tap to continue</AppText>
+              <AppText style={styles.subtitle}>{copy.positioning.subtitle}</AppText>
+              <AppText style={styles.tapHint}>{copy.positioning.tapHint}</AppText>
             </OnboardingStackedCard>
           </View>
         </View>

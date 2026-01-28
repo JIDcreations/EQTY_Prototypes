@@ -6,17 +6,21 @@ import OnboardingScreen from '../../components/OnboardingScreen';
 import useThemeColors from '../../theme/useTheme';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
+import { useApp } from '../../utils/AppContext';
+import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingWelcomeScreen({ navigation }) {
+  const { preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   return (
     <OnboardingScreen
       gradientColors={[colors.background, colors.surfaceActive]}
       showGlow={false}
     >
-      <OnboardingGesture onContinue={() => navigation.navigate('OnboardingPositioning')}>
+      <OnboardingGesture onContinue={() => navigation.navigate('OnboardingLanguage')}>
         <View style={styles.container}>
           <View pointerEvents="none" style={styles.accentOrbTop} />
           <View pointerEvents="none" style={styles.accentOrbBottom} />
@@ -24,12 +28,10 @@ export default function OnboardingWelcomeScreen({ navigation }) {
             <AppText style={styles.logo}>EQTY</AppText>
           </View>
           <View style={styles.copyBlock}>
-            <AppText style={styles.title}>Welcome to EQTY</AppText>
-            <AppText style={styles.subtitle}>
-              A calm space to understand investing, shaped around your pace and goals.
-            </AppText>
+            <AppText style={styles.title}>{copy.welcome.title}</AppText>
+            <AppText style={styles.subtitle}>{copy.welcome.subtitle}</AppText>
           </View>
-          <AppText style={styles.tapHint}>Tap to continue</AppText>
+          <AppText style={styles.tapHint}>{copy.welcome.tapHint}</AppText>
         </View>
       </OnboardingGesture>
     </OnboardingScreen>
