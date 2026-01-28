@@ -104,7 +104,7 @@ export default function LessonStepScreen() {
   const disableOuterScroll =
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
   const containerContentStyle =
-    disableOuterScroll && step === 2 ? { paddingBottom: 0 } : null;
+    disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: 0 } : null;
 
   return (
     <LessonStepContainer
@@ -243,10 +243,10 @@ function ConceptStep({ content, lessonId, onNext, onPressTerm, copy }) {
 }
 
 function IntroConceptStep({ content, onNext, copy }) {
-  const { styles } = useLessonStepStyles();
+  const { colors, styles } = useLessonStepStyles();
   const intro = content?.steps?.concept?.intro;
   const steps = copy.introConcept.steps;
-  const [activeId, setActiveId] = useState(steps[0].id);
+  const [activeIndex, setActiveIndex] = useState(null);
   const paragraph = copy.introConcept.paragraph;
 
   return (
@@ -265,44 +265,42 @@ function IntroConceptStep({ content, onNext, copy }) {
           <AppText style={styles.processTitle}>{copy.introConcept.processTitle}</AppText>
           <AppText style={styles.processHint}>{copy.introConcept.processHint}</AppText>
         </View>
-        <View style={styles.processList}>
-          <View pointerEvents="none" style={styles.processRail} />
-          {steps.map((step) => {
-            const isActive = step.id === activeId;
+        <View style={styles.processMap}>
+          <View style={styles.processLine} />
+          {steps.map((step, index) => {
+            const isActive = index === activeIndex;
             return (
-              <Pressable
-                key={step.id}
-                onPress={() => setActiveId(step.id)}
-                style={styles.processRow}
-              >
-                <View style={styles.processNodeWrap}>
+              <View key={step.id} style={styles.processStationBlock}>
+                <Pressable
+                  onPress={() =>
+                    setActiveIndex((prev) => (prev === index ? null : index))
+                  }
+                  style={[
+                    styles.processStationRow,
+                    isActive && styles.processStationRowActive,
+                  ]}
+                >
                   <View
-                    style={[
-                      styles.processNode,
-                      isActive && styles.processNodeActive,
-                    ]}
-                  >
-                    <AppText
-                      style={[
-                        styles.processNodeText,
-                        isActive && styles.processNodeTextActive,
-                      ]}
-                    >
-                      {steps.findIndex((item) => item.id === step.id) + 1}
-                    </AppText>
+                    style={[styles.processNode, isActive && styles.processNodeActive]}
+                  />
+                  <View style={styles.processStationText}>
+                    <AppText style={styles.processStationIndex}>{index + 1}</AppText>
+                    <AppText style={styles.processStationTitle}>{step.label}</AppText>
                   </View>
-                </View>
-                <View style={styles.processCopy}>
-                  <AppText
-                    style={[styles.processLabel, isActive && styles.processLabelActive]}
-                  >
-                    {step.label}
-                  </AppText>
-                  {isActive ? (
-                    <AppText style={styles.processDetail}>{step.detail}</AppText>
-                  ) : null}
-                </View>
-              </Pressable>
+                  <View style={styles.processStationIndicator}>
+                    <Ionicons
+                      name={isActive ? 'chevron-down' : 'chevron-forward'}
+                      size={16}
+                      color={isActive ? colors.accent : colors.textSecondary}
+                    />
+                  </View>
+                </Pressable>
+                {isActive ? (
+                  <View style={styles.processPanel}>
+                    <AppText style={styles.processDescription}>{step.detail}</AppText>
+                  </View>
+                ) : null}
+              </View>
             );
           })}
         </View>
@@ -421,16 +419,29 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
   const variantKey = getScenarioVariantFromOnboarding(onboardingContext, userContext);
   const variant = scenario?.variants?.[variantKey] || scenario?.variants?.new;
   const keyInsight = variant?.keyInsight || copy.introScenario.keyInsightFallback;
-  const [mode, setMode] = useState('plan');
-  const [activeMissing, setActiveMissing] = useState(null);
-  const [showOutcome, setShowOutcome] = useState(false);
-  const [outcomeMounted, setOutcomeMounted] = useState(false);
-  const outcomeAnim = useState(() => new Animated.Value(0))[0];
+  const [focusedScenario, setFocusedScenario] = useState('structured');
   const steps = copy.introScenario.steps;
-  const missingIds = mode === 'no-plan' ? ['goal', 'risk', 'strategy'] : [];
-  const activeMissingIndex = activeMissing
-    ? steps.findIndex((step) => step.id === activeMissing)
+  const isReactive = focusedScenario === 'reactive';
+  const missingIds = isReactive ? ['goal', 'risk', 'strategy'] : [];
+  const firstMissingIndex = isReactive
+    ? steps.findIndex((step) => step.id === missingIds[0])
     : -1;
+  const scenarioOutcomes = [
+    {
+      id: 'structured',
+      label: copy.introScenario.structuredLabel,
+      outcomeLabel: copy.introScenario.structuredOutcome,
+      caption: copy.introScenario.structuredCaption,
+      lineColor: colors.accent,
+    },
+    {
+      id: 'reactive',
+      label: copy.introScenario.reactiveLabel,
+      outcomeLabel: copy.introScenario.reactiveOutcome,
+      caption: copy.introScenario.reactiveCaption,
+      lineColor: toRgba(colors.textSecondary, 0.85),
+    },
+  ];
 
   useEffect(() => {
     if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -438,101 +449,84 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
     }
   }, []);
 
-  useEffect(() => {
-    if (showOutcome) {
-      setOutcomeMounted(true);
-      outcomeAnim.setValue(0);
-      Animated.timing(outcomeAnim, {
-        toValue: 1,
-        duration: 220,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }).start();
-    } else if (outcomeMounted) {
-      Animated.timing(outcomeAnim, {
-        toValue: 0,
-        duration: 200,
-        easing: Easing.in(Easing.quad),
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished) setOutcomeMounted(false);
-      });
-    }
-  }, [showOutcome, outcomeMounted, outcomeAnim]);
-
   const applyAnimation = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
-  const handleToggle = (nextMode) => {
-    if (nextMode === mode) return;
+  const handleFocus = (nextScenario) => {
+    if (nextScenario === focusedScenario) return;
     applyAnimation();
-    setMode(nextMode);
-    setActiveMissing(null);
-  };
-
-  const handleMissingPress = (id) => {
-    if (mode !== 'no-plan') return;
-    applyAnimation();
-    setActiveMissing((prev) => (prev === id ? null : id));
-  };
-
-  const handleExecutionPress = () => {
-    applyAnimation();
-    setShowOutcome((prev) => !prev);
+    setFocusedScenario(nextScenario);
   };
 
   return (
     <View style={styles.stepBody}>
       {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
-      <View style={styles.scenarioToggle}>
-        <Pressable
-          onPress={() => handleToggle('plan')}
-          style={[
-            styles.scenarioToggleOption,
-            mode === 'plan' && styles.scenarioToggleOptionActive,
-          ]}
-        >
-          <AppText
-            style={[
-              styles.scenarioToggleText,
-              mode === 'plan' && styles.scenarioToggleTextActive,
-            ]}
-          >
-            {copy.introScenario.withPlan}
-          </AppText>
-        </Pressable>
-        <Pressable
-          onPress={() => handleToggle('no-plan')}
-          style={[
-            styles.scenarioToggleOption,
-            mode === 'no-plan' && styles.scenarioToggleOptionActive,
-          ]}
-        >
-          <AppText
-            style={[
-              styles.scenarioToggleText,
-              mode === 'no-plan' && styles.scenarioToggleTextActive,
-            ]}
-          >
-            {copy.introScenario.withoutPlan}
-          </AppText>
-        </Pressable>
+      <AppText style={styles.scenarioMeaning}>{copy.introScenario.planMeaning}</AppText>
+      <View style={styles.scenarioOutcomeGrid}>
+        {scenarioOutcomes.map((scenarioItem) => {
+          const isActive = focusedScenario === scenarioItem.id;
+          return (
+            <Pressable
+              key={scenarioItem.id}
+              onPress={() => handleFocus(scenarioItem.id)}
+              style={({ pressed }) => [
+                styles.outcomePressable,
+                pressed && styles.outcomePressablePressed,
+              ]}
+            >
+              <Card style={[styles.outcomePanel, isActive && styles.outcomePanelActive]}>
+                <View style={styles.outcomeHeader}>
+                  <View style={styles.outcomeTitleStack}>
+                    <AppText style={styles.outcomeScenarioLabel}>
+                      {scenarioItem.label}
+                    </AppText>
+                    <AppText style={styles.outcomeLabel}>{scenarioItem.outcomeLabel}</AppText>
+                  </View>
+                  <View
+                    style={[
+                      styles.outcomeFocusPill,
+                      isActive && styles.outcomeFocusPillActive,
+                    ]}
+                  >
+                    <AppText
+                      style={[
+                        styles.outcomeFocusText,
+                        isActive && styles.outcomeFocusTextActive,
+                      ]}
+                    >
+                      {isActive ? copy.introScenario.focused : copy.introScenario.focus}
+                    </AppText>
+                    <Ionicons
+                      name={isActive ? 'checkmark' : 'chevron-forward'}
+                      size={12}
+                      color={isActive ? colors.textPrimary : colors.textSecondary}
+                    />
+                  </View>
+                </View>
+                <OutcomeChart
+                  variant={scenarioItem.id}
+                  lineColor={scenarioItem.lineColor}
+                  isActive={isActive}
+                />
+                <AppText style={styles.outcomeCaption}>{scenarioItem.caption}</AppText>
+              </Card>
+            </Pressable>
+          );
+        })}
       </View>
+      <AppText style={styles.scenarioFocusLine}>
+        {focusedScenario === 'structured'
+          ? copy.introScenario.focusInsightStructured
+          : copy.introScenario.focusInsightReactive}
+      </AppText>
 
       <View style={styles.scenarioPanel}>
         <View style={styles.scenarioPanelHeader}>
           <AppText style={styles.scenarioPanelTitle}>{copy.introScenario.processRail}</AppText>
-          <View
-            style={[
-              styles.scenarioBadge,
-              mode === 'no-plan' && styles.scenarioBadgeMuted,
-            ]}
-          >
+          <View style={[styles.scenarioBadge, isReactive && styles.scenarioBadgeMuted]}>
             <AppText style={styles.scenarioBadgeText}>
-              {mode === 'plan'
-                ? copy.introScenario.stableDecisions
-                : copy.introScenario.reactiveDecisions}
+              {isReactive ? copy.introScenario.reactiveLabel : copy.introScenario.structuredLabel}
             </AppText>
           </View>
         </View>
@@ -542,27 +536,13 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
             const isMissing = missingIds.includes(step.id);
             const isLast = index === steps.length - 1;
             const isDegraded =
-              activeMissingIndex >= 0 && index > activeMissingIndex && mode === 'no-plan';
+              firstMissingIndex >= 0 && index > firstMissingIndex && isReactive;
             const label = isMissing
               ? `${step.label}${copy.introScenario.missingSuffix}`
               : step.label;
-            const showJump = isExecution && mode === 'no-plan';
-            const showConsequence = isMissing && activeMissing === step.id;
-            const showExecutionHint = isExecution && !showOutcome;
-            const isInteractive = isExecution || isMissing;
-            const RowWrapper = isInteractive ? Pressable : View;
+            const showJump = isExecution && isReactive;
             return (
-              <RowWrapper
-                key={step.id}
-                onPress={
-                  isExecution
-                    ? handleExecutionPress
-                    : isMissing
-                    ? () => handleMissingPress(step.id)
-                    : undefined
-                }
-                style={styles.scenarioRailRow}
-              >
+              <View key={step.id} style={styles.scenarioRailRow}>
                 <View style={styles.scenarioRailTrack}>
                   <View
                     style={[
@@ -576,7 +556,7 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
                     <View
                       style={[
                         styles.scenarioRailLine,
-                        mode === 'no-plan' && styles.scenarioRailLineBroken,
+                        isReactive && styles.scenarioRailLineBroken,
                         isDegraded && styles.scenarioRailLineDegraded,
                       ]}
                     />
@@ -597,7 +577,7 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
                     {showJump ? (
                       <Ionicons name="arrow-forward" size={14} color={colors.accent} />
                     ) : null}
-                    {isExecution && activeMissingIndex >= 0 ? (
+                    {isExecution && isReactive ? (
                       <View style={styles.scenarioPrematureBadge}>
                         <AppText style={styles.scenarioPrematureText}>
                           {copy.introScenario.premature}
@@ -605,40 +585,15 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
                       </View>
                     ) : null}
                   </View>
-                  {showExecutionHint ? (
-                    <AppText style={styles.scenarioTapHint}>
-                      {copy.introScenario.tapExecution}
-                    </AppText>
-                  ) : null}
-                  {showConsequence ? (
-                    <AppText style={styles.scenarioConsequence}>
-                      {copy.introScenario.downstreamImpact}
-                    </AppText>
-                  ) : null}
                 </View>
-              </RowWrapper>
+              </View>
             );
           })}
         </View>
-        {outcomeMounted ? (
-          <Animated.View
-            style={[
-              styles.scenarioOutcome,
-              {
-                opacity: outcomeAnim,
-                transform: [
-                  {
-                    translateY: outcomeAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [10, 0],
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <OutcomeChart mode={mode} copy={copy} />
-          </Animated.View>
+        {isReactive ? (
+          <AppText style={styles.scenarioConsequence}>
+            {copy.introScenario.downstreamImpact}
+          </AppText>
         ) : null}
       </View>
       <AppText style={styles.scenarioInsightLine}>{keyInsight}</AppText>
@@ -647,12 +602,12 @@ function IntroScenarioStep({ content, onboardingContext, userContext, onNext, co
   );
 }
 
-function OutcomeChart({ mode, copy }) {
+function OutcomeChart({ variant, lineColor, isActive }) {
   const { styles } = useLessonStepStyles();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const lineAnim = useState(() => new Animated.Value(1))[0];
   const points =
-    mode === 'plan'
+    variant === 'structured'
       ? [
           { x: 0, y: 68 },
           { x: 18, y: 62 },
@@ -680,7 +635,7 @@ function OutcomeChart({ mode, copy }) {
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
     }).start();
-  }, [mode, lineAnim]);
+  }, [variant, lineAnim]);
 
   const segments = useMemo(() => {
     if (!size.width || !size.height) return [];
@@ -697,56 +652,48 @@ function OutcomeChart({ mode, copy }) {
   }, [points, size]);
 
   return (
-    <View style={styles.outcomePanel}>
-      <View style={styles.outcomeHeader}>
-        <AppText style={styles.outcomeLabel}>
-          {mode === 'plan' ? copy.introScenario.stableOutcome : copy.introScenario.reactiveOutcome}
-        </AppText>
-      </View>
-      <View
-        style={styles.outcomeChart}
-        onLayout={(event) =>
-          setSize({
-            width: event.nativeEvent.layout.width,
-            height: event.nativeEvent.layout.height,
-          })
-        }
+    <View
+      style={styles.outcomeChart}
+      onLayout={(event) =>
+        setSize({
+          width: event.nativeEvent.layout.width,
+          height: event.nativeEvent.layout.height,
+        })
+      }
+    >
+      <Animated.View
+        style={[
+          styles.outcomeLine,
+          {
+            opacity: lineAnim,
+            transform: [
+              {
+                translateY: lineAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [6, 0],
+                }),
+              },
+            ],
+          },
+        ]}
       >
-        <Animated.View
-          style={[
-            styles.outcomeLine,
-            {
-              opacity: lineAnim,
-              transform: [
-                {
-                  translateY: lineAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [6, 0],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          {segments.map((segment) => (
-            <View
-              key={segment.key}
-              style={[
-                styles.outcomeLineSegment,
-                {
-                  width: segment.length,
-                  left: segment.x,
-                  top: segment.y,
-                  transform: [{ rotate: `${segment.angle}deg` }],
-                },
-              ]}
-            />
-          ))}
-        </Animated.View>
-      </View>
-      <AppText style={styles.outcomeCaption}>
-        {mode === 'plan' ? copy.introScenario.stableCaption : copy.introScenario.reactiveCaption}
-      </AppText>
+        {segments.map((segment) => (
+          <View
+            key={segment.key}
+            style={[
+              styles.outcomeLineSegment,
+              {
+                width: segment.length,
+                left: segment.x,
+                top: segment.y,
+                opacity: isActive ? 1 : 0.65,
+                backgroundColor: lineColor,
+                transform: [{ rotate: `${segment.angle}deg` }],
+              },
+            ]}
+          />
+        ))}
+      </Animated.View>
     </View>
   );
 }
@@ -1512,8 +1459,15 @@ function MultiExercise({ exercise, onNext, onPressTerm, copy }) {
 function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
   const { colors, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
+  const [submittedText, setSubmittedText] = useState('');
   const [response, setResponse] = useState(null);
   const intro = content?.steps?.reflection?.intro;
+  const question =
+    copy.messages.reflectionQuestion || content?.steps?.reflection?.question;
+  const placeholder =
+    copy.messages.reflectionPlaceholder || content?.steps?.reflection?.placeholder;
+  const canSend = text.trim().length > 0;
+  const canContinue = !!response;
 
   const buildResponse = (input) => {
     const normalized = (input || '').toLowerCase().trim();
@@ -1559,17 +1513,20 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
     return copy.messages.reflectionDefault;
   };
 
-  const handleBlur = () => {
-    setResponse(buildResponse(text));
+  const handleSend = () => {
+    if (!canSend) return;
+    const trimmed = text.trim();
+    setSubmittedText(trimmed);
+    setResponse(buildResponse(trimmed));
+    setText('');
   };
 
   const handleContinue = () => {
-    const nextResponse = response || buildResponse(text);
     if (!response) {
-      setResponse(nextResponse);
+      handleSend();
       return;
     }
-    onSubmit(text, nextResponse);
+    onSubmit(submittedText || text, response);
   };
 
   return (
@@ -1585,37 +1542,22 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.reflectionThread}>
+      <View style={styles.reflectionThread}>
           <View style={[styles.chatBubble, styles.chatBubbleSystem]}>
             <AppText style={styles.chatLabel}>EQTY</AppText>
-            <GlossaryText
-              text={content?.steps?.reflection?.question}
-              style={styles.chatText}
-              onPressTerm={onPressTerm}
-            />
+            <GlossaryText text={question} style={styles.chatText} onPressTerm={onPressTerm} />
           </View>
-          <View style={[styles.chatBubble, styles.chatBubbleUser]}>
-            <TextInput
-              style={styles.chatInput}
-              value={text}
-              onChangeText={(value) => {
-                setText(value);
-                setResponse(null);
-              }}
-              onBlur={handleBlur}
-              placeholder={
-                content?.steps?.reflection?.placeholder || copy.messages.reflectionPlaceholder
-              }
-              placeholderTextColor={colors.textSecondary}
-              multiline
-            />
-          </View>
-        {response ? (
-          <View style={[styles.chatBubble, styles.chatBubbleSystem]}>
-            <AppText style={styles.chatLabel}>{copy.labels.eqtyInsight}</AppText>
-            <AppText style={styles.chatText}>{response}</AppText>
-          </View>
-        ) : null}
+          {submittedText ? (
+            <View style={[styles.chatBubble, styles.chatBubbleUser]}>
+              <AppText style={styles.chatText}>{submittedText}</AppText>
+            </View>
+          ) : null}
+          {response ? (
+            <View style={[styles.chatBubble, styles.chatBubbleSystem]}>
+              <AppText style={styles.chatLabel}>{copy.labels.eqtyInsight}</AppText>
+              <AppText style={styles.chatText}>{response}</AppText>
+            </View>
+          ) : null}
         </View>
       </ScrollView>
       <View style={styles.reflectionFooter}>
@@ -1627,7 +1569,39 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
             </AppText>
           </View>
         ) : null}
-        <PrimaryButton label={copy.buttons.continue} onPress={handleContinue} />
+        <PrimaryButton
+          label={copy.buttons.continue}
+          onPress={handleContinue}
+          disabled={!canContinue}
+        />
+        <View style={styles.reflectionComposer}>
+          <TextInput
+            style={styles.reflectionInput}
+            value={text}
+            onChangeText={(value) => {
+              setText(value);
+              setResponse(null);
+            }}
+            placeholder={placeholder}
+            placeholderTextColor={toRgba(colors.textSecondary, 0.7)}
+            multiline
+          />
+          <Pressable
+            onPress={handleSend}
+            disabled={!canSend}
+            style={({ pressed }) => [
+              styles.reflectionSendButton,
+              !canSend && styles.reflectionSendButtonDisabled,
+              pressed && canSend && styles.reflectionSendButtonPressed,
+            ]}
+          >
+            <Ionicons
+              name="arrow-up"
+              size={16}
+              color={canSend ? colors.textPrimary : colors.textSecondary}
+            />
+          </Pressable>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -1993,80 +1967,6 @@ const createStyles = (colors) =>
     textTransform: 'uppercase',
     letterSpacing: 1.2,
   },
-  processHint: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-  },
-  processList: {
-    position: 'relative',
-    gap: 0,
-    paddingLeft: spacing.xs,
-  },
-  processRail: {
-    position: 'absolute',
-    left: 10,
-    top: 8,
-    bottom: 8,
-    width: 2,
-    backgroundColor: colors.divider,
-  },
-  processRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  processNodeWrap: {
-    width: 24,
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  processNode: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: colors.surfaceActive,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  processNodeActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-  },
-  processNodeText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small - 1,
-    color: colors.textSecondary,
-    lineHeight: typography.small - 1,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    includeFontPadding: false,
-    transform: [{ translateY: Platform.OS === 'ios' ? 0.5 : 0 }],
-  },
-  processNodeTextActive: {
-    color: colors.background,
-  },
-  processCopy: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  processLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-  },
-  processLabelActive: {
-    color: colors.textPrimary,
-  },
-  processDetail: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 18,
-  },
   segmentRow: {
     flexDirection: 'row',
     gap: spacing.xs,
@@ -2095,35 +1995,26 @@ const createStyles = (colors) =>
   scenarioCard: {
     gap: spacing.md,
   },
-  scenarioToggle: {
-    flexDirection: 'row',
-    padding: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: toRgba(colors.textSecondary, 0.45),
-    backgroundColor: colors.surface,
-    marginTop: spacing.md,
-  },
-  scenarioToggleOption: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scenarioToggleOptionActive: {
-    backgroundColor: colors.surfaceActive,
-    borderWidth: 1,
-    borderColor: toRgba(colors.textSecondary, 0.35),
-  },
-  scenarioToggleText: {
+  scenarioMeaning: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
-    fontSize: typography.small,
-    letterSpacing: 0.6,
+    fontSize: typography.body,
+    lineHeight: 22,
   },
-  scenarioToggleTextActive: {
-    color: colors.textPrimary,
+  scenarioOutcomeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  outcomePressable: {
+    flexBasis: '48%',
+    flexGrow: 1,
+    minWidth: 0,
+    borderRadius: 16,
+  },
+  outcomePressablePressed: {
+    opacity: 0.95,
+    transform: [{ scale: 0.99 }],
   },
   scenarioPanel: {
     padding: spacing.md,
@@ -2249,16 +2140,6 @@ const createStyles = (colors) =>
     fontSize: typography.small - 1,
     letterSpacing: 0.4,
   },
-  scenarioTapHint: {
-    fontFamily: typography.fontFamilyMedium,
-    color: toRgba(colors.textSecondary, 0.8),
-    fontSize: typography.small - 1,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  scenarioOutcome: {
-    marginTop: spacing.md,
-  },
   outcomePanel: {
     gap: spacing.sm,
     padding: spacing.md,
@@ -2267,15 +2148,55 @@ const createStyles = (colors) =>
     borderColor: colors.divider,
     backgroundColor: colors.surface,
   },
+  outcomePanelActive: {
+    borderColor: toRgba(colors.accent, 0.7),
+    backgroundColor: toRgba(colors.accent, 0.08),
+  },
   outcomeHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  outcomeTitleStack: {
+    flex: 1,
+    gap: 2,
+  },
+  outcomeScenarioLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
   outcomeLabel: {
     fontFamily: typography.fontFamilyDemi,
     color: colors.textPrimary,
     fontSize: typography.body,
+  },
+  outcomeFocusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: toRgba(colors.textSecondary, 0.4),
+    backgroundColor: toRgba(colors.textSecondary, 0.12),
+  },
+  outcomeFocusPillActive: {
+    borderColor: toRgba(colors.accent, 0.8),
+    backgroundColor: toRgba(colors.accent, 0.18),
+  },
+  outcomeFocusText: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small - 1,
+    letterSpacing: 0.4,
+  },
+  outcomeFocusTextActive: {
+    color: colors.textPrimary,
   },
   outcomeChart: {
     height: 120,
@@ -2297,6 +2218,12 @@ const createStyles = (colors) =>
     color: colors.textSecondary,
     fontSize: typography.small,
     lineHeight: 18,
+  },
+  scenarioFocusLine: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 22,
   },
   scenarioInsightLine: {
     fontFamily: typography.fontFamilyMedium,
@@ -2625,16 +2552,17 @@ const createStyles = (colors) =>
   },
   reflectionBody: {
     flex: 1,
+    gap: 0,
   },
   reflectionScroll: {
     flex: 1,
   },
   reflectionScrollContent: {
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.lg,
   },
   reflectionFooter: {
     gap: spacing.sm,
-    paddingBottom: spacing.sm,
+    marginTop: 'auto',
   },
   chatBubble: {
     maxWidth: '92%',
@@ -2667,12 +2595,41 @@ const createStyles = (colors) =>
     fontSize: typography.body,
     lineHeight: 22,
   },
-  chatInput: {
-    minHeight: 72,
+  reflectionComposer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  reflectionInput: {
+    flex: 1,
+    minHeight: 44,
+    maxHeight: 120,
     color: colors.textPrimary,
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.body,
     textAlignVertical: 'top',
+  },
+  reflectionSendButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: toRgba(colors.textSecondary, 0.5),
+    backgroundColor: colors.surfaceActive,
+  },
+  reflectionSendButtonPressed: {
+    transform: [{ scale: 0.96 }],
+  },
+  reflectionSendButtonDisabled: {
+    opacity: 0.5,
   },
   reflectionSavedPill: {
     alignSelf: 'flex-start',
