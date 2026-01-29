@@ -62,9 +62,7 @@ const createStyles = (colors) =>
     copyBlock: {
       marginTop: 'auto',
       transform: [{ translateY: -190 }],
-      alignSelf: 'center',
       width: '100%',
-      maxWidth: 320,
       gap: spacing.sm,
     },
     title: {
