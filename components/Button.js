@@ -73,7 +73,7 @@ const createStyles = (colors) =>
     primaryButton: {
       backgroundColor: colors.accent,
       borderRadius: 16,
-      paddingVertical: 14,
+      paddingVertical: 16,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -86,7 +86,7 @@ const createStyles = (colors) =>
     secondaryButton: {
       backgroundColor: colors.surface,
       borderRadius: 16,
-      paddingVertical: 14,
+      paddingVertical: 16,
       alignItems: 'center',
       justifyContent: 'center',
       position: 'relative',

@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import useThemeColors from '../theme/useTheme';
+import { layout } from '../theme/layout';
 import { spacing } from '../theme/spacing';
 
 const ACCENT_GLOW = 'rgba(255, 213, 0, 0.18)';
@@ -18,6 +19,7 @@ export default function OnboardingScreen({
   showGlow = true,
 }) {
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const resolvedGradientColors =
     variant === 'accent'
@@ -37,7 +39,11 @@ export default function OnboardingScreen({
         <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
           <ScrollView
             style={styles.scroll}
-            contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
+            contentContainerStyle={[
+              styles.scrollContent,
+              contentContainerStyle,
+              { paddingBottom: insets.bottom },
+            ]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
@@ -57,7 +63,7 @@ export default function OnboardingScreen({
           <View pointerEvents="none" style={styles.glowBottom} />
         </>
       ) : null}
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
         <View style={[styles.content, contentContainerStyle]}>{children}</View>
       </SafeAreaView>
     </LinearGradient>
@@ -77,14 +83,16 @@ const createStyles = (colors) =>
       flex: 1,
     },
     scrollContent: {
-      padding: spacing.xl,
-      paddingBottom: spacing.xxxl,
+      paddingHorizontal: layout.sideMargin,
+      paddingTop: spacing.xl,
+      paddingBottom: 0,
       gap: spacing.lg,
       minHeight: '100%',
     },
     content: {
       flex: 1,
-      padding: spacing.xl,
+      paddingHorizontal: layout.sideMargin,
+      paddingVertical: spacing.xl,
     },
     glowTop: {
       position: 'absolute',

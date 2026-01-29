@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { layout } from '../theme/layout';
 import useThemeColors from '../theme/useTheme';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
@@ -8,8 +10,20 @@ import AppText from './AppText';
 export default function Toast({ message, visible, onHide, duration = 1600 }) {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(12)).current;
+  const toastStyle = useMemo(
+    () => [
+      styles.toast,
+      {
+        left: layout.sideMargin,
+        right: layout.sideMargin,
+        bottom: insets.bottom + spacing.xl,
+      },
+    ],
+    [insets.bottom, styles.toast]
+  );
 
   useEffect(() => {
     if (visible) {
@@ -48,7 +62,7 @@ export default function Toast({ message, visible, onHide, duration = 1600 }) {
   if (!visible || !message) return null;
 
   return (
-    <Animated.View style={[styles.toast, { opacity, transform: [{ translateY }] }]}>
+    <Animated.View style={[toastStyle, { opacity, transform: [{ translateY }] }]}>
       <View style={styles.toastInner}>
         <AppText style={styles.toastText}>{message}</AppText>
       </View>
@@ -60,9 +74,6 @@ const createStyles = (colors) =>
   StyleSheet.create({
     toast: {
       position: 'absolute',
-      left: spacing.lg,
-      right: spacing.lg,
-      bottom: spacing.xl,
     },
     toastInner: {
       backgroundColor: colors.surfaceActive,

@@ -1803,25 +1803,25 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   introText: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textPrimary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   bodyText: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textPrimary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   caption: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   visualHint: {
     flexDirection: 'row',
@@ -1845,7 +1845,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   journeyPager: {
     flex: 1,
@@ -1880,7 +1880,7 @@ const createStyles = (colors) =>
     justifyContent: 'space-between',
   },
   journeyStepChip: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
@@ -1908,19 +1908,19 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textPrimary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   journeyWhy: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   journeyDetail: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   journeyTapHint: {
     fontFamily: typography.fontFamilyMedium,
@@ -1990,7 +1990,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   scenarioCard: {
     gap: spacing.md,
@@ -1999,7 +1999,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   scenarioOutcomeGrid: {
     flexDirection: 'row',
@@ -2035,7 +2035,7 @@ const createStyles = (colors) =>
     fontSize: typography.body,
   },
   scenarioBadge: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
@@ -2125,11 +2125,11 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   scenarioPrematureBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: toRgba(colors.accent, 0.6),
@@ -2160,7 +2160,7 @@ const createStyles = (colors) =>
   },
   outcomeTitleStack: {
     flex: 1,
-    gap: 2,
+    gap: 4,
   },
   outcomeScenarioLabel: {
     fontFamily: typography.fontFamilyMedium,
@@ -2217,19 +2217,19 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   scenarioFocusLine: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   scenarioInsightLine: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   optionList: {
     gap: spacing.sm,
@@ -2278,12 +2278,12 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   exerciseStatusText: {
     fontFamily: typography.fontFamilyMedium,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   exerciseStatusCorrect: {
     color: colors.textPrimary,
@@ -2387,7 +2387,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   exerciseOutcome: {
     gap: spacing.sm,
@@ -2435,7 +2435,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   exerciseLabel: {
     fontFamily: typography.fontFamilyDemi,
@@ -2593,7 +2593,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textPrimary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   reflectionComposer: {
     flexDirection: 'row',
@@ -2636,8 +2636,8 @@ const createStyles = (colors) =>
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.divider,
@@ -2663,7 +2663,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.body,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   processHint: {
     fontFamily: typography.fontFamilyMedium,
@@ -2718,7 +2718,7 @@ const createStyles = (colors) =>
   processStationRowActive: {
     backgroundColor: toRgba(colors.surfaceActive, 0.6),
     borderRadius: 14,
-    paddingVertical: 6,
+    paddingVertical: 8,
     paddingHorizontal: 8,
   },
   processNode: {
@@ -2774,7 +2774,7 @@ const createStyles = (colors) =>
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
     fontSize: typography.small,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   processSubsteps: {
     flexDirection: 'row',
@@ -2782,8 +2782,8 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   processChip: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.divider,

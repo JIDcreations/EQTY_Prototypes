@@ -74,7 +74,7 @@ const createStyles = (colors) =>
       fontFamily: typography.fontFamilyMedium,
       color: colors.textSecondary,
       fontSize: typography.body,
-      lineHeight: 22,
+      lineHeight: 24,
     },
     sheetLabel: {
       fontFamily: typography.fontFamilyDemi,

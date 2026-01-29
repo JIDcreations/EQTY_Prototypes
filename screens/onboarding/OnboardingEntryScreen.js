@@ -129,13 +129,13 @@ const createStyles = (colors) =>
       fontFamily: typography.fontFamilyDemi,
       fontSize: 28,
       color: colors.textPrimary,
-      lineHeight: 34,
+      lineHeight: 36,
     },
     subtitle: {
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.body,
       color: colors.textSecondary,
-      lineHeight: 22,
+      lineHeight: 24,
     },
     cardHeader: {
       gap: 4,

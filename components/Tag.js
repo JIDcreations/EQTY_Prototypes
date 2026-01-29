@@ -26,7 +26,7 @@ const toRgba = (hex, alpha) => {
 const createStyles = (colors) =>
   StyleSheet.create({
     base: {
-      paddingHorizontal: 10,
+      paddingHorizontal: 12,
       paddingVertical: 4,
       borderRadius: 999,
       backgroundColor: colors.surfaceActive,

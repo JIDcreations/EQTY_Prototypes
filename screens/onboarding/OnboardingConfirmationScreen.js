@@ -105,6 +105,6 @@ const createStyles = (colors) =>
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.body,
       color: colors.textSecondary,
-      lineHeight: 22,
+      lineHeight: 24,
     },
   });

@@ -42,7 +42,7 @@ const createStyles = (colors) =>
     dots: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: 8,
     },
     dot: {
       width: 18,

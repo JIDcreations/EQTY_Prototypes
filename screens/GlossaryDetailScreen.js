@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import { glossaryTerms } from '../data/glossary';
 import useThemeColors from '../theme/useTheme';
+import { layout } from '../theme/layout';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -18,6 +19,7 @@ export default function GlossaryDetailScreen() {
   const { termId } = route.params || {};
   const { userContext } = useApp();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [explanation, setExplanation] = useState(null);
 
@@ -30,7 +32,7 @@ export default function GlossaryDetailScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -66,9 +68,10 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     content: {
-      padding: spacing.lg,
+      paddingHorizontal: layout.sideMargin,
+      paddingTop: spacing.lg,
       gap: spacing.lg,
-      paddingBottom: spacing.xxxl,
+      paddingBottom: 0,
     },
     header: {
       gap: spacing.sm,

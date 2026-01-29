@@ -1,18 +1,20 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
 import useThemeColors from '../theme/useTheme';
+import { layout } from '../theme/layout';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import useToast from '../utils/useToast';
 
 export default function ChangePasswordScreen({ navigation }) {
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [currentPassword, setCurrentPassword] = useState('');
   const [nextPassword, setNextPassword] = useState('');
@@ -30,7 +32,7 @@ export default function ChangePasswordScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeader title="Reset password" onBack={() => navigation.goBack()} />
@@ -96,9 +98,10 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     content: {
-      padding: spacing.lg,
+      paddingHorizontal: layout.sideMargin,
+      paddingTop: spacing.lg,
       gap: spacing.lg,
-      paddingBottom: spacing.xxxl,
+      paddingBottom: 0,
     },
     card: {
       gap: spacing.md,

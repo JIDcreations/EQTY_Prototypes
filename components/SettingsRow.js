@@ -58,7 +58,7 @@ const createStyles = (colors) =>
     },
     rowContent: {
       flex: 1,
-      gap: 2,
+      gap: 4,
     },
     label: {
       fontFamily: typography.fontFamilyMedium,

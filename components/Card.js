@@ -17,7 +17,7 @@ const createStyles = (colors, isLight) =>
     card: {
       backgroundColor: colors.surface,
       borderRadius: 18,
-      padding: 18,
+      padding: 16,
       shadowColor: colors.background,
       shadowOpacity: isLight ? 0.12 : 0.35,
       shadowRadius: isLight ? 10 : 18,

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
@@ -10,6 +10,7 @@ import SectionTitle from '../components/SectionTitle';
 import { useApp } from '../utils/AppContext';
 import { getLessonContent, getLessonOverviewCopy, getLocalizedLessons, formatLessonModuleLabel } from '../utils/localization';
 import useThemeColors from '../theme/useTheme';
+import { layout } from '../theme/layout';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 
@@ -19,6 +20,7 @@ export default function LessonOverviewScreen() {
   const { lessonId, entrySource } = route.params || {};
   const { preferences } = useApp();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [isStructureOpen, setIsStructureOpen] = useState(false);
   const overviewCopy = useMemo(
@@ -39,11 +41,11 @@ export default function LessonOverviewScreen() {
       : [lesson.shortDescription];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <View style={styles.layout}>
         <ScrollView
           style={styles.container}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
@@ -91,7 +93,7 @@ export default function LessonOverviewScreen() {
           </View>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
           <PrimaryButton
             label={overviewCopy.startLesson}
             onPress={() =>
@@ -120,9 +122,10 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     content: {
-      padding: spacing.lg,
+      paddingHorizontal: layout.sideMargin,
+      paddingTop: spacing.lg,
       gap: spacing.xl,
-      paddingBottom: spacing.xl,
+      paddingBottom: 0,
     },
     layout: {
       flex: 1,
@@ -167,7 +170,7 @@ const createStyles = (colors) =>
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: toRgba(colors.accent, 0.18),
-      marginTop: 2,
+      marginTop: 0,
     },
     bulletIndexText: {
       fontFamily: typography.fontFamilyDemi,
@@ -179,7 +182,7 @@ const createStyles = (colors) =>
       fontFamily: typography.fontFamilyMedium,
       color: colors.textPrimary,
       fontSize: typography.body,
-      lineHeight: 22,
+      lineHeight: 24,
     },
     structureContainer: {
       gap: spacing.sm,
@@ -234,7 +237,7 @@ const createStyles = (colors) =>
       fontSize: typography.small,
     },
     footer: {
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: layout.sideMargin,
       paddingTop: spacing.md,
       paddingBottom: spacing.lg,
       gap: spacing.md,

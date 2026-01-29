@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
@@ -17,6 +17,7 @@ import {
   getLocalizedModules,
 } from '../utils/localization';
 import useThemeColors from '../theme/useTheme';
+import { layout } from '../theme/layout';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -25,6 +26,7 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { progress, authUser, userContext, preferences } = useApp();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [expandedFocus, setExpandedFocus] = useState(null);
   const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
@@ -90,7 +92,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -185,9 +187,10 @@ const createStyles = (colors) =>
       backgroundColor: '#12161C',
     },
     content: {
-      padding: spacing.lg,
+      paddingHorizontal: layout.sideMargin,
+      paddingTop: spacing.lg,
       gap: spacing.xl,
-      paddingBottom: spacing.xxxl,
+      paddingBottom: 0,
     },
     header: {
       gap: spacing.sm,
@@ -323,7 +326,7 @@ const createStyles = (colors) =>
       color: colors.textSecondary,
     },
     focusActionIcon: {
-      marginTop: 1,
+      marginTop: 0,
     },
     focusTitle: {
       fontFamily: typography.fontFamilyDemi,
@@ -334,7 +337,7 @@ const createStyles = (colors) =>
       fontFamily: typography.fontFamilyMedium,
       fontSize: typography.body,
       color: colors.textPrimary,
-      lineHeight: 22,
+      lineHeight: 24,
     },
     focusDetail: {
       fontFamily: typography.fontFamilyMedium,

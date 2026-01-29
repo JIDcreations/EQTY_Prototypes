@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../../components/AppText';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
@@ -17,6 +18,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   const { onboardingContext, updateOnboardingContext, preferences } = useApp();
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [answer, setAnswer] = useState(onboardingContext?.[field] || '');
   const localizedQuestion = copy.question.questions[field] || question;
@@ -28,7 +30,11 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
 
   return (
     <OnboardingScreen contentContainerStyle={styles.screen}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={insets.top + spacing.lg}
+      >
         <View style={styles.headerRow}>
           <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
@@ -58,7 +64,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
           />
           <PrimaryButton label={copy.question.button} onPress={handleNext} />
         </OnboardingStackedCard>
-      </View>
+      </KeyboardAvoidingView>
     </OnboardingScreen>
   );
 }
@@ -122,7 +128,7 @@ const createStyles = (colors) =>
       fontFamily: typography.fontFamilyDemi,
       fontSize: 24,
       color: colors.textPrimary,
-      lineHeight: 30,
+      lineHeight: 32,
     },
     input: {
       minHeight: 160,

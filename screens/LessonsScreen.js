@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
@@ -9,6 +9,7 @@ import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { getLessonOverviewCopy, getLocalizedLessons, getLocalizedModules } from '../utils/localization';
 import useThemeColors from '../theme/useTheme';
+import { layout } from '../theme/layout';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
@@ -18,6 +19,7 @@ export default function LessonsScreen() {
   const navigation = useNavigation();
   const { progress, preferences } = useApp();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const overviewCopy = useMemo(
     () => getLessonOverviewCopy(preferences?.language),
@@ -45,7 +47,7 @@ export default function LessonsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
         showsVerticalScrollIndicator={false}
       >
         <SectionTitle title="Lessons" subtitle="Curriculum overview" />
@@ -113,9 +115,10 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     content: {
-      padding: spacing.lg,
+      paddingHorizontal: layout.sideMargin,
+      paddingTop: spacing.lg,
       gap: spacing.xl,
-      paddingBottom: spacing.xxxl,
+      paddingBottom: 0,
     },
     module: {
       gap: spacing.md,
