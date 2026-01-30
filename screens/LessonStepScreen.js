@@ -1,16 +1,12 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  Animated,
-  Easing,
   KeyboardAvoidingView,
-  LayoutAnimation,
   Linking,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
-  UIManager,
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -37,6 +33,63 @@ import {
 } from '../utils/localization';
 
 const TOTAL_STEPS = 6;
+const STABLE_CURVE_POINTS = [
+  { x: 0, y: 78 },
+  { x: 8, y: 75 },
+  { x: 16, y: 72 },
+  { x: 24, y: 68 },
+  { x: 32, y: 66 },
+  { x: 40, y: 60 },
+  { x: 48, y: 58 },
+  { x: 56, y: 52 },
+  { x: 64, y: 50 },
+  { x: 72, y: 44 },
+  { x: 80, y: 40 },
+  { x: 88, y: 36 },
+  { x: 96, y: 30 },
+  { x: 100, y: 26 },
+];
+const VOLATILE_CURVE_POINTS = [
+  { x: 0, y: 50 },
+  { x: 15, y: 38 },
+  { x: 30, y: 64 },
+  { x: 45, y: 42 },
+  { x: 60, y: 70 },
+  { x: 75, y: 50 },
+  { x: 90, y: 78 },
+  { x: 100, y: 72 },
+];
+
+const getSmoothPoints = (basePoints, samplesPerSegment = 10) => {
+  if (basePoints.length < 3) return basePoints;
+  const smooth = [];
+  for (let i = 0; i < basePoints.length - 1; i += 1) {
+    const p0 = basePoints[i - 1] || basePoints[i];
+    const p1 = basePoints[i];
+    const p2 = basePoints[i + 1];
+    const p3 = basePoints[i + 2] || p2;
+    for (let step = 0; step <= samplesPerSegment; step += 1) {
+      const t = step / samplesPerSegment;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      const x =
+        0.5 *
+        (2 * p1.x +
+          (-p0.x + p2.x) * t +
+          (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
+          (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
+      const y =
+        0.5 *
+        (2 * p1.y +
+          (-p0.y + p2.y) * t +
+          (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
+          (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
+      if (i > 0 && step === 0) continue;
+      smooth.push({ x, y });
+    }
+  }
+  return smooth;
+};
 
 function useLessonStepStyles() {
   const colors = useThemeColors();
@@ -90,11 +143,7 @@ export default function LessonStepScreen() {
 
   const handleComplete = async () => {
     await completeLesson(lessonId);
-    if (entrySource === 'Lessons') {
-      navigation.navigate('Tabs', { screen: 'Lessons' });
-    } else {
-      navigation.navigate('Tabs', { screen: 'Home' });
-    }
+    navigation.navigate('LessonSuccess', { lessonId });
   };
 
   const handleTermPress = (term) => {
@@ -119,6 +168,9 @@ export default function LessonStepScreen() {
         onPressTerm={handleTermPress}
         stepLabel={
           lessonId === 'lesson_0' ? getIntroStepLabel(preferences?.language, step) : null
+        }
+        helperText={
+          isIntroScenario ? copy.introScenario.headerHelper : null
         }
         progressText={
           isIntroConcept
@@ -385,315 +437,239 @@ function IntroVisualizationStep({ onNext, copy }) {
   );
 }
 
-function getScenarioVariantFromOnboarding(onboardingContext, userContext) {
-  const experienceText = (onboardingContext?.experienceAnswer || '').toLowerCase();
-  const knowledgeText = (onboardingContext?.knowledgeAnswer || '').toLowerCase();
-
-  if (/(seasoned|professional|advisor|decade|advanced)/.test(experienceText)) {
-    return 'seasoned';
-  }
-  if (/(year|years|portfolio|stock|stocks|crypto|etf|bond|fund|index|broker|app|trade|trading)/.test(experienceText)) {
-    return 'growing';
-  }
-  if (/(none|nothing|new|starting|beginner)/.test(experienceText)) {
-    return 'new';
-  }
-
-  if (/(advanced|expert|professional)/.test(knowledgeText)) {
-    return 'seasoned';
-  }
-  if (/(intermediate|familiar|comfortable|some)/.test(knowledgeText)) {
-    return 'growing';
-  }
-  if (/(basic|new|beginner|none)/.test(knowledgeText)) {
-    return 'new';
-  }
-
-  return userContext?.experience || 'new';
-}
-
-function IntroScenarioStep({ content, onboardingContext, userContext, onNext, copy }) {
+function IntroScenarioStep({ onNext, copy }) {
   const { styles, colors } = useLessonStepStyles();
-  const scenario = content?.steps?.scenario;
-  const intro = scenario?.intro;
-  const variantKey = getScenarioVariantFromOnboarding(onboardingContext, userContext);
-  const variant = scenario?.variants?.[variantKey] || scenario?.variants?.new;
-  const keyInsight = variant?.keyInsight || copy.introScenario.keyInsightFallback;
-  const [focusedScenario, setFocusedScenario] = useState('structured');
   const steps = copy.introScenario.steps;
-  const isReactive = focusedScenario === 'reactive';
-  const missingIds = isReactive ? ['goal', 'risk', 'strategy'] : [];
-  const firstMissingIndex = isReactive
-    ? steps.findIndex((step) => step.id === missingIds[0])
-    : -1;
-  const scenarioOutcomes = [
-    {
-      id: 'structured',
-      label: copy.introScenario.structuredLabel,
-      outcomeLabel: copy.introScenario.structuredOutcome,
-      caption: copy.introScenario.structuredCaption,
-      lineColor: colors.accent,
-    },
-    {
-      id: 'reactive',
-      label: copy.introScenario.reactiveLabel,
-      outcomeLabel: copy.introScenario.reactiveOutcome,
-      caption: copy.introScenario.reactiveCaption,
-      lineColor: toRgba(colors.textSecondary, 0.85),
-    },
-  ];
+  const totalSteps = steps.length;
+  const [progress, setProgress] = useState(0);
+  const clampedProgress = Math.max(0, Math.min(progress, totalSteps));
+  const progressRatio = totalSteps ? clampedProgress / totalSteps : 0;
 
-  useEffect(() => {
-    if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-      UIManager.setLayoutAnimationEnabledExperimental(true);
-    }
-  }, []);
+  const structuredSteps = steps.map((step, index) => {
+    const threshold = index + 1;
+    const isActive = clampedProgress >= threshold;
+    const isCurrent = clampedProgress > threshold - 1 && clampedProgress < threshold;
+    return { ...step, isActive, isCurrent };
+  });
 
-  const applyAnimation = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  };
-
-  const handleFocus = (nextScenario) => {
-    if (nextScenario === focusedScenario) return;
-    applyAnimation();
-    setFocusedScenario(nextScenario);
-  };
+  const missingIds = ['goal', 'risk', 'strategy'];
+  const reactiveSteps = steps.map((step, index) => {
+    const threshold = index + 1;
+    const isMissing = missingIds.includes(step.id);
+    const isActive = !isMissing && clampedProgress >= threshold;
+    const isCurrent = !isMissing && clampedProgress > threshold - 1 && clampedProgress < threshold;
+    return {
+      ...step,
+      isActive,
+      isCurrent,
+      isMissing,
+    };
+  });
 
   return (
     <View style={styles.stepBody}>
-      {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
-      <AppText style={styles.scenarioMeaning}>{copy.introScenario.planMeaning}</AppText>
-      <View style={styles.scenarioOutcomeGrid}>
-        {scenarioOutcomes.map((scenarioItem) => {
-          const isActive = focusedScenario === scenarioItem.id;
-          return (
-            <Pressable
-              key={scenarioItem.id}
-              onPress={() => handleFocus(scenarioItem.id)}
-              style={({ pressed }) => [
-                styles.outcomePressable,
-                pressed && styles.outcomePressablePressed,
-              ]}
-            >
-              <Card style={[styles.outcomePanel, isActive && styles.outcomePanelActive]}>
-                <View style={styles.outcomeHeader}>
-                  <View style={styles.outcomeTitleStack}>
-                    <AppText style={styles.outcomeScenarioLabel}>
-                      {scenarioItem.label}
-                    </AppText>
-                    <AppText style={styles.outcomeLabel}>{scenarioItem.outcomeLabel}</AppText>
-                  </View>
-                  <View
-                    style={[
-                      styles.outcomeFocusPill,
-                      isActive && styles.outcomeFocusPillActive,
-                    ]}
-                  >
-                    <AppText
-                      style={[
-                        styles.outcomeFocusText,
-                        isActive && styles.outcomeFocusTextActive,
-                      ]}
-                    >
-                      {isActive ? copy.introScenario.focused : copy.introScenario.focus}
-                    </AppText>
-                    <Ionicons
-                      name={isActive ? 'checkmark' : 'chevron-forward'}
-                      size={12}
-                      color={isActive ? colors.textPrimary : colors.textSecondary}
-                    />
-                  </View>
-                </View>
-                <OutcomeChart
-                  variant={scenarioItem.id}
-                  lineColor={scenarioItem.lineColor}
-                  isActive={isActive}
-                />
-                <AppText style={styles.outcomeCaption}>{scenarioItem.caption}</AppText>
-              </Card>
-            </Pressable>
-          );
-        })}
-      </View>
-      <AppText style={styles.scenarioFocusLine}>
-        {focusedScenario === 'structured'
-          ? copy.introScenario.focusInsightStructured
-          : copy.introScenario.focusInsightReactive}
-      </AppText>
-
-      <View style={styles.scenarioPanel}>
-        <View style={styles.scenarioPanelHeader}>
-          <AppText style={styles.scenarioPanelTitle}>{copy.introScenario.processRail}</AppText>
-          <View style={[styles.scenarioBadge, isReactive && styles.scenarioBadgeMuted]}>
-            <AppText style={styles.scenarioBadgeText}>
-              {isReactive ? copy.introScenario.reactiveLabel : copy.introScenario.structuredLabel}
+      <View style={styles.scenarioCompareGrid}>
+        <Card style={styles.scenarioComparePanel}>
+          <View style={styles.scenarioCompareHeader}>
+            <AppText style={styles.scenarioCompareLabel}>
+              {copy.introScenario.structuredLabel}
+            </AppText>
+            <AppText style={styles.scenarioCompareSubline}>
+              {copy.introScenario.structuredSubline}
             </AppText>
           </View>
-        </View>
-        <View style={styles.scenarioRail}>
-          {steps.map((step, index) => {
-            const isExecution = step.id === 'execution';
-            const isMissing = missingIds.includes(step.id);
-            const isLast = index === steps.length - 1;
-            const isDegraded =
-              firstMissingIndex >= 0 && index > firstMissingIndex && isReactive;
-            const label = isMissing
-              ? `${step.label}${copy.introScenario.missingSuffix}`
-              : step.label;
-            const showJump = isExecution && isReactive;
-            return (
-              <View key={step.id} style={styles.scenarioRailRow}>
-                <View style={styles.scenarioRailTrack}>
-                  <View
-                    style={[
-                      styles.scenarioNode,
-                      isExecution && styles.scenarioNodeActive,
-                      isMissing && styles.scenarioNodeMissing,
-                      isDegraded && styles.scenarioNodeDegraded,
-                    ]}
-                  />
-                  {!isLast ? (
+          <View style={styles.scenarioCompareSteps}>
+            {structuredSteps.map((step, index) => {
+              const isLast = index === structuredSteps.length - 1;
+              return (
+                <View key={step.id} style={styles.scenarioCompareRow}>
+                  <View style={styles.scenarioCompareTrack}>
                     <View
                       style={[
-                        styles.scenarioRailLine,
-                        isReactive && styles.scenarioRailLineBroken,
-                        isDegraded && styles.scenarioRailLineDegraded,
+                        styles.scenarioCompareNode,
+                        step.isActive && styles.scenarioCompareNodeActive,
+                        step.isCurrent && styles.scenarioCompareNodeCurrent,
                       ]}
                     />
-                  ) : null}
-                </View>
-                <View style={styles.scenarioRailLabelColumn}>
-                  <View style={styles.scenarioRailLabelRow}>
-                    <AppText
-                      style={[
-                        styles.scenarioRailLabel,
-                        isMissing && styles.scenarioRailLabelMuted,
-                        isExecution && styles.scenarioRailLabelStrong,
-                        isDegraded && styles.scenarioRailLabelDegraded,
-                      ]}
-                    >
-                      {label}
-                    </AppText>
-                    {showJump ? (
-                      <Ionicons name="arrow-forward" size={14} color={colors.accent} />
-                    ) : null}
-                    {isExecution && isReactive ? (
-                      <View style={styles.scenarioPrematureBadge}>
-                        <AppText style={styles.scenarioPrematureText}>
-                          {copy.introScenario.premature}
-                        </AppText>
-                      </View>
+                    {!isLast ? (
+                      <View
+                        style={[
+                          styles.scenarioCompareLine,
+                          step.isActive && styles.scenarioCompareLineActive,
+                        ]}
+                      />
                     ) : null}
                   </View>
+                  <AppText
+                    style={[
+                      styles.scenarioCompareStepLabel,
+                      step.isActive && styles.scenarioCompareStepLabelActive,
+                      step.isCurrent && styles.scenarioCompareStepLabelCurrent,
+                    ]}
+                  >
+                    {step.label}
+                  </AppText>
                 </View>
-              </View>
-            );
-          })}
-        </View>
-        {isReactive ? (
-          <AppText style={styles.scenarioConsequence}>
-            {copy.introScenario.downstreamImpact}
-          </AppText>
-        ) : null}
+              );
+            })}
+          </View>
+          <ScenarioCurve
+            variant="stable"
+            progress={progressRatio}
+            label={copy.introScenario.stableLabel}
+          />
+        </Card>
+
+        <Card style={[styles.scenarioComparePanel, styles.scenarioComparePanelReactive]}>
+          <View style={styles.scenarioCompareHeader}>
+            <AppText style={styles.scenarioCompareLabel}>
+              {copy.introScenario.reactiveLabel}
+            </AppText>
+            <AppText style={styles.scenarioCompareSubline}>
+              {copy.introScenario.reactiveSubline}
+            </AppText>
+          </View>
+          <View style={styles.scenarioCompareSteps}>
+            {reactiveSteps.map((step, index) => {
+              const isLast = index === reactiveSteps.length - 1;
+              return (
+                <View key={step.id} style={styles.scenarioCompareRow}>
+                  <View style={styles.scenarioCompareTrack}>
+                    <View
+                      style={[
+                        styles.scenarioCompareNode,
+                        step.isMissing && styles.scenarioCompareNodeMissing,
+                        step.isActive && styles.scenarioCompareNodeActiveReactive,
+                        step.isCurrent && styles.scenarioCompareNodeCurrent,
+                      ]}
+                    />
+                    {!isLast ? (
+                      <View
+                        style={[
+                          styles.scenarioCompareLine,
+                          step.isMissing && styles.scenarioCompareLineMissing,
+                          step.isActive && styles.scenarioCompareLineActiveReactive,
+                        ]}
+                      />
+                    ) : null}
+                  </View>
+                  <AppText
+                    style={[
+                      styles.scenarioCompareStepLabel,
+                      step.isMissing && styles.scenarioCompareStepLabelMissing,
+                      step.isActive && styles.scenarioCompareStepLabelActive,
+                      step.isCurrent && styles.scenarioCompareStepLabelCurrent,
+                    ]}
+                  >
+                    {step.label}
+                  </AppText>
+                </View>
+              );
+            })}
+          </View>
+          <ScenarioCurve
+            variant="volatile"
+            progress={progressRatio}
+            label={copy.introScenario.volatileLabel}
+          />
+        </Card>
       </View>
-      <AppText style={styles.scenarioInsightLine}>{keyInsight}</AppText>
+
+      <View style={styles.scenarioSliderWrap}>
+        <AppText style={styles.scenarioSliderLabel}>
+          {copy.introScenario.progressLabel}
+        </AppText>
+        <Slider
+          value={progress}
+          minimumValue={0}
+          maximumValue={totalSteps}
+          step={0.1}
+          minimumTrackTintColor={colors.accent}
+          maximumTrackTintColor={colors.surfaceActive}
+          thumbTintColor={colors.accent}
+          onValueChange={setProgress}
+        />
+      </View>
+
+      <AppText style={styles.scenarioInsightLine}>{copy.introScenario.insightLine}</AppText>
       <PrimaryButton label={copy.buttons.next} onPress={onNext} />
     </View>
   );
 }
 
-function OutcomeChart({ variant, lineColor, isActive }) {
-  const { styles } = useLessonStepStyles();
+function ScenarioCurve({ variant, progress, label }) {
+  const { styles, colors } = useLessonStepStyles();
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const lineAnim = useState(() => new Animated.Value(1))[0];
+  const clampedProgress = Math.max(0, Math.min(progress, 1));
   const points =
-    variant === 'structured'
-      ? [
-          { x: 0, y: 68 },
-          { x: 18, y: 62 },
-          { x: 36, y: 56 },
-          { x: 54, y: 52 },
-          { x: 72, y: 44 },
-          { x: 90, y: 36 },
-          { x: 100, y: 32 },
-        ]
-      : [
-          { x: 0, y: 60 },
-          { x: 18, y: 40 },
-          { x: 36, y: 78 },
-          { x: 54, y: 34 },
-          { x: 72, y: 86 },
-          { x: 90, y: 48 },
-          { x: 100, y: 58 },
-        ];
+    variant === 'stable' ? STABLE_CURVE_POINTS : VOLATILE_CURVE_POINTS;
+  const smoothPoints = useMemo(() => getSmoothPoints(points, 14), [points]);
+  const lineColor =
+    variant === 'stable' ? colors.accent : toRgba(colors.textSecondary, 0.9);
 
-  useEffect(() => {
-    lineAnim.setValue(0);
-    Animated.timing(lineAnim, {
-      toValue: 1,
-      duration: 320,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start();
-  }, [variant, lineAnim]);
-
-  const segments = useMemo(() => {
-    if (!size.width || !size.height) return [];
-    return points.slice(0, -1).map((point, index) => {
-      const next = points[index + 1];
+  const { segments, totalLength } = useMemo(() => {
+    if (!size.width || !size.height) return { segments: [], totalLength: 0 };
+    let running = 0;
+    const nextSegments = smoothPoints.slice(0, -1).map((point, index) => {
+      const next = smoothPoints[index + 1];
       const x1 = (point.x / 100) * size.width;
       const y1 = (point.y / 100) * size.height;
       const x2 = (next.x / 100) * size.width;
       const y2 = (next.y / 100) * size.height;
       const length = Math.hypot(x2 - x1, y2 - y1);
       const angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
-      return { x: x1, y: y1, length, angle, key: `seg-${index}` };
+      const start = running;
+      running += length;
+      return { x: x1, y: y1, length, angle, start, key: `seg-${index}` };
     });
-  }, [points, size]);
+    return { segments: nextSegments, totalLength: running };
+  }, [smoothPoints, size]);
 
   return (
-    <View
-      style={styles.outcomeChart}
-      onLayout={(event) =>
-        setSize({
-          width: event.nativeEvent.layout.width,
-          height: event.nativeEvent.layout.height,
-        })
-      }
-    >
-      <Animated.View
-        style={[
-          styles.outcomeLine,
-          {
-            opacity: lineAnim,
-            transform: [
-              {
-                translateY: lineAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [6, 0],
-                }),
-              },
-            ],
-          },
-        ]}
+    <View style={styles.scenarioCurveWrap}>
+      <View
+        style={styles.scenarioCurveChart}
+        onLayout={(event) =>
+          setSize({
+            width: event.nativeEvent.layout.width,
+            height: event.nativeEvent.layout.height,
+          })
+        }
       >
-        {segments.map((segment) => (
-          <View
-            key={segment.key}
-            style={[
-              styles.outcomeLineSegment,
-              {
-                width: segment.length,
-                left: segment.x,
-                top: segment.y,
-                opacity: isActive ? 1 : 0.65,
-                backgroundColor: lineColor,
-                transform: [{ rotate: `${segment.angle}deg` }],
-              },
-            ]}
-          />
-        ))}
-      </Animated.View>
+        <View
+          style={[
+            styles.scenarioCurveLine,
+            {
+              opacity: 0.2 + 0.8 * clampedProgress,
+            },
+          ]}
+        >
+          {segments.map((segment) => {
+            if (!totalLength) return null;
+            const visibleLength = Math.max(
+              0,
+              Math.min(segment.length, clampedProgress * totalLength - segment.start)
+            );
+            if (visibleLength <= 0) return null;
+            return (
+              <View
+                key={segment.key}
+                style={[
+                  styles.scenarioCurveSegment,
+                  {
+                    width: visibleLength,
+                    left: segment.x,
+                    top: segment.y,
+                    backgroundColor: lineColor,
+                    transform: [{ rotate: `${segment.angle}deg` }],
+                  },
+                ]}
+              />
+            );
+          })}
+        </View>
+      </View>
+      <AppText style={styles.scenarioCurveLabel}>{label}</AppText>
     </View>
   );
 }
@@ -2000,6 +1976,148 @@ const createStyles = (colors) =>
     color: colors.textSecondary,
     fontSize: typography.body,
     lineHeight: 24,
+  },
+  scenarioCompareGrid: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    alignItems: 'stretch',
+    marginTop: spacing.sm,
+  },
+  scenarioComparePanel: {
+    flex: 1,
+    minWidth: 0,
+    padding: spacing.md,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+    gap: spacing.lg,
+  },
+  scenarioComparePanelReactive: {
+    borderColor: toRgba(colors.textSecondary, 0.3),
+    backgroundColor: colors.surfaceActive,
+  },
+  scenarioCompareHeader: {
+    gap: spacing.xs,
+  },
+  scenarioCompareLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  scenarioCompareSubline: {
+    fontFamily: typography.fontFamilyDemi,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+  },
+  scenarioCompareSteps: {
+    flexGrow: 1,
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  scenarioCompareRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  scenarioCompareTrack: {
+    alignItems: 'center',
+    width: 18,
+  },
+  scenarioCompareNode: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: toRgba(colors.textSecondary, 0.5),
+    backgroundColor: colors.surface,
+  },
+  scenarioCompareNodeActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  scenarioCompareNodeActiveReactive: {
+    backgroundColor: colors.textPrimary,
+    borderColor: colors.textPrimary,
+  },
+  scenarioCompareNodeCurrent: {
+    backgroundColor: colors.textPrimary,
+    borderColor: colors.textPrimary,
+  },
+  scenarioCompareNodeMissing: {
+    backgroundColor: 'transparent',
+    borderStyle: 'dashed',
+    borderColor: toRgba(colors.textSecondary, 0.45),
+  },
+  scenarioCompareLine: {
+    width: 2,
+    height: 18,
+    marginTop: 4,
+    backgroundColor: toRgba(colors.textSecondary, 0.35),
+  },
+  scenarioCompareLineActive: {
+    backgroundColor: toRgba(colors.accent, 0.65),
+  },
+  scenarioCompareLineActiveReactive: {
+    backgroundColor: toRgba(colors.textPrimary, 0.75),
+  },
+  scenarioCompareLineMissing: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: toRgba(colors.textSecondary, 0.35),
+  },
+  scenarioCompareStepLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+  },
+  scenarioCompareStepLabelActive: {
+    color: colors.textPrimary,
+  },
+  scenarioCompareStepLabelCurrent: {
+    color: colors.accent,
+  },
+  scenarioCompareStepLabelMissing: {
+    color: toRgba(colors.textSecondary, 0.55),
+  },
+  scenarioSliderWrap: {
+    marginTop: spacing.xl,
+    gap: spacing.sm,
+  },
+  scenarioSliderLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  scenarioCurveWrap: {
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  scenarioCurveChart: {
+    height: 96,
+    borderRadius: 14,
+    backgroundColor: colors.surfaceActive,
+    overflow: 'hidden',
+  },
+  scenarioCurveLine: {
+    flex: 1,
+  },
+  scenarioCurveSegment: {
+    position: 'absolute',
+    height: 2,
+    borderRadius: 999,
+  },
+  scenarioCurveLabel: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.small,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
   scenarioOutcomeGrid: {
     flexDirection: 'row',

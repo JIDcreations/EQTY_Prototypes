@@ -16,6 +16,7 @@ export default function StepHeader({
   onPressTerm,
   stepLabel,
   progressText,
+  helperText,
   showTitle = true,
 }) {
   const colors = useThemeColors();
@@ -39,6 +40,7 @@ export default function StepHeader({
       {showTitle ? titleNode : null}
       <AppText style={styles.progressInline}>{progressLabel}</AppText>
       <ProgressBar progress={step / total} />
+      {helperText ? <AppText style={styles.helperText}>{helperText}</AppText> : null}
     </View>
   );
 }
@@ -66,6 +68,12 @@ const createStyles = (colors) =>
       color: colors.textSecondary,
       fontSize: typography.small - 1,
       letterSpacing: 0.6,
+    },
+    helperText: {
+      fontFamily: typography.fontFamilyMedium,
+      color: colors.textSecondary,
+      fontSize: typography.small,
+      lineHeight: 20,
     },
     stepLabel: {
       fontFamily: typography.fontFamilyDemi,

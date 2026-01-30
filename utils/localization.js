@@ -96,6 +96,15 @@ const LESSON_STEP_COPY = {
       completeExercise: 'Complete exercise',
       completeLesson: 'Complete lesson',
     },
+    lessonSuccess: {
+      title: 'Introduction lesson is finished!',
+      subtitle: (lessonTitle) => `${lessonTitle} is finished.`,
+      detail: 'Keep going with the next lessons to deepen the full process.',
+      introDetail:
+        'You can now start the full lessons that cover the entire investing process in depth.',
+      cta: 'Go to Home',
+      fallbackTitle: 'This lesson',
+    },
     labels: {
       insight: 'Insight',
       outcome: 'Outcome',
@@ -233,30 +242,17 @@ const LESSON_STEP_COPY = {
       ],
     },
     introScenario: {
-      withPlan: 'Structured decisions',
-      withoutPlan: 'Reactive decisions',
-      planMeaning:
-        'A plan here means defining your goal, risk, strategy, allocation, and vehicle before execution.',
-      processRail: 'Process rail',
-      structuredLabel: 'Structured decisions',
-      reactiveLabel: 'Reactive decisions',
-      stableDecisions: 'Structured decisions',
-      reactiveDecisions: 'Reactive decisions',
-      missingSuffix: ' missing',
-      premature: 'Premature',
-      downstreamImpact: 'Downstream steps weaken; execution becomes premature.',
-      structuredOutcome: 'Stable outcome',
-      reactiveOutcome: 'Volatile outcome',
-      structuredCaption: 'Clear steps before execution keep the curve steady.',
-      reactiveCaption: 'Skipping steps creates sharper swings.',
-      focus: 'Focus',
-      focused: 'Focused',
-      focusInsightStructured:
-        'When each step is defined upfront, decisions stay calm and consistent.',
-      focusInsightReactive:
-        'When execution comes early, outcomes swing because choices are made mid-stream.',
-      keyInsightFallback:
-        'The process prevents impulsive action by forcing clarity before execution.',
+      structuredLabel: 'With a plan',
+      structuredSubline: 'Choose before executing.',
+      reactiveLabel: 'Without a plan',
+      reactiveSubline: 'Execute without direction.',
+      headerHelper:
+        'See the difference between investing immediately without a plan and investing as a deliberate process.',
+      progressLabel: 'Process progress',
+      stableLabel: 'Stable',
+      volatileLabel: 'Volatile',
+      insightLine:
+        'When execution happens too early, the outcome becomes unpredictable.',
       steps: [
         { id: 'goal', label: 'Goal' },
         { id: 'risk', label: 'Risk' },
@@ -279,6 +275,15 @@ const LESSON_STEP_COPY = {
       reset: 'Reset',
       completeExercise: 'Oefening afronden',
       completeLesson: 'Les afronden',
+    },
+    lessonSuccess: {
+      title: 'Inleidende les is afgerond!',
+      subtitle: (lessonTitle) => `Je hebt ${lessonTitle} afgerond.`,
+      detail: 'Ga verder met de volgende lessen om het volledige proces te verdiepen.',
+      introDetail:
+        'Je kan nu starten met de volledige lessen over het hele investeringsproces in detail.',
+      cta: 'Naar Home',
+      fallbackTitle: 'Deze les',
     },
     labels: {
       insight: 'Inzicht',
@@ -418,30 +423,17 @@ const LESSON_STEP_COPY = {
       ],
     },
     introScenario: {
-      withPlan: 'Gestructureerde keuzes',
-      withoutPlan: 'Reactieve keuzes',
-      planMeaning:
-        'Een plan betekent hier dat je doel, risico, strategie, allocatie en instrument bepaalt voordat je uitvoert.',
-      processRail: 'Proceslijn',
-      structuredLabel: 'Gestructureerde keuzes',
-      reactiveLabel: 'Reactieve keuzes',
-      stableDecisions: 'Gestructureerde keuzes',
-      reactiveDecisions: 'Reactieve keuzes',
-      missingSuffix: ' ontbreekt',
-      premature: 'Te vroeg',
-      downstreamImpact: 'Volgende stappen verzwakken; uitvoering wordt te vroeg.',
-      structuredOutcome: 'Stabiele uitkomst',
-      reactiveOutcome: 'Volatiele uitkomst',
-      structuredCaption: 'Duidelijkheid voor uitvoering houdt de curve rustig.',
-      reactiveCaption: 'Stappen overslaan zorgt voor scherpere schommelingen.',
-      focus: 'Focus',
-      focused: 'Gefocust',
-      focusInsightStructured:
-        'Wanneer elke stap vooraf is bepaald, blijven beslissingen rustig en consistent.',
-      focusInsightReactive:
-        'Wanneer uitvoering te vroeg komt, schommelen uitkomsten omdat keuzes onderweg worden gemaakt.',
-      keyInsightFallback:
-        'Het proces voorkomt impulsieve actie door helderheid af te dwingen voor uitvoering.',
+      structuredLabel: 'Met stappenplan',
+      structuredSubline: 'Eerst kiezen, dan uitvoeren.',
+      reactiveLabel: 'Zonder stappenplan',
+      reactiveSubline: 'Uitvoeren zonder richting.',
+      headerHelper:
+        'Zie het verschil tussen direct investeren zonder plan en investeren als een doordacht proces.',
+      progressLabel: 'Procesvoortgang',
+      stableLabel: 'Stabiel',
+      volatileLabel: 'Volatiel',
+      insightLine:
+        'Wanneer uitvoering te vroeg gebeurt, wordt het resultaat onvoorspelbaar.',
       steps: [
         { id: 'goal', label: 'Doel' },
         { id: 'risk', label: 'Risico' },

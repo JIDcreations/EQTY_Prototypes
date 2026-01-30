@@ -22,6 +22,7 @@ import OnboardingStack from './navigation/OnboardingStack';
 import LessonOverviewScreen from './screens/LessonOverviewScreen';
 import LessonStepScreen from './screens/LessonStepScreen';
 import GlossaryDetailScreen from './screens/GlossaryDetailScreen';
+import LessonSuccessScreen from './screens/LessonSuccessScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -86,6 +87,7 @@ function RootStack() {
           <Stack.Screen name="Tabs" component={Tabs} />
           <Stack.Screen name="LessonOverview" component={LessonOverviewScreen} />
           <Stack.Screen name="LessonStep" component={LessonStepScreen} />
+          <Stack.Screen name="LessonSuccess" component={LessonSuccessScreen} />
           <Stack.Screen name="GlossaryDetail" component={GlossaryDetailScreen} />
         </>
       )}

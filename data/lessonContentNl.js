@@ -48,7 +48,7 @@ export const lessonContentNl = {
       },
       scenario: {
         title: 'Plan vs geen plan',
-        intro: 'Zie hoe planning de uitvoering vormgeeft voordat er actie wordt genomen.',
+        intro: 'Vergelijk een gestructureerd proces met een reactieve aanpak terwijl het zich ontvouwt.',
         variants: {
           new: {
             narrative: [

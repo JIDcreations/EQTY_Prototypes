@@ -48,7 +48,7 @@ export const lessonContent = {
       },
       scenario: {
         title: 'Plan vs no plan',
-        intro: 'See how planning shapes execution before any action is taken.',
+        intro: 'Compare a structured process with a reactive one as it unfolds.',
         variants: {
           new: {
             narrative: [
