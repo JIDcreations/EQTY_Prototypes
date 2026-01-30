@@ -466,6 +466,9 @@ function IntroScenarioStep({ onNext, copy }) {
           thumbTintColor={colors.accent}
           onValueChange={setProgress}
         />
+        <AppText style={styles.scenarioSliderHelper}>
+          {copy.introScenario.sliderHelper}
+        </AppText>
       </View>
 
       <View style={styles.scenarioCompareGrid}>
@@ -478,6 +481,11 @@ function IntroScenarioStep({ onNext, copy }) {
               {copy.introScenario.structuredSubline}
             </AppText>
           </View>
+          <ScenarioCurve
+            variant="stable"
+            progress={progressRatio}
+            label={copy.introScenario.stableLabel}
+          />
           <View style={styles.scenarioCompareSteps}>
             {structuredSteps.map((step, index) => {
               const isLast = index === structuredSteps.length - 1;
@@ -513,11 +521,6 @@ function IntroScenarioStep({ onNext, copy }) {
               );
             })}
           </View>
-          <ScenarioCurve
-            variant="stable"
-            progress={progressRatio}
-            label={copy.introScenario.stableLabel}
-          />
         </Card>
 
         <Card
@@ -535,6 +538,11 @@ function IntroScenarioStep({ onNext, copy }) {
               {copy.introScenario.reactiveSubline}
             </AppText>
           </View>
+          <ScenarioCurve
+            variant="volatile"
+            progress={progressRatio}
+            label={copy.introScenario.volatileLabel}
+          />
           <View style={styles.scenarioCompareSteps}>
             {reactiveSteps.map((step, index) => {
               const isLast = index === reactiveSteps.length - 1;
@@ -573,11 +581,6 @@ function IntroScenarioStep({ onNext, copy }) {
               );
             })}
           </View>
-          <ScenarioCurve
-            variant="volatile"
-            progress={progressRatio}
-            label={copy.introScenario.volatileLabel}
-          />
         </Card>
       </View>
 
@@ -2089,6 +2092,12 @@ const createStyles = (colors) =>
     lineHeight: 20,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
+  },
+  scenarioSliderHelper: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 24,
   },
   scenarioCurveWrap: {
     gap: spacing.xs,

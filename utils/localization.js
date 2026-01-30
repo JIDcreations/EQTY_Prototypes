@@ -249,6 +249,7 @@ const LESSON_STEP_COPY = {
       headerHelper:
         'See the difference between investing immediately without a plan and investing as a deliberate process.',
       progressLabel: 'Process progress',
+      sliderHelper: 'Drag to see what happens when execution happens too early.',
       stableLabel: 'Stable',
       volatileLabel: 'Volatile',
       insightLine:
@@ -447,6 +448,8 @@ const LESSON_STEP_COPY = {
       headerHelper:
         'Zie het verschil tussen direct investeren zonder plan en investeren als een doordacht proces.',
       progressLabel: 'Procesvoortgang',
+      sliderHelper:
+        'Schuif om te zien wat er gebeurt wanneer uitvoering te vroeg gebeurt.',
       stableLabel: 'Stabiel',
       volatileLabel: 'Volatiel',
       insightLine:
