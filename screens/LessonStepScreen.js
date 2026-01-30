@@ -426,6 +426,8 @@ function IntroScenarioStep({ onNext, copy }) {
   const [progress, setProgress] = useState(0);
   const clampedProgress = Math.max(0, Math.min(progress, totalSteps));
   const progressRatio = totalSteps ? clampedProgress / totalSteps : 0;
+  const structuredEmphasis = 0.8 + 0.2 * progressRatio;
+  const reactiveEmphasis = 0.7 - 0.2 * progressRatio;
 
   const structuredSteps = steps.map((step, index) => {
     const threshold = index + 1;
@@ -450,8 +452,24 @@ function IntroScenarioStep({ onNext, copy }) {
 
   return (
     <View style={styles.stepBody}>
+      <View style={styles.scenarioSliderWrap}>
+        <AppText style={styles.scenarioSliderLabel}>
+          {copy.introScenario.progressLabel}
+        </AppText>
+        <Slider
+          value={progress}
+          minimumValue={0}
+          maximumValue={totalSteps}
+          step={0.1}
+          minimumTrackTintColor={colors.accent}
+          maximumTrackTintColor={colors.surfaceActive}
+          thumbTintColor={colors.accent}
+          onValueChange={setProgress}
+        />
+      </View>
+
       <View style={styles.scenarioCompareGrid}>
-        <Card style={styles.scenarioComparePanel}>
+        <Card style={[styles.scenarioComparePanel, { opacity: structuredEmphasis }]}>
           <View style={styles.scenarioCompareHeader}>
             <AppText style={styles.scenarioCompareLabel}>
               {copy.introScenario.structuredLabel}
@@ -502,7 +520,13 @@ function IntroScenarioStep({ onNext, copy }) {
           />
         </Card>
 
-        <Card style={[styles.scenarioComparePanel, styles.scenarioComparePanelReactive]}>
+        <Card
+          style={[
+            styles.scenarioComparePanel,
+            styles.scenarioComparePanelReactive,
+            { opacity: reactiveEmphasis },
+          ]}
+        >
           <View style={styles.scenarioCompareHeader}>
             <AppText style={styles.scenarioCompareLabel}>
               {copy.introScenario.reactiveLabel}
@@ -555,22 +579,6 @@ function IntroScenarioStep({ onNext, copy }) {
             label={copy.introScenario.volatileLabel}
           />
         </Card>
-      </View>
-
-      <View style={styles.scenarioSliderWrap}>
-        <AppText style={styles.scenarioSliderLabel}>
-          {copy.introScenario.progressLabel}
-        </AppText>
-        <Slider
-          value={progress}
-          minimumValue={0}
-          maximumValue={totalSteps}
-          step={0.1}
-          minimumTrackTintColor={colors.accent}
-          maximumTrackTintColor={colors.surfaceActive}
-          thumbTintColor={colors.accent}
-          onValueChange={setProgress}
-        />
       </View>
 
       <AppText style={styles.scenarioInsightLine}>{copy.introScenario.insightLine}</AppText>

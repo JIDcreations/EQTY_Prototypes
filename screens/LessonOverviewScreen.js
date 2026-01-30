@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../components/AppText';
@@ -69,28 +70,34 @@ export default function LessonOverviewScreen() {
           </Card>
 
           <View style={styles.structureContainer}>
-            <Pressable
-              onPress={() => setIsStructureOpen((prev) => !prev)}
-              style={({ pressed }) => [styles.structureRow, pressed && styles.structurePressed]}
-            >
-              <AppText style={styles.structureTitle}>{overviewCopy.lessonStructure}</AppText>
-              <AppText style={styles.structureToggle}>
-                {isStructureOpen ? overviewCopy.hide : overviewCopy.show}
-              </AppText>
-            </Pressable>
-            {isStructureOpen ? (
-              <View style={styles.stepList}>
-                <AppText style={styles.flowHeader}>{overviewCopy.lessonFlowHeader}</AppText>
-                {overviewCopy.stepLabels.map((label, index) => (
-                  <View key={label} style={styles.stepRow}>
-                    <View style={styles.stepIndex}>
-                      <GlossaryText text={index + 1} style={styles.stepNumber} />
+            <Card style={styles.structureCard}>
+              <Pressable
+                onPress={() => setIsStructureOpen((prev) => !prev)}
+                style={({ pressed }) => [styles.structureRow, pressed && styles.structurePressed]}
+              >
+                <AppText style={styles.structureTitle}>{overviewCopy.lessonStructure}</AppText>
+                <View style={styles.structureToggle}>
+                  <Ionicons
+                    name={isStructureOpen ? 'chevron-up' : 'chevron-down'}
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </View>
+              </Pressable>
+              {isStructureOpen ? (
+                <View style={styles.stepList}>
+                  <AppText style={styles.flowHeader}>{overviewCopy.lessonFlowHeader}</AppText>
+                  {overviewCopy.stepLabels.map((label, index) => (
+                    <View key={label} style={styles.stepRow}>
+                      <View style={styles.stepIndex}>
+                        <GlossaryText text={index + 1} style={styles.stepNumber} />
+                      </View>
+                      <GlossaryText text={label} style={styles.stepLabel} />
                     </View>
-                    <GlossaryText text={label} style={styles.stepLabel} />
-                  </View>
-                ))}
-              </View>
-            ) : null}
+                  ))}
+                </View>
+              ) : null}
+            </Card>
           </View>
         </ScrollView>
 
@@ -188,17 +195,27 @@ const createStyles = (colors) =>
     structureContainer: {
       gap: spacing.sm,
     },
+    structureCard: {
+      borderWidth: 1,
+      borderColor: colors.divider,
+      backgroundColor: colors.surface,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+    },
     structureTitle: {
-      fontFamily: typography.fontFamilyMedium,
+      fontFamily: typography.fontFamilyDemi,
       fontSize: typography.body,
-      color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1.2,
+      color: colors.textPrimary,
     },
     structureToggle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: colors.divider,
+      backgroundColor: colors.surfaceActive,
     },
     structurePressed: {
       opacity: 0.9,
@@ -208,11 +225,10 @@ const createStyles = (colors) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: spacing.md,
-      paddingVertical: spacing.sm,
     },
     stepList: {
       gap: spacing.xs,
-      paddingLeft: spacing.sm,
+      paddingTop: spacing.sm,
     },
     flowHeader: {
       fontFamily: typography.fontFamilyMedium,
@@ -225,9 +241,9 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     stepIndex: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
       backgroundColor: colors.surfaceActive,
       alignItems: 'center',
       justifyContent: 'center',
@@ -235,7 +251,7 @@ const createStyles = (colors) =>
     stepNumber: {
       fontFamily: typography.fontFamilyMedium,
       color: colors.textSecondary,
-      fontSize: typography.small - 1,
+      fontSize: typography.body,
     },
     stepLabel: {
       fontFamily: typography.fontFamilyMedium,

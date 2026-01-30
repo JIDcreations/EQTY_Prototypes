@@ -12,7 +12,7 @@ const LESSON_OVERVIEW_COPY = {
   en: {
     whatYoullLearn: "What you'll learn",
     keyTakeaways: 'Key takeaways',
-    lessonStructure: 'Lesson structure',
+    lessonStructure: 'Lesson flow',
     lessonFlowHeader: 'Lesson flow (6 parts)',
     show: 'Show',
     hide: 'Hide',
@@ -34,7 +34,7 @@ const LESSON_OVERVIEW_COPY = {
   nl: {
     whatYoullLearn: 'Wat je leert',
     keyTakeaways: 'Belangrijkste inzichten',
-    lessonStructure: 'Lesopbouw',
+    lessonStructure: 'Lesverloop',
     lessonFlowHeader: 'Lesverloop (6 onderdelen)',
     show: 'Toon',
     hide: 'Verberg',
@@ -440,7 +440,7 @@ const LESSON_STEP_COPY = {
       ],
     },
     introScenario: {
-      structuredLabel: 'Met stappenplan',
+      structuredLabel: 'Met\nstappenplan',
       structuredSubline: 'Eerst kiezen, dan uitvoeren.',
       reactiveLabel: 'Zonder stappenplan',
       reactiveSubline: 'Uitvoeren zonder richting.',
