@@ -123,7 +123,9 @@ export default function LessonStepScreen() {
       case 5:
         return content?.steps?.reflection?.title || introTitle || 'Reflection';
       case 6:
-        return introTitle || 'The full investing process';
+        return lessonId === 'lesson_0'
+          ? 'Het volledige investeringsproces'
+          : introTitle || 'The full investing process';
       default:
         return `${copy.labels.part} ${step}`;
     }
@@ -148,8 +150,10 @@ export default function LessonStepScreen() {
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
   const containerContentStyle =
     disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: 0 } : null;
-  const flowPhaseLabel =
-    copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
+  let flowPhaseLabel = copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
+  if (lessonId === 'lesson_0' && step === 6) {
+    flowPhaseLabel = 'Samenvatting';
+  }
   const flowMetaLabel = `${flowPhaseLabel} · ${step}/${TOTAL_STEPS}`.toUpperCase();
 
   return (
@@ -295,7 +299,7 @@ function IntroConceptStep({ content, onNext, copy }) {
       <Card style={styles.processCard}>
         <View style={styles.processHeader}>
           <AppText style={styles.processTitle}>{copy.introConcept.processTitle}</AppText>
-          <AppText style={styles.processHint}>{copy.introConcept.processHint}</AppText>
+          <AppText style={styles.processSubline}>{copy.labels.processContext}</AppText>
         </View>
         <View style={styles.processMap}>
           <View style={styles.processLine} />
@@ -1598,58 +1602,54 @@ function SummaryStep({ content, onComplete, onPressTerm, copy }) {
 
 function IntroSummaryStep({ content, onComplete, copy }) {
   const { colors, styles } = useLessonStepStyles();
-  const map = content?.steps?.summary?.processMap || [];
-  const stations = map.length
-    ? map
-    : [
-        {
-          id: 'target',
-          title: 'Target',
-          description: 'Define the objective and boundaries.',
-          substeps: ['Purpose', 'Time horizon', 'Goal type'],
-        },
-        {
-          id: 'drivers',
-          title: 'Drivers',
-          description: 'Clarify the risk profile and constraints.',
-          substeps: ['Risk capacity', 'Risk tolerance', 'Financial resources'],
-        },
-        {
-          id: 'strategy',
-          title: 'Financial investment strategy',
-          description: 'Set the rules for how you will invest.',
-          substeps: ['Liquidity', 'Costs', 'Ethics/ESG', 'Dividend preference'],
-        },
-        {
-          id: 'allocation',
-          title: 'Capital allocation',
-          description: 'Distribute capital across the plan.',
-          substeps: ['Asset categories', 'Diversification', 'Example allocations'],
-        },
-        {
-          id: 'vehicles',
-          title: 'Investment vehicles',
-          description: 'Select the tools that express the plan.',
-          substeps: ['Equities', 'Bonds', 'ETFs', 'Alternatives'],
-        },
-        {
-          id: 'execution',
-          title: 'Execution',
-          description: 'Execute only after every step is clear.',
-          substeps: ['Order types', 'Transaction costs', 'Execution comes last'],
-        },
-      ];
-  const [activeIndex, setActiveIndex] = useState(0);
+  const summarySubtext =
+    'Dit is het vaste stappenplan dat elke investering structureert.';
+  const summaryHelper = 'Tik op de stappen voor meer info.';
+  const stations = [
+    {
+      id: 'target',
+      title: 'Doelbepaling',
+      description: 'Definieer het doel en de grenzen voor uitvoering.',
+      substeps: ['Doel', 'Tijdshorizon', 'Doeltype'],
+    },
+    {
+      id: 'drivers',
+      title: 'Individuele risicoanalyse',
+      description: 'Verduidelijk de randvoorwaarden die elke beslissing vormen.',
+      substeps: ['Risicocapaciteit', 'Risicotolerantie', 'Financiële middelen'],
+    },
+    {
+      id: 'strategy',
+      title: 'Financiële investeringsstrategie',
+      description: 'Zet de regels vast die beslissingen onder onzekerheid sturen.',
+      substeps: ['Liquiditeit', 'Kosten', 'Ethiek/ESG', 'Dividendvoorkeur'],
+    },
+    {
+      id: 'allocation',
+      title: 'Kapitaalallocatie',
+      description: 'Verdeel kapitaal over gedefinieerde prioriteiten.',
+      substeps: ['Activaklassen', 'Diversificatie', 'Voorbeeldallocaties'],
+    },
+    {
+      id: 'vehicles',
+      title: 'Beleggingsinstrumenten',
+      description: 'Selecteer de tools die het plan uitdrukken.',
+      substeps: ['Aandelen', 'Obligaties', "ETF's", 'Alternatieven'],
+    },
+    {
+      id: 'execution',
+      title: 'Uitvoering',
+      description: 'Plaats orders pas wanneer het systeem duidelijk is.',
+      substeps: ['Ordertypes', 'Transactiekosten', 'Uitvoering komt als laatste'],
+    },
+  ];
+  const [activeIndex, setActiveIndex] = useState(null);
 
   return (
     <View style={[styles.stepBody, styles.summaryBody]}>
       <View style={styles.summaryHeaderBlock}>
-        <AppText style={styles.processTitle}>{copy.labels.investingProcess}</AppText>
-        <AppText style={styles.summarySubtitle}>
-          {content?.steps?.summary?.subtitle ||
-            'Execution is the final step - not the starting point.'}
-        </AppText>
-        <AppText style={styles.processHint}>{copy.labels.tapStation}</AppText>
+        <AppText style={styles.summarySubtitle}>{summarySubtext}</AppText>
+        <AppText style={styles.summaryHelper}>{summaryHelper}</AppText>
       </View>
 
       <View style={styles.summaryContent}>
@@ -1914,7 +1914,7 @@ const createStyles = (colors) =>
     gap: spacing.md,
   },
   processHeader: {
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
   processTitle: {
     fontFamily: typography.fontFamilyMedium,
@@ -1923,6 +1923,12 @@ const createStyles = (colors) =>
     lineHeight: 20,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
+  },
+  processSubline: {
+    fontFamily: typography.fontFamilyMedium,
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 24,
   },
   segmentRow: {
     flexDirection: 'row',
@@ -2765,9 +2771,9 @@ const createStyles = (colors) =>
     fontSize: typography.body,
     lineHeight: 24,
   },
-  processHint: {
+  summaryHelper: {
     fontFamily: typography.fontFamilyMedium,
-    color: toRgba(colors.textSecondary, 0.75),
+    color: colors.textSecondary,
     fontSize: typography.body,
     lineHeight: 24,
   },

@@ -102,6 +102,11 @@ const LESSON_STEP_COPY = {
         5: 'Reflection',
         6: 'Summary',
       },
+      processContext:
+        'The fixed framework behind every investment.',
+      processTapMore: 'Tap the steps for more info.',
+      processOverview:
+        'This is an overview. You’re learning the process.',
       insight: 'Insight',
       outcome: 'Outcome',
       aligned: 'Aligned',
@@ -294,6 +299,11 @@ const LESSON_STEP_COPY = {
         5: 'Reflectie',
         6: 'Samenvatting',
       },
+      processContext:
+        'het vaste stappenplan dat elke investering structureert.',
+      processTapMore: 'Tik op de stappen voor meer info.',
+      processOverview:
+        'Dit is een overzicht. Je leert hier het proces.',
       insight: 'Inzicht',
       outcome: 'Uitkomst',
       aligned: 'In lijn',
