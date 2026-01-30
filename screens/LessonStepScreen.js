@@ -26,7 +26,6 @@ import { typography } from '../theme/typography';
 import { useApp } from '../utils/AppContext';
 import { getScenarioVariant } from '../utils/helpers';
 import {
-  getIntroStepLabel,
   getIntroStepTitle,
   getLessonContent,
   getLessonStepCopy,
@@ -103,17 +102,12 @@ export default function LessonStepScreen() {
   const { lessonId, step = 1, entrySource } = route.params || {};
   const { userContext, onboardingContext, addReflection, completeLesson, preferences } = useApp();
   const glossary = useGlossary();
-  const isIntroConcept = lessonId === 'lesson_0' && step === 1;
-  const isIntroVisualization = lessonId === 'lesson_0' && step === 2;
   const isIntroScenario = lessonId === 'lesson_0' && step === 3;
-  const isIntroExercise = lessonId === 'lesson_0' && step === 4;
-  const isIntroReflection = lessonId === 'lesson_0' && step === 5;
-  const isIntroSummary = lessonId === 'lesson_0' && step === 6;
 
   const content = getLessonContent(lessonId, preferences?.language);
   const copy = useMemo(() => getLessonStepCopy(preferences?.language), [preferences?.language]);
   const stepTitle = useMemo(() => {
-    if (!content) return `Step ${step}`;
+    if (!content) return `${copy.labels.part} ${step}`;
     const introTitle = getIntroStepTitle(preferences?.language, step);
     switch (step) {
       case 1:
@@ -131,9 +125,9 @@ export default function LessonStepScreen() {
       case 6:
         return introTitle || 'The full investing process';
       default:
-        return `Step ${step}`;
+        return `${copy.labels.part} ${step}`;
     }
-  }, [content, lessonId, preferences?.language, step]);
+  }, [content, copy.labels.part, lessonId, preferences?.language, step]);
 
   const handleNext = () => {
     if (step < TOTAL_STEPS) {
@@ -154,6 +148,9 @@ export default function LessonStepScreen() {
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
   const containerContentStyle =
     disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: 0 } : null;
+  const flowPhaseLabel =
+    copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
+  const flowMetaLabel = `${flowPhaseLabel} · ${step}/${TOTAL_STEPS}`.toUpperCase();
 
   return (
     <LessonStepContainer
@@ -166,26 +163,9 @@ export default function LessonStepScreen() {
         title={stepTitle}
         onBack={() => navigation.goBack()}
         onPressTerm={handleTermPress}
-        stepLabel={
-          lessonId === 'lesson_0' ? getIntroStepLabel(preferences?.language, step) : null
-        }
+        stepLabel={flowMetaLabel}
         helperText={
           isIntroScenario ? copy.introScenario.headerHelper : null
-        }
-        progressText={
-          isIntroConcept
-            ? `1/${TOTAL_STEPS}`
-            : isIntroVisualization
-            ? `2/${TOTAL_STEPS}`
-            : isIntroScenario
-            ? `3/${TOTAL_STEPS}`
-            : isIntroExercise
-            ? `4/${TOTAL_STEPS}`
-            : isIntroReflection
-            ? `5/${TOTAL_STEPS}`
-            : isIntroSummary
-            ? `6/${TOTAL_STEPS}`
-            : null
         }
         showTitle
       />
@@ -404,9 +384,7 @@ function IntroVisualizationStep({ onNext, copy }) {
                 </View>
                 <View style={styles.journeyAccent} />
               </View>
-              <AppText style={styles.journeyLabel}>
-                {`${copy.introVisualization.stepPrefix} ${index + 1} - ${step.label}`}
-              </AppText>
+              <AppText style={styles.journeyLabel}>{step.label}</AppText>
               {expandedCards[step.id] ? (
                 <>
                   <AppText style={styles.journeyDetail}>{step.detail}</AppText>
@@ -1666,6 +1644,7 @@ function IntroSummaryStep({ content, onComplete, copy }) {
   return (
     <View style={[styles.stepBody, styles.summaryBody]}>
       <View style={styles.summaryHeaderBlock}>
+        <AppText style={styles.processTitle}>{copy.labels.investingProcess}</AppText>
         <AppText style={styles.summarySubtitle}>
           {content?.steps?.summary?.subtitle ||
             'Execution is the final step - not the starting point.'}
@@ -1889,8 +1868,8 @@ const createStyles = (colors) =>
   journeyWhy: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 20,
+    fontSize: typography.body,
+    lineHeight: 24,
   },
   journeyDetail: {
     fontFamily: typography.fontFamilyMedium,
@@ -1901,7 +1880,8 @@ const createStyles = (colors) =>
   journeyTapHint: {
     fontFamily: typography.fontFamilyMedium,
     color: toRgba(colors.textSecondary, 0.7),
-    fontSize: typography.small,
+    fontSize: typography.body,
+    lineHeight: 20,
     letterSpacing: 1.1,
     textTransform: 'uppercase',
   },
@@ -1939,7 +1919,8 @@ const createStyles = (colors) =>
   processTitle: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textPrimary,
-    fontSize: typography.small,
+    fontSize: typography.body,
+    lineHeight: 20,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
   },
@@ -2090,7 +2071,8 @@ const createStyles = (colors) =>
   scenarioSliderLabel: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
-    fontSize: typography.small,
+    fontSize: typography.body,
+    lineHeight: 20,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
@@ -2786,8 +2768,8 @@ const createStyles = (colors) =>
   processHint: {
     fontFamily: typography.fontFamilyMedium,
     color: toRgba(colors.textSecondary, 0.75),
-    fontSize: typography.small,
-    letterSpacing: 0.2,
+    fontSize: typography.body,
+    lineHeight: 24,
   },
   summaryBody: {
     flex: 1,
@@ -2891,8 +2873,8 @@ const createStyles = (colors) =>
   processDescription: {
     fontFamily: typography.fontFamilyMedium,
     color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 20,
+    fontSize: typography.body,
+    lineHeight: 24,
   },
   processSubsteps: {
     flexDirection: 'row',

@@ -80,6 +80,7 @@ export default function LessonOverviewScreen() {
             </Pressable>
             {isStructureOpen ? (
               <View style={styles.stepList}>
+                <AppText style={styles.flowHeader}>{overviewCopy.lessonFlowHeader}</AppText>
                 {overviewCopy.stepLabels.map((label, index) => (
                   <View key={label} style={styles.stepRow}>
                     <View style={styles.stepIndex}>
@@ -189,14 +190,14 @@ const createStyles = (colors) =>
     },
     structureTitle: {
       fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
+      fontSize: typography.body,
       color: colors.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 1.2,
     },
     structureToggle: {
       fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
+      fontSize: typography.body,
       color: colors.textSecondary,
     },
     structurePressed: {
@@ -212,6 +213,11 @@ const createStyles = (colors) =>
     stepList: {
       gap: spacing.xs,
       paddingLeft: spacing.sm,
+    },
+    flowHeader: {
+      fontFamily: typography.fontFamilyMedium,
+      fontSize: typography.body,
+      color: colors.textSecondary,
     },
     stepRow: {
       flexDirection: 'row',
@@ -234,7 +240,7 @@ const createStyles = (colors) =>
     stepLabel: {
       fontFamily: typography.fontFamilyMedium,
       color: colors.textSecondary,
-      fontSize: typography.small,
+      fontSize: typography.body,
     },
     footer: {
       paddingHorizontal: layout.sideMargin,

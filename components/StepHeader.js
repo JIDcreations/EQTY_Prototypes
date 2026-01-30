@@ -16,6 +16,7 @@ export default function StepHeader({
   onPressTerm,
   stepLabel,
   progressText,
+  secondaryProgressText,
   helperText,
   showTitle = true,
 }) {
@@ -37,9 +38,12 @@ export default function StepHeader({
         </Pressable>
       </View>
       {stepLabel ? <AppText style={styles.stepLabel}>{stepLabel}</AppText> : null}
-      {showTitle ? titleNode : null}
-      <AppText style={styles.progressInline}>{progressLabel}</AppText>
+      {progressText ? <AppText style={styles.progressInline}>{progressLabel}</AppText> : null}
+      {secondaryProgressText ? (
+        <AppText style={styles.progressInline}>{secondaryProgressText}</AppText>
+      ) : null}
       <ProgressBar progress={step / total} />
+      {showTitle ? titleNode : null}
       {helperText ? <AppText style={styles.helperText}>{helperText}</AppText> : null}
     </View>
   );
@@ -66,14 +70,15 @@ const createStyles = (colors) =>
     progressInline: {
       fontFamily: typography.fontFamilyMedium,
       color: colors.textSecondary,
-      fontSize: typography.small - 1,
-      letterSpacing: 0.6,
+      fontSize: typography.body,
+      lineHeight: 20,
+      letterSpacing: 0.4,
     },
     helperText: {
       fontFamily: typography.fontFamilyMedium,
       color: colors.textSecondary,
-      fontSize: typography.small,
-      lineHeight: 20,
+      fontSize: typography.body,
+      lineHeight: 24,
     },
     stepLabel: {
       fontFamily: typography.fontFamilyDemi,

@@ -13,14 +13,15 @@ const LESSON_OVERVIEW_COPY = {
     whatYoullLearn: "What you'll learn",
     keyTakeaways: 'Key takeaways',
     lessonStructure: 'Lesson structure',
+    lessonFlowHeader: 'Lesson flow (6 parts)',
     show: 'Show',
     hide: 'Hide',
     startLesson: 'Start lesson',
     back: 'Back',
     stepLabels: [
       'Concept',
-      'Visual exploration',
-      'Scenario',
+      'Visualization',
+      'Contextual example',
       'Practical exercise',
       'Reflection',
       'Summary',
@@ -34,14 +35,15 @@ const LESSON_OVERVIEW_COPY = {
     whatYoullLearn: 'Wat je leert',
     keyTakeaways: 'Belangrijkste inzichten',
     lessonStructure: 'Lesopbouw',
+    lessonFlowHeader: 'Lesverloop (6 onderdelen)',
     show: 'Toon',
     hide: 'Verberg',
     startLesson: 'Start les',
     back: 'Terug',
     stepLabels: [
       'Concept',
-      'Visuele verkenning',
-      'Scenario',
+      'Visualisatie',
+      'Contextueel voorbeeld',
       'Praktische oefening',
       'Reflectie',
       'Samenvatting',
@@ -50,25 +52,6 @@ const LESSON_OVERVIEW_COPY = {
     statusCurrent: 'Huidig',
     statusUpcoming: 'Aankomend',
     lessonFinished: 'Les afgerond',
-  },
-};
-
-const INTRO_STEP_LABELS = {
-  en: {
-    1: 'STEP 1 - CONCEPT',
-    2: 'STEP 2 - VISUALISATION',
-    3: 'STEP 3 - SCENARIO',
-    4: 'STEP 4 - EXERCISE',
-    5: 'STEP 5 - REFLECTION',
-    6: 'STEP 6 - SUMMARY',
-  },
-  nl: {
-    1: 'STAP 1 - CONCEPT',
-    2: 'STAP 2 - VISUALISATIE',
-    3: 'STAP 3 - SCENARIO',
-    4: 'STAP 4 - OEFENING',
-    5: 'STAP 5 - REFLECTIE',
-    6: 'STAP 6 - SAMENVATTING',
   },
 };
 
@@ -106,6 +89,19 @@ const LESSON_STEP_COPY = {
       fallbackTitle: 'This lesson',
     },
     labels: {
+      lessonFlow: 'Lesson flow',
+      investingProcess: 'Investing process',
+      investingProcessStatic: 'Investing process (6 steps)',
+      part: 'Part',
+      step: 'Step',
+      lessonFlowPhases: {
+        1: 'Concept',
+        2: 'Visualization',
+        3: 'Contextual example',
+        4: 'Practical exercise',
+        5: 'Reflection',
+        6: 'Summary',
+      },
       insight: 'Insight',
       outcome: 'Outcome',
       aligned: 'Aligned',
@@ -153,7 +149,7 @@ const LESSON_STEP_COPY = {
       title: 'What is investing as a process?',
       paragraph:
         'Investing is not a single action. It is a sequence of decisions that build on each other. Buying or selling only happens at the final step.',
-      processTitle: 'Process overview',
+      processTitle: 'Investing process',
       processHint: 'Tap a step to see its role.',
       steps: [
         {
@@ -190,7 +186,6 @@ const LESSON_STEP_COPY = {
     },
     introVisualization: {
       subtitle: 'Each decision naturally leads to the next.',
-      stepPrefix: 'Step',
       steps: [
         {
           id: 'goal',
@@ -286,6 +281,19 @@ const LESSON_STEP_COPY = {
       fallbackTitle: 'Deze les',
     },
     labels: {
+      lessonFlow: 'Lesverloop',
+      investingProcess: 'Beleggingsproces',
+      investingProcessStatic: 'Beleggingsproces (6 stappen)',
+      part: 'Onderdeel',
+      step: 'Stap',
+      lessonFlowPhases: {
+        1: 'Concept',
+        2: 'Visualisatie',
+        3: 'Contextueel voorbeeld',
+        4: 'Praktische oefening',
+        5: 'Reflectie',
+        6: 'Samenvatting',
+      },
       insight: 'Inzicht',
       outcome: 'Uitkomst',
       aligned: 'In lijn',
@@ -333,7 +341,7 @@ const LESSON_STEP_COPY = {
       title: 'Wat is investeren als proces?',
       paragraph:
         'Investeren is geen eenmalige actie. Het is een reeks beslissingen die op elkaar voortbouwen. Kopen of verkopen gebeurt pas in de laatste stap.',
-      processTitle: 'Procesoverzicht',
+      processTitle: 'Beleggingsproces',
       processHint: 'Tik op een stap om de rol te zien.',
       steps: [
         {
@@ -370,7 +378,6 @@ const LESSON_STEP_COPY = {
     },
     introVisualization: {
       subtitle: 'Elke beslissing leidt natuurlijk naar de volgende.',
-      stepPrefix: 'Stap',
       steps: [
         {
           id: 'goal',
@@ -843,11 +850,6 @@ export function formatLessonModuleLabel(language, moduleNumber, lessonOrder) {
   return moduleNumber !== undefined
     ? `Module ${moduleNumber}, Lesson ${lessonOrder}`
     : `Lesson ${lessonOrder}`;
-}
-
-export function getIntroStepLabel(language, step) {
-  const locale = getLocaleKey(language);
-  return INTRO_STEP_LABELS[locale]?.[step] || INTRO_STEP_LABELS.en[step] || null;
 }
 
 export function getIntroStepTitle(language, step) {
