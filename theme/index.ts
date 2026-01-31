@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useApp } from '../utils/AppContext';
 import { colors } from './colors';
 import { typography } from './typography';
+import { layout } from './layout';
 import { spacing } from './spacing';
 import { createComponents } from './components';
 
@@ -12,6 +13,7 @@ export const getTheme = (appearance) => {
     mode,
     colors: palette,
     typography,
+    layout,
     spacing,
     components: createComponents(palette),
   };
@@ -22,4 +24,4 @@ export const useTheme = () => {
   return useMemo(() => getTheme(preferences?.appearance), [preferences?.appearance]);
 };
 
-export { colors, typography, spacing, createComponents };
+export { colors, typography, layout, spacing, createComponents };

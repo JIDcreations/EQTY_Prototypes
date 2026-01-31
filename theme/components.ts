@@ -1,3 +1,4 @@
+import { layout } from './layout';
 import { spacing } from './spacing';
 import { typography } from './typography';
 
@@ -142,13 +143,6 @@ const shadows = {
 const transforms = {
   scalePressed: 0.99,
   scalePressedStrong: 0.96,
-};
-
-const layout = {
-  pagePaddingHorizontal: spacing.xl,
-  sectionGap: spacing.xxl,
-  contentGap: spacing.xxl,
-  cardGap: spacing.md,
 };
 
 export const createComponents = (colors) => ({

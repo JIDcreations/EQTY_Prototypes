@@ -123,7 +123,7 @@ const createStyles = (colors, components) => {
       backgroundColor: colors.background.surfaceActive,
       borderTopLeftRadius: components.radius.card,
       borderTopRightRadius: components.radius.card,
-      paddingHorizontal: spacing.xl,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.md,
       paddingBottom: spacing.xxl,
     },
