@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SettingsRow({
@@ -15,8 +13,8 @@ export default function SettingsRow({
   isLast = false,
   disabled = false,
 }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const Container = onPress ? Pressable : View;
 
   return (
@@ -33,47 +31,48 @@ export default function SettingsRow({
         {value ? <AppText style={styles.value}>{value}</AppText> : null}
         {right || null}
         {onPress ? (
-          <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+          <Ionicons
+            name="chevron-forward"
+            size={components.sizes.icon.md}
+            color={colors.text.secondary}
+          />
         ) : null}
       </View>
     </Container>
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     row: {
+      ...components.list.row,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: spacing.md,
-      paddingVertical: spacing.sm,
+      gap: spacing.sm,
     },
     rowDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.divider,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
     },
     rowDisabled: {
-      opacity: 0.6,
+      opacity: components.opacity.value60,
     },
     rowContent: {
       flex: 1,
-      gap: 4,
+      gap: spacing.xs,
     },
     label: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textPrimary,
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     value: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     rowRight: {
       flexDirection: 'row',

@@ -1,13 +1,11 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 
 export default function OnboardingProgress({ current, total, label, style }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <View style={[styles.container, style]}>
@@ -24,7 +22,7 @@ export default function OnboardingProgress({ current, total, label, style }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
@@ -33,26 +31,23 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     label: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1.4,
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
     dots: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
+      gap: spacing.sm,
     },
     dot: {
-      width: 18,
-      height: 3,
-      borderRadius: 999,
+      width: components.sizes.track.sm,
+      height: components.sizes.line.thick,
+      borderRadius: components.radius.pill,
     },
     dotActive: {
-      backgroundColor: colors.accent,
+      backgroundColor: colors.accent.primary,
     },
     dotInactive: {
-      backgroundColor: colors.surfaceActive,
+      backgroundColor: colors.background.surfaceActive,
     },
   });

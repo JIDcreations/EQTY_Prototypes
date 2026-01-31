@@ -4,16 +4,14 @@ import AppText from '../../components/AppText';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import useThemeColors from '../../theme/useTheme';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { spacing, typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingConfirmationScreen() {
   const { updatePreferences, updateAuthUser, preferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   const handleFinish = async () => {
@@ -47,7 +45,7 @@ export default function OnboardingConfirmationScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -60,13 +58,8 @@ const createStyles = (colors) =>
       justifyContent: 'center',
     },
     logo: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 32,
-      color: colors.textPrimary,
-      letterSpacing: 6,
-      textShadowColor: 'rgba(255, 213, 0, 0.2)',
-      textShadowOffset: { width: 0, height: 6 },
-      textShadowRadius: 14,
+      ...typography.styles.display,
+      color: colors.text.primary,
     },
     cardHeader: {
       gap: spacing.sm,
@@ -76,35 +69,29 @@ const createStyles = (colors) =>
       alignItems: 'center',
       gap: spacing.xs,
       alignSelf: 'flex-start',
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 999,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.pill,
       paddingHorizontal: spacing.sm,
-      paddingVertical: 4,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
+      paddingVertical: spacing.xs,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
     },
     badgeDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.xs,
+      height: components.sizes.dot.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
     badgeText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: 11,
-      color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1.2,
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 24,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     text: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
   });

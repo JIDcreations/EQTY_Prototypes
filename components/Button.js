@@ -5,9 +5,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { typography } from '../theme/typography';
+import { useTheme } from '../theme';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -29,8 +28,8 @@ function usePressScale() {
 }
 
 export function PrimaryButton({ label, onPress, style, disabled }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { components } = useTheme();
+  const styles = useMemo(() => createStyles(components), [components]);
   const { animatedStyle, onPressIn, onPressOut } = usePressScale();
 
   return (
@@ -46,11 +45,10 @@ export function PrimaryButton({ label, onPress, style, disabled }) {
   );
 }
 
-export function SecondaryButton({ label, onPress, style, disabled, tone = 'default' }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+export function SecondaryButton({ label, onPress, style, disabled }) {
+  const { components } = useTheme();
+  const styles = useMemo(() => createStyles(components), [components]);
   const { animatedStyle, onPressIn, onPressOut } = usePressScale();
-  const isAccent = tone === 'accent';
 
   return (
     <AnimatedPressable
@@ -60,57 +58,38 @@ export function SecondaryButton({ label, onPress, style, disabled, tone = 'defau
       onPress={onPress}
       disabled={disabled}
     >
-      <View style={[styles.secondaryBorder, isAccent && styles.secondaryBorderAccent]} />
-      <AppText style={[styles.secondaryLabel, isAccent && styles.secondaryLabelAccent]}>
-        {label}
-      </AppText>
+      <View style={styles.secondaryBorder} />
+      <AppText style={styles.secondaryLabel}>{label}</AppText>
     </AnimatedPressable>
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (components) =>
   StyleSheet.create({
     primaryButton: {
-      backgroundColor: colors.accent,
-      borderRadius: 16,
-      paddingVertical: 16,
-      alignItems: 'center',
-      justifyContent: 'center',
+      ...components.button.base,
+      ...components.button.primary,
     },
     primaryLabel: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
-      color: colors.background,
-      letterSpacing: 0.3,
+      ...components.button.labelOnAccent,
     },
     secondaryButton: {
-      backgroundColor: colors.surface,
-      borderRadius: 16,
-      paddingVertical: 16,
-      alignItems: 'center',
-      justifyContent: 'center',
+      ...components.button.base,
+      ...components.button.secondary,
       position: 'relative',
       overflow: 'hidden',
     },
     secondaryBorder: {
       position: 'absolute',
       inset: 0,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
-    },
-    secondaryBorderAccent: {
-      borderColor: colors.accent,
+      borderRadius: components.radius.button,
+      borderWidth: components.borderWidth.thin,
+      borderColor: 'transparent',
     },
     secondaryLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
-    },
-    secondaryLabelAccent: {
-      color: colors.accent,
+      ...components.button.label,
     },
     disabled: {
-      opacity: 0.55,
+      ...components.button.disabled,
     },
   });

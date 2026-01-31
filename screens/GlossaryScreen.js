@@ -7,15 +7,12 @@ import Card from '../components/Card';
 import BottomSheet from '../components/BottomSheet';
 import SectionTitle from '../components/SectionTitle';
 import { glossaryTerms } from '../data/glossary';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 
 export default function GlossaryScreen() {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [query, setQuery] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(null);
 
@@ -56,17 +53,25 @@ export default function GlossaryScreen() {
       >
         <SectionTitle title="Glossary" subtitle="Quick definitions" />
         <View style={styles.searchBar}>
-          <Ionicons name="search" size={18} color={colors.textSecondary} />
+          <Ionicons
+            name="search"
+            size={components.sizes.icon.md}
+            color={colors.text.secondary}
+          />
           <TextInput
             value={query}
             onChangeText={setQuery}
             placeholder="Search financial terms"
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
             style={styles.searchInput}
           />
           {query.length > 0 ? (
             <Pressable style={styles.clearButton} onPress={() => setQuery('')}>
-              <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+              <Ionicons
+                name="close-circle"
+                size={components.sizes.icon.md}
+                color={colors.text.secondary}
+              />
             </Pressable>
           ) : null}
         </View>
@@ -104,7 +109,11 @@ export default function GlossaryScreen() {
           <View style={styles.sheetSection}>
             <AppText style={styles.sheetLabel}>Learn more</AppText>
             <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
-              <Ionicons name="logo-youtube" size={18} color={colors.accent} />
+              <Ionicons
+                name="logo-youtube"
+                size={components.sizes.icon.md}
+                color={colors.accent.primary}
+              />
               <AppText style={styles.learnMoreText}>Learn more on YouTube</AppText>
             </Pressable>
           </View>
@@ -114,36 +123,34 @@ export default function GlossaryScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.surface,
-      borderRadius: 16,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
+      backgroundColor: colors.background.surface,
+      borderRadius: components.radius.input,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
       gap: spacing.sm,
     },
     searchInput: {
       flex: 1,
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textPrimary,
-      fontSize: typography.body,
+      ...components.input.text,
     },
     clearButton: {
       padding: spacing.xs,
@@ -155,33 +162,27 @@ const createStyles = (colors) =>
       gap: spacing.xs,
     },
     termTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     termDescription: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     emptyText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     sheetSection: {
       gap: spacing.xs,
     },
     sheetLabel: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.small,
-      letterSpacing: 0.3,
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
     sheetText: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     learnMoreRow: {
       flexDirection: 'row',
@@ -190,8 +191,7 @@ const createStyles = (colors) =>
       paddingTop: spacing.xs,
     },
     learnMoreText: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.accent,
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
   });

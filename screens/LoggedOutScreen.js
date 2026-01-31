@@ -4,17 +4,14 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
 import Card from '../components/Card';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 
 export default function LoggedOutScreen({ navigation }) {
   const { updateAuthUser } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   const handleLogin = async () => {
     await updateAuthUser({});
@@ -40,34 +37,31 @@ export default function LoggedOutScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     card: {
-      gap: spacing.sm,
+      gap: components.layout.cardGap,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h1,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     text: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
   });

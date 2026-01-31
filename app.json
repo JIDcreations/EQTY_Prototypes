@@ -12,9 +12,7 @@
       "supportsTablet": false
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#12161C"
-      }
+      "adaptiveIcon": {}
     },
     "plugins": [
       "expo-font"

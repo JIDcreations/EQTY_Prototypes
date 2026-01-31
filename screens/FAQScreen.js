@@ -5,10 +5,7 @@ import AppText from '../components/AppText';
 import { SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 
 const FAQ_ITEMS = [
   {
@@ -44,9 +41,9 @@ const FAQ_ITEMS = [
 ];
 
 export default function FAQScreen({ navigation }) {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -83,37 +80,34 @@ export default function FAQScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     list: {
       gap: spacing.md,
     },
     card: {
-      gap: spacing.sm,
+      gap: components.layout.cardGap,
     },
     question: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.h3,
+      color: colors.text.primary,
     },
     answer: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      lineHeight: 20,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

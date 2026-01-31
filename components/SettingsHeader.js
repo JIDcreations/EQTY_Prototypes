@@ -1,21 +1,23 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SettingsHeader({ title, subtitle, onBack, rightAction }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         {onBack ? (
           <Pressable onPress={onBack} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
+            <Ionicons
+              name="chevron-back"
+              size={components.sizes.icon.lg}
+              color={colors.text.primary}
+            />
           </Pressable>
         ) : (
           <View style={styles.backSpacer} />
@@ -28,7 +30,7 @@ export default function SettingsHeader({ title, subtitle, onBack, rightAction })
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       gap: spacing.xs,
@@ -39,25 +41,23 @@ const createStyles = (colors) =>
       alignItems: 'center',
     },
     backButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surface,
       alignItems: 'center',
       justifyContent: 'center',
     },
     backSpacer: {
-      width: 36,
-      height: 36,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.h1,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

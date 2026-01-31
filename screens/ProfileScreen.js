@@ -5,17 +5,14 @@ import Card from '../components/Card';
 import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 
 export default function ProfileScreen() {
   const { userContext, updateUserContext } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [experience, setExperience] = useState(userContext.experience);
   const [knowledge, setKnowledge] = useState(userContext.knowledge);
   const [motivation, setMotivation] = useState(userContext.motivation);
@@ -47,7 +44,7 @@ export default function ProfileScreen() {
             value={experience}
             onChangeText={setExperience}
             placeholder="new / growing / seasoned"
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
           />
           <AppText style={styles.label}>Knowledge</AppText>
           <TextInput
@@ -55,7 +52,7 @@ export default function ProfileScreen() {
             value={knowledge}
             onChangeText={setKnowledge}
             placeholder="basic / intermediate / advanced"
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
           />
           <AppText style={styles.label}>Motivation</AppText>
           <TextInput
@@ -63,7 +60,7 @@ export default function ProfileScreen() {
             value={motivation}
             onChangeText={setMotivation}
             placeholder="Why are you investing?"
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
           />
           <PrimaryButton label="Save profile" onPress={handleSave} />
         </Card>
@@ -75,8 +72,11 @@ export default function ProfileScreen() {
             <Switch
               value={darkMode}
               onValueChange={setDarkMode}
-              trackColor={{ false: colors.surfaceActive, true: colors.accent }}
-              thumbColor={colors.background}
+              trackColor={{
+                false: colors.background.surfaceActive,
+                true: colors.accent.primary,
+              }}
+              thumbColor={colors.background.app}
             />
           </View>
           <AppText style={styles.caption}>Light mode is coming soon.</AppText>
@@ -86,36 +86,32 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     card: {
-      gap: spacing.md,
+      gap: components.layout.cardGap,
     },
     label: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     input: {
-      borderRadius: 14,
-      padding: spacing.sm,
-      backgroundColor: colors.surfaceActive,
-      color: colors.textPrimary,
-      fontFamily: typography.fontFamilyMedium,
+      ...components.input.container,
+      ...components.input.text,
     },
     switchRow: {
       flexDirection: 'row',
@@ -123,13 +119,11 @@ const createStyles = (colors) =>
       alignItems: 'center',
     },
     switchLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textPrimary,
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     caption: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

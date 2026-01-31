@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
 
 export default function Tag({ label, tone = 'default', style }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   return (
     <View style={[styles.base, tone === 'accent' && styles.accent, style]}>
       <AppText style={[styles.text, tone === 'accent' && styles.textAccent]}>{label}</AppText>
@@ -23,23 +22,22 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     base: {
-      paddingHorizontal: 12,
-      paddingVertical: 4,
-      borderRadius: 999,
-      backgroundColor: colors.surfaceActive,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surfaceActive,
     },
     accent: {
-      backgroundColor: toRgba(colors.accent, 0.18),
+      backgroundColor: toRgba(colors.accent.primary, 0.18),
     },
     text: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     textAccent: {
-      color: colors.accent,
+      color: colors.text.primary,
     },
   });

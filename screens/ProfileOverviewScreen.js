@@ -16,10 +16,7 @@ import SegmentedControl from '../components/SegmentedControl';
 import SettingsRow from '../components/SettingsRow';
 import SettingsSection from '../components/SettingsSection';
 import Toast from '../components/Toast';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import useToast from '../utils/useToast';
 
@@ -38,9 +35,9 @@ const TEXT_SIZE_OPTIONS = [
 export default function ProfileOverviewScreen() {
   const navigation = useNavigation();
   const { authUser, onboardingContext, preferences, updatePreferences, logOut } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const toast = useToast();
 
   const previewAnswers = useMemo(() => {
@@ -143,8 +140,11 @@ export default function ProfileOverviewScreen() {
                 <Switch
                   value={false}
                   disabled
-                  trackColor={{ false: colors.surface, true: colors.accent }}
-                  thumbColor={colors.background}
+                  trackColor={{
+                    false: colors.background.surface,
+                    true: colors.accent.primary,
+                  }}
+                  thumbColor={colors.background.app}
                 />
               }
               isLast
@@ -194,7 +194,6 @@ export default function ProfileOverviewScreen() {
             </AppText>
             <SecondaryButton
               label="Edit personal context"
-              tone="accent"
               onPress={() => navigation.navigate('EditPersonalContext')}
               style={styles.contextButton}
             />
@@ -262,97 +261,89 @@ export default function ProfileOverviewScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     header: {
       gap: spacing.xs,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.title,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     card: {
-      gap: spacing.md,
+      gap: components.layout.cardGap,
     },
     inlineHint: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     contextBlock: {
-      gap: 4,
+      gap: spacing.xs,
     },
     contextLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     contextValue: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     contextPlaceholder: {
-      color: colors.textSecondary,
+      color: colors.text.secondary,
     },
     contextButton: {
       marginTop: spacing.xs,
     },
     contextHelper: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     cardTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.h3,
+      color: colors.text.primary,
     },
     cardSubtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     textSizeHeader: {
-      gap: 4,
+      gap: spacing.xs,
     },
     textSizeList: {
-      borderRadius: 14,
+      borderRadius: components.radius.card,
       overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.divider,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
     },
     textSizeRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.md,
-      backgroundColor: colors.surfaceActive,
+      ...components.list.row,
+      paddingHorizontal: spacing.lg,
+      backgroundColor: colors.background.surfaceActive,
     },
     rowDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.divider,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
     },
     textSizeLeft: {
       flexDirection: 'row',
@@ -360,55 +351,52 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     textSizeLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     textSizeSample: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     textSizeSampleComfort: {
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     textSizeSampleLarge: {
-      fontSize: typography.h2,
+      ...typography.styles.h2,
+      color: colors.text.secondary,
     },
     radio: {
-      width: 18,
-      height: 18,
-      borderRadius: 9,
-      borderWidth: 1,
-      borderColor: colors.textSecondary,
+      width: components.sizes.track.sm,
+      height: components.sizes.track.sm,
+      borderRadius: components.radius.pill,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.text.secondary,
       alignItems: 'center',
       justifyContent: 'center',
     },
     radioActive: {
-      borderColor: colors.accent,
+      borderColor: colors.accent.primary,
     },
     radioDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.sm,
+      height: components.sizes.dot.sm,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
     previewCard: {
-      backgroundColor: colors.surfaceActive,
+      backgroundColor: colors.background.surfaceActive,
       padding: spacing.md,
-      borderRadius: 14,
+      borderRadius: components.radius.card,
       gap: spacing.xs,
     },
     previewTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.small,
-      color: colors.textPrimary,
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
     previewText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 20,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     logoutButton: {
       marginTop: spacing.sm,

@@ -2,15 +2,13 @@ import React, { createContext, useCallback, useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from './BottomSheet';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
 
 export const GlossaryContext = createContext(null);
 
 export function GlossaryProvider({ children }) {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [activeTerm, setActiveTerm] = useState(null);
 
@@ -54,7 +52,11 @@ export function GlossaryProvider({ children }) {
           <View style={styles.glossarySection}>
             <AppText style={styles.sheetLabel}>Learn more</AppText>
             <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
-              <Ionicons name="logo-youtube" size={18} color={colors.accent} />
+              <Ionicons
+                name="logo-youtube"
+                size={components.sizes.icon.md}
+                color={colors.accent.primary}
+              />
               <AppText style={styles.learnMoreText}>Learn more on YouTube</AppText>
             </Pressable>
           </View>
@@ -71,16 +73,12 @@ export function useGlossary() {
 const createStyles = (colors) =>
   StyleSheet.create({
     sheetText: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.body,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     sheetLabel: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.small,
-      letterSpacing: 0.3,
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
     glossarySection: {
       gap: spacing.xs,
@@ -92,8 +90,7 @@ const createStyles = (colors) =>
       paddingTop: spacing.xs,
     },
     learnMoreText: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.accent,
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
   });

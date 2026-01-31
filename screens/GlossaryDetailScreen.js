@@ -6,10 +6,7 @@ import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import { glossaryTerms } from '../data/glossary';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getGlossaryExplanation } from '../utils/helpers';
 
@@ -18,9 +15,9 @@ export default function GlossaryDetailScreen() {
   const route = useRoute();
   const { termId } = route.params || {};
   const { userContext } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [explanation, setExplanation] = useState(null);
 
   const term = useMemo(
@@ -57,46 +54,42 @@ export default function GlossaryDetailScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     header: {
       gap: spacing.sm,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.title,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     explainCard: {
-      gap: spacing.sm,
+      gap: components.layout.cardGap,
     },
     cardTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     cardText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
   });

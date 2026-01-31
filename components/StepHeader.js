@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import ProgressBar from './ProgressBar';
 import GlossaryText from './GlossaryText';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
 
 export default function StepHeader({
   step,
@@ -20,8 +18,8 @@ export default function StepHeader({
   helperText,
   showTitle = true,
 }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const isPlainTitle = typeof title === 'string' || typeof title === 'number';
   const titleNode = isPlainTitle ? (
     <GlossaryText text={String(title)} style={styles.title} onPressTerm={onPressTerm} />
@@ -34,7 +32,11 @@ export default function StepHeader({
     <View style={styles.container}>
       <View style={styles.topRow}>
         <Pressable onPress={onBack} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
+          <Ionicons
+            name="chevron-back"
+            size={components.sizes.icon.lg}
+            color={colors.text.primary}
+          />
         </Pressable>
       </View>
       {stepLabel ? <AppText style={styles.stepLabel}>{stepLabel}</AppText> : null}
@@ -49,7 +51,7 @@ export default function StepHeader({
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       gap: spacing.sm,
@@ -60,36 +62,27 @@ const createStyles = (colors) =>
       justifyContent: 'flex-start',
     },
     backButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surface,
       alignItems: 'center',
       justifyContent: 'center',
     },
     progressInline: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.body,
-      lineHeight: 20,
-      letterSpacing: 0.4,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     helperText: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.body,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     stepLabel: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.small,
-      letterSpacing: 1.4,
-      textTransform: 'uppercase',
+      ...typography.styles.stepLabel,
+      color: colors.text.primary,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.h1,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
   });

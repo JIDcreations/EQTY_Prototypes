@@ -5,9 +5,7 @@ import OnboardingScreen from '../components/OnboardingScreen';
 import OnboardingStackedCard from '../components/OnboardingStackedCard';
 import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getLessonContent, getLessonStepCopy } from '../utils/localization';
 
@@ -16,8 +14,8 @@ export default function LessonSuccessScreen() {
   const route = useRoute();
   const { lessonId } = route.params || {};
   const { preferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getLessonStepCopy(preferences?.language), [preferences?.language]);
   const content = getLessonContent(lessonId, preferences?.language);
   const lessonTitle = content?.title || copy.lessonSuccess.fallbackTitle;
@@ -29,7 +27,7 @@ export default function LessonSuccessScreen() {
 
   return (
     <OnboardingScreen
-      gradientColors={[colors.background, colors.surfaceActive]}
+      gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
     >
       <View style={styles.container}>
@@ -55,7 +53,16 @@ export default function LessonSuccessScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -65,48 +72,42 @@ const createStyles = (colors) =>
     content: {
       flex: 1,
       justifyContent: 'center',
-      transform: [{ translateY: -10 }],
+      transform: [{ translateY: components.offsets.translate.sm }],
     },
     cardHeader: {
       gap: spacing.sm,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 28,
-      color: colors.textPrimary,
-      lineHeight: 36,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     detail: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     footer: {
       paddingTop: spacing.lg,
     },
     accentOrbTop: {
       position: 'absolute',
-      top: 60,
-      left: -80,
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      backgroundColor: 'rgba(31, 39, 56, 0.6)',
+      top: components.offsets.onboarding.orbTopMd,
+      left: components.offsets.onboarding.orbLeftLg,
+      width: components.sizes.illustration.md,
+      height: components.sizes.illustration.md,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.background.surface, 0.6),
     },
     accentOrbBottom: {
       position: 'absolute',
-      bottom: 80,
-      right: -90,
-      width: 240,
-      height: 240,
-      borderRadius: 120,
-      backgroundColor: 'rgba(255, 213, 0, 0.08)',
+      bottom: components.offsets.onboarding.orbBottomSm,
+      right: components.offsets.onboarding.orbRightLg,
+      width: components.sizes.illustration.xxl,
+      height: components.sizes.illustration.xxl,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.accent.primary, 0.08),
     },
   });

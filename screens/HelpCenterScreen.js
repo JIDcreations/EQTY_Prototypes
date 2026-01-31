@@ -6,10 +6,7 @@ import AppText from '../components/AppText';
 import { SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 
 const HELP_TOPICS = [
   {
@@ -54,9 +51,9 @@ const GUIDE_ITEMS = [
 ];
 
 export default function HelpCenterScreen({ navigation }) {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [query, setQuery] = useState('');
   const filteredGuides = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -83,17 +80,25 @@ export default function HelpCenterScreen({ navigation }) {
         <Card style={styles.card}>
           <AppText style={styles.sectionTitle}>Search the help center</AppText>
           <View style={styles.searchBar}>
-            <Ionicons name="search" size={18} color={colors.textSecondary} />
+            <Ionicons
+              name="search"
+              size={components.sizes.icon.md}
+              color={colors.text.secondary}
+            />
             <TextInput
               value={query}
               onChangeText={setQuery}
               placeholder="Search help topics"
-              placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
               style={styles.searchInput}
             />
             {query.length > 0 ? (
               <Pressable style={styles.clearButton} onPress={() => setQuery('')}>
-                <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+                <Ionicons
+                  name="close-circle"
+                  size={components.sizes.icon.md}
+                  color={colors.text.secondary}
+                />
               </Pressable>
             ) : null}
           </View>
@@ -148,84 +153,73 @@ export default function HelpCenterScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     card: {
-      gap: spacing.md,
+      gap: components.layout.cardGap,
     },
     sectionTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.surface,
-      borderRadius: 16,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
+      backgroundColor: colors.background.surface,
+      borderRadius: components.radius.input,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
       gap: spacing.sm,
     },
     searchInput: {
       flex: 1,
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textPrimary,
-      fontSize: typography.body,
+      ...components.input.text,
     },
     clearButton: {
       padding: spacing.xs,
     },
     helperText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     list: {
       gap: spacing.sm,
     },
     listItem: {
-      gap: spacing.xs,
-      paddingVertical: spacing.sm,
+      ...components.list.row,
     },
     listDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.divider,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
     },
     itemTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     itemText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      lineHeight: 20,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     emptyText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     text: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
   });

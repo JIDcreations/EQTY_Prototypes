@@ -5,16 +5,14 @@ import AppText from '../../components/AppText';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import useThemeColors from '../../theme/useTheme';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { spacing, typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getLanguageOptions, getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingLanguageScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const options = useMemo(
     () => getLanguageOptions(preferences?.language),
@@ -33,7 +31,11 @@ export default function OnboardingLanguageScreen({ navigation }) {
         <View style={styles.topArea}>
           <View style={styles.topRow}>
             <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-              <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+              <Ionicons
+                name="chevron-back"
+                size={components.sizes.icon.lg}
+                color={colors.text.secondary}
+              />
             </Pressable>
             <AppText style={styles.logo}>EQTY</AppText>
           </View>
@@ -81,7 +83,7 @@ export default function OnboardingLanguageScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
       flex: 1,
@@ -100,32 +102,27 @@ const createStyles = (colors) =>
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: spacing.md,
-      minHeight: 48,
+      minHeight: components.sizes.input.minHeight,
     },
     logo: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 32,
-      color: colors.textPrimary,
-      letterSpacing: 6,
-      textShadowColor: 'rgba(255, 213, 0, 0.2)',
-      textShadowOffset: { width: 0, height: 6 },
-      textShadowRadius: 14,
+      ...typography.styles.display,
+      color: colors.text.primary,
     },
     backButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surface,
       alignItems: 'center',
       justifyContent: 'center',
       position: 'absolute',
-      left: 0,
+      left: spacing.none,
     },
     cardHeader: {
       gap: spacing.xs,
     },
     cardContent: {
-      minHeight: 330,
+      minHeight: components.sizes.screen.minPanelHeight,
       justifyContent: 'space-between',
     },
     cardBody: {
@@ -136,53 +133,48 @@ const createStyles = (colors) =>
       alignItems: 'center',
       gap: spacing.xs,
       alignSelf: 'flex-start',
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 999,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.pill,
       paddingHorizontal: spacing.sm,
-      paddingVertical: 4,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
+      paddingVertical: spacing.xs,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
     },
     badgeDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.xs,
+      height: components.sizes.dot.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
     badgeText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: 11,
-      color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1.2,
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 26,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     list: {
-      borderRadius: 18,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
+      borderRadius: components.radius.card,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
       overflow: 'hidden',
     },
     row: {
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.md,
+      ...components.list.row,
+      paddingHorizontal: spacing.lg,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: colors.surfaceActive,
+      backgroundColor: colors.background.surfaceActive,
     },
     rowDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.surface,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
     },
     rowLeft: {
       flexDirection: 'row',
@@ -190,31 +182,29 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     rowLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     activeLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     radio: {
-      width: 18,
-      height: 18,
-      borderRadius: 9,
-      borderWidth: 1,
-      borderColor: colors.textSecondary,
+      width: components.sizes.track.sm,
+      height: components.sizes.track.sm,
+      borderRadius: components.radius.pill,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.text.secondary,
       alignItems: 'center',
       justifyContent: 'center',
     },
     radioActive: {
-      borderColor: colors.accent,
+      borderColor: colors.accent.primary,
     },
     radioDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.sm,
+      height: components.sizes.dot.sm,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
   });

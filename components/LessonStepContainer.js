@@ -2,18 +2,16 @@ import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
+import { spacing, useTheme } from '../theme';
 
 export default function LessonStepContainer({
   children,
   scrollEnabled = true,
   contentStyle,
 }) {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const containerStyle = scrollEnabled
     ? [styles.content, contentStyle, { paddingBottom: insets.bottom }]
     : [styles.content, styles.contentFixed, contentStyle, { paddingBottom: insets.bottom }];
@@ -38,17 +36,17 @@ export default function LessonStepContainer({
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
       paddingTop: spacing.lg,
-      paddingHorizontal: layout.sideMargin,
-      paddingBottom: 0,
-      gap: spacing.lg,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
+      paddingBottom: spacing.none,
+      gap: components.layout.contentGap,
     },
     contentFixed: {
       flex: 1,

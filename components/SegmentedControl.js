@@ -1,13 +1,11 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SegmentedControl({ options, value, onChange }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <View style={styles.container}>
@@ -29,31 +27,30 @@ export default function SegmentedControl({ options, value, onChange }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 16,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.input,
       padding: spacing.xs,
       gap: spacing.xs,
     },
     segment: {
       flex: 1,
       paddingVertical: spacing.xs,
-      borderRadius: 12,
+      borderRadius: components.radius.input,
       alignItems: 'center',
       justifyContent: 'center',
     },
     segmentActive: {
-      backgroundColor: colors.accent,
+      backgroundColor: colors.accent.primary,
     },
     segmentText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     segmentTextActive: {
-      color: colors.background,
+      color: colors.text.primary,
     },
   });

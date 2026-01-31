@@ -1,30 +1,16 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { lightColors } from '../theme/colors';
-import useThemeColors from '../theme/useTheme';
+import { useTheme } from '../theme';
 
 export default function Card({ children, active = false, style }) {
-  const colors = useThemeColors();
-  const styles = useMemo(
-    () => createStyles(colors, colors.background === lightColors.background),
-    [colors]
-  );
-  return <View style={[styles.card, active && styles.active, style]}>{children}</View>;
+  const { components } = useTheme();
+  const styles = useMemo(() => createStyles(components), [components]);
+  return <View style={[styles.card, style]}>{children}</View>;
 }
 
-const createStyles = (colors, isLight) =>
+const createStyles = (components) =>
   StyleSheet.create({
     card: {
-      backgroundColor: colors.surface,
-      borderRadius: 18,
-      padding: 16,
-      shadowColor: colors.background,
-      shadowOpacity: isLight ? 0.12 : 0.35,
-      shadowRadius: isLight ? 10 : 18,
-      shadowOffset: { width: 0, height: isLight ? 6 : 10 },
-      elevation: isLight ? 3 : 6,
-    },
-    active: {
-      backgroundColor: colors.surfaceActive,
+      ...components.card.base,
     },
   });

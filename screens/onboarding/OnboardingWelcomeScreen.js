@@ -3,21 +3,19 @@ import { StyleSheet, View } from 'react-native';
 import AppText from '../../components/AppText';
 import OnboardingGesture from '../../components/OnboardingGesture';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import useThemeColors from '../../theme/useTheme';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { spacing, typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingWelcomeScreen({ navigation }) {
   const { preferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   return (
     <OnboardingScreen
-      gradientColors={[colors.background, colors.surfaceActive]}
+      gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
     >
       <OnboardingGesture onContinue={() => navigation.navigate('OnboardingLanguage')}>
@@ -38,7 +36,16 @@ export default function OnboardingWelcomeScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -51,58 +58,47 @@ const createStyles = (colors) =>
       justifyContent: 'flex-start',
     },
     logo: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 64,
-      color: colors.textPrimary,
-      letterSpacing: 8,
-      textShadowColor: 'rgba(255, 213, 0, 0.2)',
-      textShadowOffset: { width: 0, height: 8 },
-      textShadowRadius: 18,
+      ...typography.styles.display,
+      color: colors.text.primary,
     },
     copyBlock: {
       marginTop: 'auto',
-      transform: [{ translateY: -190 }],
+      transform: [{ translateY: components.offsets.translate.lg }],
       width: '100%',
       gap: spacing.sm,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 26,
-      color: colors.textPrimary,
-      lineHeight: 32,
+      ...typography.styles.h1,
+      color: colors.text.primary,
       textAlign: 'left',
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
       textAlign: 'left',
     },
     tapHint: {
       marginTop: spacing.xl,
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      letterSpacing: 0.4,
+      ...typography.styles.small,
+      color: colors.text.secondary,
       textAlign: 'center',
     },
     accentOrbTop: {
       position: 'absolute',
-      top: 40,
-      left: -60,
-      width: 180,
-      height: 180,
-      borderRadius: 90,
-      backgroundColor: 'rgba(30, 39, 56, 0.6)',
+      top: components.offsets.onboarding.orbTopSm,
+      left: components.offsets.onboarding.orbLeftSm,
+      width: components.sizes.illustration.sm,
+      height: components.sizes.illustration.sm,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.background.surfaceActive, 0.6),
     },
     accentOrbBottom: {
       position: 'absolute',
-      bottom: 120,
-      right: -80,
-      width: 220,
-      height: 220,
-      borderRadius: 110,
-      backgroundColor: 'rgba(31, 37, 46, 0.7)',
+      bottom: components.offsets.onboarding.orbBottomLg,
+      right: components.offsets.onboarding.orbRightSm,
+      width: components.sizes.illustration.lg,
+      height: components.sizes.illustration.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.background.surface, 0.7),
     },
   });

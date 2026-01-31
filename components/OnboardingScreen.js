@@ -2,12 +2,16 @@ import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
+import { spacing, useTheme } from '../theme';
 
-const ACCENT_GLOW = 'rgba(255, 213, 0, 0.18)';
-const ACCENT_GLOW_SOFT = 'rgba(255, 213, 0, 0.08)';
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
 
 export default function OnboardingScreen({
   children,
@@ -18,13 +22,17 @@ export default function OnboardingScreen({
   gradientColors,
   showGlow = true,
 }) {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const resolvedGradientColors =
     variant === 'accent'
-      ? [colors.background, ACCENT_GLOW_SOFT, colors.surfaceActive]
-      : [colors.background, colors.surface, colors.surfaceActive];
+      ? [
+          colors.background.app,
+          toRgba(colors.accent.primary, 0.08),
+          colors.background.surfaceActive,
+        ]
+      : [colors.background.app, colors.background.surface, colors.background.surfaceActive];
 
   if (scroll) {
     return (
@@ -70,11 +78,11 @@ export default function OnboardingScreen({
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     gradient: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     safeArea: {
       flex: 1,
@@ -83,45 +91,45 @@ const createStyles = (colors) =>
       flex: 1,
     },
     scrollContent: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.xl,
-      paddingBottom: 0,
-      gap: spacing.lg,
+      paddingBottom: spacing.none,
+      gap: components.layout.contentGap,
       minHeight: '100%',
     },
     content: {
       flex: 1,
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingVertical: spacing.xl,
     },
     glowTop: {
       position: 'absolute',
-      top: -80,
-      right: -120,
-      width: 260,
-      height: 260,
-      borderRadius: 130,
-      backgroundColor: ACCENT_GLOW,
-      opacity: 0.55,
+      top: components.offsets.glow.top,
+      right: components.offsets.glow.rightLg,
+      width: components.sizes.illustration.xxxl,
+      height: components.sizes.illustration.xxxl,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.accent.primary, 0.18),
+      opacity: components.opacity.value55,
     },
     glowMid: {
       position: 'absolute',
       top: '30%',
-      left: -120,
-      width: 240,
-      height: 240,
-      borderRadius: 120,
-      backgroundColor: colors.surfaceActive,
-      opacity: 0.55,
+      left: components.offsets.glow.leftLg,
+      width: components.sizes.illustration.xxl,
+      height: components.sizes.illustration.xxl,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surfaceActive,
+      opacity: components.opacity.value55,
     },
     glowBottom: {
       position: 'absolute',
-      bottom: -120,
-      right: -80,
-      width: 220,
-      height: 220,
-      borderRadius: 110,
-      backgroundColor: ACCENT_GLOW,
-      opacity: 0.35,
+      bottom: components.offsets.glow.bottomLg,
+      right: components.offsets.glow.rightSm,
+      width: components.sizes.illustration.lg,
+      height: components.sizes.illustration.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.accent.primary, 0.18),
+      opacity: components.opacity.value35,
     },
   });

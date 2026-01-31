@@ -9,16 +9,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
-import { lightColors } from '../theme/colors';
 
 export default function BottomSheet({ visible, title, onClose, children }) {
   const insets = useSafeAreaInsets();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [isMounted, setIsMounted] = useState(visible);
   const translateY = useSharedValue(120);
   const scrimOpacity = useSharedValue(0);
@@ -76,20 +73,21 @@ export default function BottomSheet({ visible, title, onClose, children }) {
         </Animated.View>
         <GestureDetector gesture={panGesture}>
           <Animated.View
-            style={[
-              styles.sheet,
-              sheetStyle,
-              { paddingBottom: spacing.xxl + insets.bottom },
-            ]}
+            style={[styles.sheet, sheetStyle]}
           >
             <View style={styles.handle} />
             <View style={styles.headerRow}>
               {title ? <AppText style={styles.title}>{title}</AppText> : <View />}
               <Pressable onPress={handleClose} style={styles.closeButton}>
-                <Ionicons name="close" size={20} color={colors.textSecondary} />
+                <Ionicons
+                  name="close"
+                  size={components.sizes.icon.lg}
+                  color={colors.text.secondary}
+                />
               </Pressable>
             </View>
             <View style={styles.content}>{children}</View>
+            <View style={{ height: insets.bottom }} />
           </Animated.View>
         </GestureDetector>
       </View>
@@ -106,11 +104,8 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors) => {
-  const isLight = colors.background === lightColors.background;
-  const scrimColor = isLight
-    ? toRgba(colors.textPrimary, 0.35)
-    : toRgba(colors.background, 0.65);
+const createStyles = (colors, components) => {
+  const scrimColor = toRgba(colors.text.primary, 0.5);
 
   return StyleSheet.create({
     container: {
@@ -125,17 +120,18 @@ const createStyles = (colors) => {
       flex: 1,
     },
     sheet: {
-      backgroundColor: colors.surfaceActive,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
-      paddingHorizontal: spacing.lg,
+      backgroundColor: colors.background.surfaceActive,
+      borderTopLeftRadius: components.radius.card,
+      borderTopRightRadius: components.radius.card,
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
+      paddingBottom: spacing.xxl,
     },
     handle: {
-      width: 40,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: colors.surface,
+      width: components.sizes.handle.width,
+      height: components.sizes.handle.height,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surface,
       alignSelf: 'center',
       marginBottom: spacing.md,
     },
@@ -146,18 +142,17 @@ const createStyles = (colors) => {
       marginBottom: spacing.sm,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.h2,
+      ...typography.styles.h2,
+      color: colors.text.primary,
       flex: 1,
     },
     closeButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: colors.surface,
+      backgroundColor: colors.background.surface,
       marginLeft: spacing.sm,
     },
     content: {

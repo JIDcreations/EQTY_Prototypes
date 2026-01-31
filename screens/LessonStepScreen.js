@@ -20,9 +20,7 @@ import { useGlossary } from '../components/GlossaryProvider';
 import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
 import StepHeader from '../components/StepHeader';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getScenarioVariant } from '../utils/helpers';
 import {
@@ -91,9 +89,9 @@ const getSmoothPoints = (basePoints, samplesPerSegment = 10) => {
 };
 
 function useLessonStepStyles() {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
-  return { colors, styles };
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  return { colors, components, styles };
 }
 
 export default function LessonStepScreen() {
@@ -149,7 +147,7 @@ export default function LessonStepScreen() {
   const disableOuterScroll =
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
   const containerContentStyle =
-    disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: 0 } : null;
+    disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: spacing.none } : null;
   let flowPhaseLabel = copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
   if (lessonId === 'lesson_0' && step === 6) {
     flowPhaseLabel = 'Samenvatting';
@@ -262,10 +260,10 @@ function ConceptStep({ content, lessonId, onNext, onPressTerm, copy }) {
           onPressTerm={onPressTerm}
         />
         <View style={styles.visualHint}>
-          <View style={[styles.hintBar, { height: 8 }]} />
-          <View style={[styles.hintBar, { height: 14 }]} />
-          <View style={[styles.hintBar, { height: 22 }]} />
-          <View style={[styles.hintBar, { height: 30 }]} />
+          <View style={[styles.hintBar, styles.hintBarXs]} />
+          <View style={[styles.hintBar, styles.hintBarSm]} />
+          <View style={[styles.hintBar, styles.hintBarMd]} />
+          <View style={[styles.hintBar, styles.hintBarLg]} />
         </View>
         <GlossaryText
           text={content?.steps?.concept?.visualHint}
@@ -279,15 +277,22 @@ function ConceptStep({ content, lessonId, onNext, onPressTerm, copy }) {
 }
 
 function IntroConceptStep({ content, onNext, copy }) {
-  const { colors, styles } = useLessonStepStyles();
+  const { colors, components, styles } = useLessonStepStyles();
   const intro = content?.steps?.concept?.intro;
+  const introSubtitleNl =
+    'Investeren werkt wanneer elke beslissing voortbouwt op de vorige.';
+  const isLessonSubtitle = intro === introSubtitleNl;
   const steps = copy.introConcept.steps;
   const [activeIndex, setActiveIndex] = useState(null);
   const paragraph = copy.introConcept.paragraph;
 
   return (
     <View style={styles.stepBody}>
-      {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
+      {intro ? (
+        <AppText style={[styles.stepIntro, isLessonSubtitle && styles.stepIntroSecondary]}>
+          {intro}
+        </AppText>
+      ) : null}
       <Card style={styles.conceptCard}>
         <View style={styles.introHeader}>
           <View style={styles.introAccent} />
@@ -326,8 +331,8 @@ function IntroConceptStep({ content, onNext, copy }) {
                   <View style={styles.processStationIndicator}>
                     <Ionicons
                       name={isActive ? 'chevron-down' : 'chevron-forward'}
-                      size={16}
-                      color={isActive ? colors.accent : colors.textSecondary}
+                      size={components.sizes.icon.sm}
+                      color={isActive ? colors.accent.primary : colors.text.secondary}
                     />
                   </View>
                 </Pressable>
@@ -461,9 +466,9 @@ function IntroScenarioStep({ onNext, copy }) {
           minimumValue={0}
           maximumValue={totalSteps}
           step={0.1}
-          minimumTrackTintColor={colors.accent}
-          maximumTrackTintColor={colors.surfaceActive}
-          thumbTintColor={colors.accent}
+          minimumTrackTintColor={colors.accent.primary}
+          maximumTrackTintColor={colors.background.surfaceActive}
+          thumbTintColor={colors.accent.primary}
           onValueChange={setProgress}
         />
         <AppText style={styles.scenarioSliderHelper}>
@@ -591,14 +596,14 @@ function IntroScenarioStep({ onNext, copy }) {
 }
 
 function ScenarioCurve({ variant, progress, label }) {
-  const { styles, colors } = useLessonStepStyles();
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const { styles, colors, components } = useLessonStepStyles();
+  const [size, setSize] = useState({ width: spacing.none, height: spacing.none });
   const clampedProgress = Math.max(0, Math.min(progress, 1));
   const points =
     variant === 'stable' ? STABLE_CURVE_POINTS : VOLATILE_CURVE_POINTS;
   const smoothPoints = useMemo(() => getSmoothPoints(points, 14), [points]);
   const lineColor =
-    variant === 'stable' ? colors.accent : toRgba(colors.textSecondary, 0.9);
+    variant === 'stable' ? colors.accent.primary : toRgba(colors.text.secondary, 0.9);
 
   const { segments, totalLength } = useMemo(() => {
     if (!size.width || !size.height) return { segments: [], totalLength: 0 };
@@ -633,7 +638,7 @@ function ScenarioCurve({ variant, progress, label }) {
           style={[
             styles.scenarioCurveLine,
             {
-              opacity: 0.2 + 0.8 * clampedProgress,
+              opacity: components.opacity.value20 + components.opacity.value80 * clampedProgress,
             },
           ]}
         >
@@ -1055,7 +1060,7 @@ function IntroExerciseStep({ exercise, onNext, copy }) {
 
 function ExerciseOutcomeLine({ mode }) {
   const { styles } = useLessonStepStyles();
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState({ width: spacing.none, height: spacing.none });
   const points =
     mode === 'stable'
       ? [
@@ -1262,9 +1267,9 @@ function TradeoffExercise({ exercise, onNext, onPressTerm, copy }) {
                 minimumValue={slider.min}
                 maximumValue={slider.max}
                 step={slider.step}
-                minimumTrackTintColor={colors.accent}
-                maximumTrackTintColor={colors.surfaceActive}
-                thumbTintColor={colors.accent}
+                minimumTrackTintColor={colors.accent.primary}
+                maximumTrackTintColor={colors.background.surfaceActive}
+                thumbTintColor={colors.accent.primary}
                 onValueChange={(nextValue) => handleValueChange(slider.id, nextValue)}
               />
               {slider.leftLabel || slider.rightLabel ? (
@@ -1326,7 +1331,7 @@ function TradeoffExercise({ exercise, onNext, onPressTerm, copy }) {
 }
 
 function MultiExercise({ exercise, onNext, onPressTerm, copy }) {
-  const { colors, styles } = useLessonStepStyles();
+  const { colors, components, styles } = useLessonStepStyles();
   const {
     description,
     options = [],
@@ -1398,7 +1403,11 @@ function MultiExercise({ exercise, onNext, onPressTerm, copy }) {
               if (!option) return null;
               return (
                 <View key={id} style={styles.impactRow}>
-                  <Ionicons name="checkmark-circle" size={16} color={colors.accent} />
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={components.sizes.icon.sm}
+                    color={colors.accent.primary}
+                  />
                   <GlossaryText
                     text={option.detail}
                     style={styles.impactText}
@@ -1426,7 +1435,7 @@ function MultiExercise({ exercise, onNext, onPressTerm, copy }) {
 }
 
 function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
-  const { colors, styles } = useLessonStepStyles();
+  const { colors, components, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
   const [submittedText, setSubmittedText] = useState('');
   const [response, setResponse] = useState(null);
@@ -1532,7 +1541,11 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
       <View style={styles.reflectionFooter}>
         {response ? (
           <View style={styles.reflectionSavedPill}>
-            <Ionicons name="sparkles-outline" size={14} color={colors.textSecondary} />
+            <Ionicons
+              name="sparkles-outline"
+              size={components.sizes.icon.xs}
+              color={colors.text.secondary}
+            />
             <AppText style={styles.reflectionSavedText}>
               {copy.messages.reflectionSaved}
             </AppText>
@@ -1552,7 +1565,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
               setResponse(null);
             }}
             placeholder={placeholder}
-            placeholderTextColor={toRgba(colors.textSecondary, 0.7)}
+            placeholderTextColor={toRgba(colors.text.secondary, 0.7)}
             multiline
           />
           <Pressable
@@ -1566,8 +1579,8 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
           >
             <Ionicons
               name="arrow-up"
-              size={16}
-              color={canSend ? colors.textPrimary : colors.textSecondary}
+              size={components.sizes.icon.sm}
+              color={canSend ? colors.text.primary : colors.text.secondary}
             />
           </Pressable>
         </View>
@@ -1577,7 +1590,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
 }
 
 function SummaryStep({ content, onComplete, onPressTerm, copy }) {
-  const { colors, styles } = useLessonStepStyles();
+  const { colors, components, styles } = useLessonStepStyles();
   return (
     <View style={styles.stepBody}>
       <Card style={styles.summaryCard}>
@@ -1585,7 +1598,11 @@ function SummaryStep({ content, onComplete, onPressTerm, copy }) {
         <View style={styles.takeawayList}>
           {content?.steps?.summary?.takeaways?.map((item) => (
             <View key={item} style={styles.takeawayRow}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.accent} />
+              <Ionicons
+                name="checkmark-circle"
+                size={components.sizes.icon.md}
+                color={colors.accent.primary}
+              />
               <GlossaryText
                 text={item}
                 style={styles.takeawayText}
@@ -1601,7 +1618,11 @@ function SummaryStep({ content, onComplete, onPressTerm, copy }) {
           onPress={() => Linking.openURL(content.steps.summary.video.url)}
           style={styles.videoRow}
         >
-          <Ionicons name="play-circle" size={20} color={colors.accent} />
+          <Ionicons
+            name="play-circle"
+            size={components.sizes.icon.lg}
+            color={colors.accent.primary}
+          />
           <AppText style={styles.videoText}>{content.steps.summary.video.label}</AppText>
         </Pressable>
       ) : null}
@@ -1612,7 +1633,7 @@ function SummaryStep({ content, onComplete, onPressTerm, copy }) {
 }
 
 function IntroSummaryStep({ content, onComplete, copy }) {
-  const { colors, styles } = useLessonStepStyles();
+  const { colors, components, styles } = useLessonStepStyles();
   const summarySubtext =
     'Dit is het vaste stappenplan dat elke investering structureert.';
   const summaryHelper = 'Tik op de stappen voor meer info.';
@@ -1701,8 +1722,8 @@ function IntroSummaryStep({ content, onComplete, copy }) {
                     <View style={styles.processStationIndicator}>
                       <Ionicons
                         name={isActive ? 'chevron-down' : 'chevron-forward'}
-                        size={16}
-                        color={isActive ? colors.accent : colors.textSecondary}
+                        size={components.sizes.icon.sm}
+                        color={isActive ? colors.accent.primary : colors.text.secondary}
                       />
                     </View>
                   </Pressable>
@@ -1734,7 +1755,7 @@ function IntroSummaryStep({ content, onComplete, copy }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
   stepBody: {
     gap: spacing.lg,
@@ -1748,46 +1769,38 @@ const createStyles = (colors) =>
     gap: spacing.sm,
   },
   introAccent: {
-    width: 18,
-    height: 2,
-    backgroundColor: colors.accent,
-    borderRadius: 999,
+    width: components.sizes.track.sm,
+    height: components.sizes.line.thin,
+    backgroundColor: colors.accent.primary,
+    borderRadius: components.radius.pill,
   },
   introLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    letterSpacing: 1.4,
+    ...typography.styles.small,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   introTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.h1,
+    ...typography.styles.h1,
+    color: colors.text.primary,
   },
   stepIntro: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
+  },
+  stepIntroSecondary: {
+    color: colors.text.secondary,
   },
   introText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   bodyText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   caption: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 20,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   visualHint: {
     flexDirection: 'row',
@@ -1795,30 +1808,39 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   hintBar: {
-    width: 18,
-    borderRadius: 6,
-    backgroundColor: colors.surfaceActive,
+    width: components.sizes.track.sm,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surfaceActive,
+  },
+  hintBarXs: {
+    height: components.sizes.hintBar.xs,
+  },
+  hintBarSm: {
+    height: components.sizes.hintBar.sm,
+  },
+  hintBarMd: {
+    height: components.sizes.hintBar.md,
+  },
+  hintBarLg: {
+    height: components.sizes.hintBar.lg,
   },
   visualCard: {
     gap: spacing.md,
   },
   journeyTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.h1,
+    ...typography.styles.h1,
+    color: colors.text.primary,
   },
   journeySubtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.secondary,
   },
   journeyPager: {
     flex: 1,
     marginTop: spacing.sm,
   },
   journeyPagerContent: {
-    paddingBottom: 0,
+    paddingBottom: spacing.none,
   },
   journeyBody: {
     flex: 1,
@@ -1831,11 +1853,11 @@ const createStyles = (colors) =>
     marginTop: spacing.md,
   },
   journeyPage: {
-    borderRadius: 22,
+    borderRadius: components.radius.card,
     padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
     gap: spacing.md,
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -1846,80 +1868,67 @@ const createStyles = (colors) =>
     justifyContent: 'space-between',
   },
   journeyStepChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
   },
   journeyStepText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
-    letterSpacing: 1,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   journeyAccent: {
-    width: 24,
-    height: 2,
-    borderRadius: 999,
-    backgroundColor: toRgba(colors.accent, 0.4),
+    width: components.sizes.square.xs,
+    height: components.sizes.line.thin,
+    borderRadius: components.radius.pill,
+    backgroundColor: toRgba(colors.accent.primary, 0.4),
   },
   journeyLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   journeyQuestion: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   journeyWhy: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   journeyDetail: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   journeyTapHint: {
-    fontFamily: typography.fontFamilyMedium,
-    color: toRgba(colors.textSecondary, 0.7),
-    fontSize: typography.body,
-    lineHeight: 20,
-    letterSpacing: 1.1,
+    ...typography.styles.body,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   journeyVisual: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
     padding: spacing.md,
-    height: 190,
+    height: components.sizes.chart.xl,
     overflow: 'hidden',
     justifyContent: 'center',
   },
   journeyPlaceholder: {
     flex: 1,
-    borderRadius: 14,
-    borderWidth: 1,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.textSecondary, 0.3),
+    borderColor: toRgba(colors.text.secondary, 0.3),
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
   },
   journeyPlaceholderText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   processCard: {
     gap: spacing.md,
@@ -1928,18 +1937,13 @@ const createStyles = (colors) =>
     gap: spacing.sm,
   },
   processTitle: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-    lineHeight: 20,
+    ...typography.styles.body,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    color: colors.text.secondary,
   },
   processSubline: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.secondary,
   },
   segmentRow: {
     flexDirection: 'row',
@@ -1947,33 +1951,28 @@ const createStyles = (colors) =>
     marginTop: spacing.sm,
   },
   segment: {
-    paddingVertical: 16,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
-    borderWidth: 1,
-    borderColor: colors.textPrimary,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.text.primary,
   },
   segmentLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.small,
+    ...typography.styles.small,
+    color: colors.text.primary,
   },
   sheetText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   scenarioCard: {
     gap: spacing.md,
   },
   scenarioMeaning: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   scenarioCompareGrid: {
     flexDirection: 'row',
@@ -1983,32 +1982,29 @@ const createStyles = (colors) =>
   },
   scenarioComparePanel: {
     flex: 1,
-    minWidth: 0,
+    minWidth: spacing.none,
     padding: spacing.md,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
     gap: spacing.lg,
   },
   scenarioComparePanelReactive: {
-    borderColor: toRgba(colors.textSecondary, 0.3),
-    backgroundColor: colors.surfaceActive,
+    borderColor: toRgba(colors.text.secondary, 0.3),
+    backgroundColor: colors.background.surfaceActive,
   },
   scenarioCompareHeader: {
     gap: spacing.xs,
   },
   scenarioCompareLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    letterSpacing: 0.8,
+    ...typography.styles.small,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   scenarioCompareSubline: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.h3,
+    color: colors.text.primary,
   },
   scenarioCompareSteps: {
     flexGrow: 1,
@@ -2022,91 +2018,85 @@ const createStyles = (colors) =>
   },
   scenarioCompareTrack: {
     alignItems: 'center',
-    width: 18,
+    width: components.sizes.track.sm,
   },
   scenarioCompareNode: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: toRgba(colors.textSecondary, 0.5),
-    backgroundColor: colors.surface,
+    width: components.sizes.dot.md,
+    height: components.sizes.dot.md,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: toRgba(colors.text.secondary, 0.5),
+    backgroundColor: colors.background.surface,
   },
   scenarioCompareNodeActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
+    backgroundColor: colors.accent.primary,
+    borderColor: colors.accent.primary,
   },
   scenarioCompareNodeActiveReactive: {
-    backgroundColor: colors.textPrimary,
-    borderColor: colors.textPrimary,
+    backgroundColor: colors.text.primary,
+    borderColor: colors.text.primary,
   },
   scenarioCompareNodeCurrent: {
-    backgroundColor: colors.textPrimary,
-    borderColor: colors.textPrimary,
+    backgroundColor: colors.text.primary,
+    borderColor: colors.text.primary,
   },
   scenarioCompareNodeMissing: {
     backgroundColor: 'transparent',
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.textSecondary, 0.45),
+    borderColor: toRgba(colors.text.secondary, 0.45),
   },
   scenarioCompareLine: {
-    width: 2,
-    height: 18,
-    marginTop: 4,
-    backgroundColor: toRgba(colors.textSecondary, 0.35),
+    width: components.sizes.line.thin,
+    height: components.sizes.track.sm,
+    marginTop: spacing.xs,
+    backgroundColor: toRgba(colors.text.secondary, 0.35),
   },
   scenarioCompareLineActive: {
-    backgroundColor: toRgba(colors.accent, 0.65),
+    backgroundColor: toRgba(colors.accent.primary, 0.65),
   },
   scenarioCompareLineActiveReactive: {
-    backgroundColor: toRgba(colors.textPrimary, 0.75),
+    backgroundColor: toRgba(colors.text.primary, 0.75),
   },
   scenarioCompareLineMissing: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
+    borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.textSecondary, 0.35),
+    borderColor: toRgba(colors.text.secondary, 0.35),
   },
   scenarioCompareStepLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   scenarioCompareStepLabelActive: {
-    color: colors.textPrimary,
+    color: colors.text.primary,
   },
   scenarioCompareStepLabelCurrent: {
-    color: colors.accent,
+    color: colors.text.primary,
   },
   scenarioCompareStepLabelMissing: {
-    color: toRgba(colors.textSecondary, 0.55),
+    color: colors.text.secondary,
   },
   scenarioSliderWrap: {
     marginTop: spacing.xl,
     gap: spacing.sm,
   },
   scenarioSliderLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 20,
-    letterSpacing: 0.8,
+    ...typography.styles.body,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   scenarioSliderHelper: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.secondary,
   },
   scenarioCurveWrap: {
     gap: spacing.xs,
     marginTop: spacing.sm,
   },
   scenarioCurveChart: {
-    height: 96,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
+    height: components.sizes.chart.md,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surfaceActive,
     overflow: 'hidden',
   },
   scenarioCurveLine: {
@@ -2114,15 +2104,13 @@ const createStyles = (colors) =>
   },
   scenarioCurveSegment: {
     position: 'absolute',
-    height: 2,
-    borderRadius: 999,
+    height: components.sizes.line.thin,
+    borderRadius: components.radius.pill,
   },
   scenarioCurveLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    letterSpacing: 1.2,
+    ...typography.styles.small,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   scenarioOutcomeGrid: {
     flexDirection: 'row',
@@ -2132,19 +2120,19 @@ const createStyles = (colors) =>
   outcomePressable: {
     flexBasis: '48%',
     flexGrow: 1,
-    minWidth: 0,
-    borderRadius: 16,
+    minWidth: spacing.none,
+    borderRadius: components.radius.input,
   },
   outcomePressablePressed: {
-    opacity: 0.95,
-    transform: [{ scale: 0.99 }],
+    opacity: components.opacity.value95,
+    transform: [{ scale: components.transforms.scalePressed }],
   },
   scenarioPanel: {
     padding: spacing.md,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
     gap: spacing.md,
   },
   scenarioPanelHeader: {
@@ -2153,27 +2141,24 @@ const createStyles = (colors) =>
     justifyContent: 'space-between',
   },
   scenarioPanelTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.h3,
+    color: colors.text.primary,
   },
   scenarioBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: toRgba(colors.accent, 0.6),
-    backgroundColor: toRgba(colors.accent, 0.12),
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: toRgba(colors.accent.primary, 0.6),
+    backgroundColor: toRgba(colors.accent.primary, 0.12),
   },
   scenarioBadgeMuted: {
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
   },
   scenarioBadgeText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small - 1,
-    letterSpacing: 0.6,
+    ...typography.styles.meta,
+    color: colors.text.secondary,
   },
   scenarioRail: {
     gap: spacing.sm,
@@ -2185,55 +2170,54 @@ const createStyles = (colors) =>
   },
   scenarioRailTrack: {
     alignItems: 'center',
-    width: 18,
+    width: components.sizes.track.sm,
   },
   scenarioNode: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.textSecondary,
+    width: components.sizes.dot.md,
+    height: components.sizes.dot.md,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.text.secondary,
   },
   scenarioNodeActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accent.primary,
   },
   scenarioNodeDegraded: {
-    opacity: 0.4,
+    opacity: components.opacity.value40,
   },
   scenarioNodeMissing: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
+    borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.textSecondary, 0.6),
+    borderColor: toRgba(colors.text.secondary, 0.6),
   },
   scenarioRailLine: {
-    width: 2,
-    height: 18,
-    marginTop: 4,
-    backgroundColor: toRgba(colors.textSecondary, 0.5),
+    width: components.sizes.line.thin,
+    height: components.sizes.track.sm,
+    marginTop: spacing.xs,
+    backgroundColor: toRgba(colors.text.secondary, 0.5),
   },
   scenarioRailLineBroken: {
     backgroundColor: 'transparent',
-    borderRadius: 1,
-    borderWidth: 1,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.textSecondary, 0.5),
+    borderColor: toRgba(colors.text.secondary, 0.5),
   },
   scenarioRailLineDegraded: {
-    opacity: 0.4,
+    opacity: components.opacity.value40,
   },
   scenarioRailLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   scenarioRailLabelMuted: {
-    color: colors.textSecondary,
+    color: colors.text.secondary,
   },
   scenarioRailLabelStrong: {
-    color: colors.accent,
+    color: colors.text.primary,
   },
   scenarioRailLabelDegraded: {
-    color: toRgba(colors.textSecondary, 0.6),
+    color: colors.text.secondary,
   },
   scenarioRailLabelRow: {
     flexDirection: 'row',
@@ -2245,35 +2229,31 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   scenarioConsequence: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 20,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   scenarioPrematureBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: toRgba(colors.accent, 0.6),
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: toRgba(colors.accent.primary, 0.6),
   },
   scenarioPrematureText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.accent,
-    fontSize: typography.small - 1,
-    letterSpacing: 0.4,
+    ...typography.styles.meta,
+    color: colors.text.secondary,
   },
   outcomePanel: {
     gap: spacing.sm,
     padding: spacing.md,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
   },
   outcomePanelActive: {
-    borderColor: toRgba(colors.accent, 0.7),
-    backgroundColor: toRgba(colors.accent, 0.08),
+    borderColor: toRgba(colors.accent.primary, 0.7),
+    backgroundColor: toRgba(colors.accent.primary, 0.08),
   },
   outcomeHeader: {
     flexDirection: 'row',
@@ -2283,48 +2263,43 @@ const createStyles = (colors) =>
   },
   outcomeTitleStack: {
     flex: 1,
-    gap: 4,
+    gap: spacing.xs,
   },
   outcomeScenarioLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    letterSpacing: 0.8,
+    ...typography.styles.small,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   outcomeLabel: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.h3,
+    color: colors.text.primary,
   },
   outcomeFocusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: toRgba(colors.textSecondary, 0.4),
-    backgroundColor: toRgba(colors.textSecondary, 0.12),
+    paddingVertical: spacing.xs,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: toRgba(colors.text.secondary, 0.4),
+    backgroundColor: toRgba(colors.text.secondary, 0.12),
   },
   outcomeFocusPillActive: {
-    borderColor: toRgba(colors.accent, 0.8),
-    backgroundColor: toRgba(colors.accent, 0.18),
+    borderColor: toRgba(colors.accent.primary, 0.8),
+    backgroundColor: toRgba(colors.accent.primary, 0.18),
   },
   outcomeFocusText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small - 1,
-    letterSpacing: 0.4,
+    ...typography.styles.meta,
+    color: colors.text.secondary,
   },
   outcomeFocusTextActive: {
-    color: colors.textPrimary,
+    color: colors.text.primary,
   },
   outcomeChart: {
-    height: 120,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
+    height: components.sizes.chart.lg,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surfaceActive,
     overflow: 'hidden',
   },
   outcomeLine: {
@@ -2332,58 +2307,50 @@ const createStyles = (colors) =>
   },
   outcomeLineSegment: {
     position: 'absolute',
-    height: 2,
-    borderRadius: 999,
-    backgroundColor: colors.textSecondary,
+    height: components.sizes.line.thin,
+    borderRadius: components.radius.pill,
+    backgroundColor: colors.text.secondary,
   },
   outcomeCaption: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 20,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   scenarioFocusLine: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   scenarioInsightLine: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   optionList: {
     gap: spacing.sm,
   },
   option: {
     padding: spacing.sm,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
-    borderWidth: 1,
-    borderColor: colors.textPrimary,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.text.primary,
   },
   optionActive: {
-    backgroundColor: colors.surfaceActive,
-    borderWidth: 1,
-    borderColor: colors.textPrimary,
+    backgroundColor: colors.background.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.text.primary,
   },
   optionText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.small,
+    ...typography.styles.small,
+    color: colors.text.primary,
   },
   optionTextActive: {
-    color: colors.accent,
+    color: colors.text.primary,
   },
   insightCard: {
     gap: spacing.xs,
   },
   insightTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.h2,
+    ...typography.styles.h2,
+    color: colors.text.primary,
   },
   exerciseCard: {
     gap: spacing.md,
@@ -2398,28 +2365,23 @@ const createStyles = (colors) =>
     gap: spacing.md,
   },
   exerciseInstruction: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   exerciseStatusText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    lineHeight: 20,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   exerciseStatusCorrect: {
-    color: colors.textPrimary,
+    color: colors.text.primary,
   },
   exerciseStatusWrong: {
-    color: colors.textSecondary,
+    color: colors.text.secondary,
   },
   exerciseSectionLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    letterSpacing: 1.2,
+    ...typography.styles.small,
     textTransform: 'uppercase',
+    color: colors.text.secondary,
   },
   exerciseSlots: {
     gap: spacing.sm,
@@ -2429,48 +2391,45 @@ const createStyles = (colors) =>
     alignItems: 'center',
     gap: spacing.sm,
     padding: spacing.sm,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
-    minHeight: 56,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
+    minHeight: components.sizes.list.minItemHeight,
   },
   exerciseSlotExecution: {
-    borderColor: toRgba(colors.accent, 0.6),
+    borderColor: toRgba(colors.accent.primary, 0.6),
   },
   exerciseSlotWrong: {
-    borderColor: toRgba(colors.accent, 0.8),
-    backgroundColor: toRgba(colors.accent, 0.08),
+    borderColor: toRgba(colors.accent.primary, 0.8),
+    backgroundColor: toRgba(colors.accent.primary, 0.08),
   },
   exerciseSlotHint: {
-    borderColor: toRgba(colors.accent, 0.6),
+    borderColor: toRgba(colors.accent.primary, 0.6),
   },
   exerciseSlotIndex: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: components.sizes.square.sm,
+    height: components.sizes.square.sm,
+    borderRadius: components.radius.input,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background.surface,
   },
   exerciseSlotIndexText: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.small,
-    color: colors.textPrimary,
+    ...typography.styles.stepLabel,
+    color: colors.text.primary,
   },
   exerciseSlotText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textPrimary,
+    ...typography.styles.body,
+    color: colors.text.primary,
     flex: 1,
   },
   exerciseSlotEmptyText: {
-    color: colors.textSecondary,
+    color: colors.text.secondary,
   },
   exerciseSlotTextMuted: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
-    color: colors.textSecondary,
+    ...typography.styles.body,
+    color: colors.text.secondary,
     flex: 1,
   },
   exerciseChipList: {
@@ -2479,17 +2438,16 @@ const createStyles = (colors) =>
     gap: spacing.sm,
   },
   exerciseChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
   },
   exerciseChipText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textPrimary,
+    ...typography.styles.small,
+    color: colors.text.primary,
   },
   exerciseActionRow: {
     flexDirection: 'column',
@@ -2507,18 +2465,16 @@ const createStyles = (colors) =>
     gap: spacing.sm,
   },
   exerciseHintBody: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   exerciseOutcome: {
     gap: spacing.sm,
     padding: spacing.md,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
   },
   exerciseOutcomeHeader: {
     flexDirection: 'row',
@@ -2526,14 +2482,13 @@ const createStyles = (colors) =>
     justifyContent: 'space-between',
   },
   exerciseOutcomeLabel: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.body,
-    color: colors.textPrimary,
+    ...typography.styles.h3,
+    color: colors.text.primary,
   },
   exerciseOutcomeChart: {
-    height: 90,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
+    height: components.sizes.chart.sm,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surface,
     overflow: 'hidden',
   },
   exerciseOutcomeLineWrap: {
@@ -2544,26 +2499,23 @@ const createStyles = (colors) =>
   },
   exerciseOutcomeLineSegment: {
     position: 'absolute',
-    height: 2,
-    borderRadius: 999,
-    backgroundColor: colors.textSecondary,
+    height: components.sizes.line.thin,
+    borderRadius: components.radius.pill,
+    backgroundColor: colors.text.secondary,
   },
   exerciseLineStable: {
-    backgroundColor: colors.textSecondary,
+    backgroundColor: colors.text.secondary,
   },
   exerciseLineReactive: {
-    backgroundColor: toRgba(colors.textSecondary, 0.7),
+    backgroundColor: toRgba(colors.text.secondary, 0.7),
   },
   exerciseOutcomeText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
-    lineHeight: 20,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   exerciseLabel: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.small,
+    ...typography.styles.stepLabel,
+    color: colors.text.primary,
   },
   sequenceList: {
     gap: spacing.sm,
@@ -2574,54 +2526,49 @@ const createStyles = (colors) =>
     alignItems: 'center',
     gap: spacing.sm,
     padding: spacing.sm,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceActive,
-    borderWidth: 1,
-    borderColor: colors.textPrimary,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.text.primary,
   },
   sequenceIndex: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
+    width: components.sizes.square.xs,
+    height: components.sizes.square.xs,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   sequenceIndexText: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.small,
-    color: colors.textPrimary,
+    ...typography.styles.stepLabel,
+    color: colors.text.primary,
   },
   sequenceText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textPrimary,
+    ...typography.styles.small,
+    color: colors.text.primary,
     flex: 1,
   },
   sliderRow: {
     gap: spacing.xs,
   },
   sliderTitle: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   sliderValue: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.h3,
+    color: colors.text.primary,
   },
   sliderHintRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   sliderHintText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   optionDisabled: {
-    opacity: 0.45,
+    opacity: components.opacity.value45,
   },
   resultsBlock: {
     gap: spacing.sm,
@@ -2633,24 +2580,22 @@ const createStyles = (colors) =>
     alignItems: 'center',
   },
   resultLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   resultValue: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.h3,
+    color: colors.text.primary,
   },
   scoreTrack: {
-    height: 8,
-    borderRadius: 6,
+    height: components.sizes.hintBar.xs,
+    borderRadius: components.radius.input,
     overflow: 'hidden',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background.surface,
   },
   scoreFill: {
-    height: 8,
-    backgroundColor: colors.accent,
+    height: components.sizes.hintBar.xs,
+    backgroundColor: colors.accent.primary,
   },
   impactList: {
     gap: spacing.xs,
@@ -2662,10 +2607,9 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   impactText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.small,
+    ...typography.styles.small,
     flex: 1,
+    color: colors.text.primary,
   },
   exerciseActions: {
     gap: spacing.md,
@@ -2675,7 +2619,7 @@ const createStyles = (colors) =>
   },
   reflectionBody: {
     flex: 1,
-    gap: 0,
+    gap: spacing.none,
   },
   reflectionScroll: {
     flex: 1,
@@ -2689,87 +2633,75 @@ const createStyles = (colors) =>
   },
   chatBubble: {
     maxWidth: '92%',
-    borderRadius: 18,
+    borderRadius: components.radius.input,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
   },
   chatBubbleSystem: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background.surface,
   },
   chatBubbleUser: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.surfaceActive,
+    backgroundColor: colors.background.surfaceActive,
   },
   chatLabel: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.tiny,
-    color: colors.textSecondary,
-    letterSpacing: 1.1,
+    ...typography.styles.meta,
+    color: colors.text.secondary,
     textTransform: 'uppercase',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   chatText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   reflectionComposer: {
+    ...components.input.container,
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
   },
   reflectionInput: {
     flex: 1,
-    minHeight: 44,
-    maxHeight: 120,
-    color: colors.textPrimary,
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.body,
+    ...components.input.multiline,
+    ...components.input.text,
+    maxHeight: components.sizes.input.composerMaxHeight,
     textAlignVertical: 'top',
   },
   reflectionSendButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: components.sizes.square.lg,
+    height: components.sizes.square.lg,
+    borderRadius: components.radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: toRgba(colors.textSecondary, 0.5),
-    backgroundColor: colors.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: toRgba(colors.text.secondary, 0.5),
+    backgroundColor: colors.background.surfaceActive,
   },
   reflectionSendButtonPressed: {
-    transform: [{ scale: 0.96 }],
+    transform: [{ scale: components.transforms.scalePressedStrong }],
   },
   reflectionSendButtonDisabled: {
-    opacity: 0.5,
+    opacity: components.opacity.value50,
   },
   reflectionSavedPill: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
   },
   reflectionSavedText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textSecondary,
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   summaryCard: {
     gap: spacing.md,
@@ -2778,21 +2710,16 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   summaryTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    color: colors.textPrimary,
-    fontSize: typography.h1,
+    ...typography.styles.h1,
+    color: colors.text.primary,
   },
   summarySubtitle: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.secondary,
   },
   summaryHelper: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.secondary,
   },
   summaryBody: {
     flex: 1,
@@ -2808,10 +2735,9 @@ const createStyles = (colors) =>
     paddingBottom: spacing.md,
   },
   systemInsight: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
+    ...typography.styles.body,
     textAlign: 'center',
+    color: colors.text.primary,
   },
   summaryFooter: {
     marginTop: 'auto',
@@ -2823,12 +2749,12 @@ const createStyles = (colors) =>
   },
   processLine: {
     position: 'absolute',
-    left: spacing.sm + 1,
-    top: 4,
-    bottom: 4,
-    width: 2,
-    borderRadius: 999,
-    backgroundColor: toRgba(colors.textSecondary, 0.25),
+    left: components.offsets.lesson.processLineLeft,
+    top: spacing.xs,
+    bottom: spacing.xs,
+    width: components.sizes.line.thin,
+    borderRadius: components.radius.pill,
+    backgroundColor: toRgba(colors.text.secondary, 0.25),
   },
   processStationBlock: {
     gap: spacing.xs,
@@ -2839,22 +2765,22 @@ const createStyles = (colors) =>
     gap: spacing.sm,
   },
   processStationRowActive: {
-    backgroundColor: toRgba(colors.surfaceActive, 0.6),
-    borderRadius: 14,
-    paddingVertical: 8,
-    paddingHorizontal: 8,
+    backgroundColor: toRgba(colors.background.surfaceActive, 0.6),
+    borderRadius: components.radius.input,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
   processNode: {
-    width: 14,
-    height: 14,
-    borderRadius: 999,
-    borderWidth: 2,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    width: components.sizes.dot.lg,
+    height: components.sizes.dot.lg,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
   },
   processNodeActive: {
-    borderColor: colors.accent,
-    backgroundColor: colors.accent,
+    borderColor: colors.accent.primary,
+    backgroundColor: colors.accent.primary,
   },
   processStationText: {
     flex: 1,
@@ -2863,41 +2789,37 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   processStationIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: components.sizes.square.xs,
+    height: components.sizes.square.xs,
+    borderRadius: components.radius.input,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
   },
   processStationIndex: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.small,
-    color: colors.textSecondary,
+    ...typography.styles.stepLabel,
+    color: colors.text.secondary,
   },
   processStationTitle: {
-    fontFamily: typography.fontFamilyDemi,
-    fontSize: typography.body,
-    color: colors.textPrimary,
+    ...typography.styles.h3,
+    color: colors.text.primary,
     flexShrink: 1,
   },
   processPanel: {
     marginLeft: spacing.lg,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surface,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
     gap: spacing.sm,
   },
   processDescription: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textSecondary,
-    fontSize: typography.body,
-    lineHeight: 24,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   processSubsteps: {
     flexDirection: 'row',
@@ -2905,17 +2827,16 @@ const createStyles = (colors) =>
     gap: spacing.xs,
   },
   processChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.divider,
-    backgroundColor: colors.surfaceActive,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: components.radius.pill,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
   },
   processChipText: {
-    fontFamily: typography.fontFamilyMedium,
-    fontSize: typography.small,
-    color: colors.textPrimary,
+    ...typography.styles.small,
+    color: colors.text.primary,
   },
   takeawayList: {
     gap: spacing.sm,
@@ -2926,22 +2847,20 @@ const createStyles = (colors) =>
     gap: spacing.sm,
   },
   takeawayText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   videoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
     padding: spacing.sm,
-    borderRadius: 14,
-    backgroundColor: colors.surface,
+    borderRadius: components.radius.input,
+    backgroundColor: colors.background.surface,
   },
   videoText: {
-    fontFamily: typography.fontFamilyMedium,
-    color: colors.textPrimary,
-    fontSize: typography.body,
+    ...typography.styles.body,
+    color: colors.text.primary,
   },
   });
 

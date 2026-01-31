@@ -6,16 +6,14 @@ import OnboardingAuthButton from '../../components/OnboardingAuthButton';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import useThemeColors from '../../theme/useTheme';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { spacing, typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingEntryScreen({ navigation }) {
   const { preferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [sheetVisible, setSheetVisible] = useState(false);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
@@ -87,7 +85,7 @@ export default function OnboardingEntryScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -96,16 +94,11 @@ const createStyles = (colors) =>
     },
     header: {
       gap: spacing.sm,
-      maxWidth: 320,
+      maxWidth: components.sizes.screen.maxContentWidth,
     },
     logo: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 34,
-      color: colors.textPrimary,
-      letterSpacing: 6,
-      textShadowColor: 'rgba(255, 213, 0, 0.2)',
-      textShadowOffset: { width: 0, height: 6 },
-      textShadowRadius: 14,
+      ...typography.styles.display,
+      color: colors.text.primary,
     },
     kickerRow: {
       flexDirection: 'row',
@@ -113,50 +106,40 @@ const createStyles = (colors) =>
       gap: spacing.xs,
     },
     kickerDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.xs,
+      height: components.sizes.dot.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
     kicker: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 28,
-      color: colors.textPrimary,
-      lineHeight: 36,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     cardHeader: {
-      gap: 4,
+      gap: spacing.xs,
     },
     cardTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     cardSubtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     actions: {
       gap: spacing.md,
     },
     link: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
       textAlign: 'center',
     },
   });

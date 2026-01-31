@@ -5,21 +5,19 @@ import OnboardingGesture from '../../components/OnboardingGesture';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
-import useThemeColors from '../../theme/useTheme';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { spacing, typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingAIDisclaimerScreen({ navigation }) {
   const { preferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   return (
     <OnboardingScreen
-      gradientColors={[colors.background, colors.surfaceActive]}
+      gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
     >
       <OnboardingGesture onContinue={() => navigation.navigate('OnboardingEntry')}>
@@ -48,7 +46,16 @@ export default function OnboardingAIDisclaimerScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -61,7 +68,7 @@ const createStyles = (colors) =>
     content: {
       flex: 1,
       justifyContent: 'center',
-      transform: [{ translateY: -10 }],
+      transform: [{ translateY: components.offsets.translate.sm }],
     },
     cardHeader: {
       gap: spacing.sm,
@@ -71,61 +78,52 @@ const createStyles = (colors) =>
       alignItems: 'center',
       gap: spacing.xs,
       alignSelf: 'flex-start',
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 999,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.pill,
       paddingHorizontal: spacing.sm,
-      paddingVertical: 4,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
+      paddingVertical: spacing.xs,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
     },
     badgeDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.xs,
+      height: components.sizes.dot.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
     badgeText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: 11,
-      color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1.2,
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 28,
-      color: colors.textPrimary,
-      lineHeight: 36,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     tapHint: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      letterSpacing: 0.4,
+      ...typography.styles.small,
+      color: colors.text.secondary,
       textAlign: 'right',
     },
     accentOrbTop: {
       position: 'absolute',
-      top: 60,
-      right: -70,
-      width: 190,
-      height: 190,
-      borderRadius: 95,
-      backgroundColor: 'rgba(31, 39, 56, 0.65)',
+      top: components.offsets.onboarding.orbTopMd,
+      right: components.offsets.onboarding.orbRightMd,
+      width: components.sizes.illustration.smAlt,
+      height: components.sizes.illustration.smAlt,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.background.surface, 0.65),
     },
     accentOrbBottom: {
       position: 'absolute',
-      bottom: 90,
-      left: -80,
-      width: 230,
-      height: 230,
-      borderRadius: 115,
-      backgroundColor: 'rgba(255, 213, 0, 0.08)',
+      bottom: components.offsets.onboarding.orbBottomMd,
+      left: components.offsets.onboarding.orbLeftLg,
+      width: components.sizes.illustration.xl,
+      height: components.sizes.illustration.xl,
+      borderRadius: components.radius.pill,
+      backgroundColor: toRgba(colors.accent.primary, 0.08),
     },
   });

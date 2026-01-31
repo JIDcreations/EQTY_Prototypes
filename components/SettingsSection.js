@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SettingsSection({ title, helper, children }) {
-  const colors = useThemeColors();
+  const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
@@ -24,15 +22,11 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textSecondary,
-      fontSize: typography.small,
-      letterSpacing: 0.6,
-      textTransform: 'uppercase',
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     helper: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

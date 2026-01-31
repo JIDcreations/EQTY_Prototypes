@@ -5,18 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import Toast from '../components/Toast';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import useToast from '../utils/useToast';
 
 export default function EditPersonalContextScreen({ navigation }) {
   const { onboardingContext, updateOnboardingContext } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [experienceAnswer, setExperienceAnswer] = useState(
     onboardingContext?.experienceAnswer || ''
   );
@@ -48,7 +45,11 @@ export default function EditPersonalContextScreen({ navigation }) {
         <View style={styles.headerRow}>
           <AppText style={styles.title}>Personal context</AppText>
           <Pressable onPress={() => navigation.goBack()} style={styles.closeButton}>
-            <Ionicons name="close" size={20} color={colors.textSecondary} />
+            <Ionicons
+              name="close"
+              size={components.sizes.icon.lg}
+              color={colors.text.secondary}
+            />
           </Pressable>
         </View>
         <AppText style={styles.subtitle}>
@@ -63,7 +64,7 @@ export default function EditPersonalContextScreen({ navigation }) {
             value={experienceAnswer}
             onChangeText={setExperienceAnswer}
             placeholder="e.g. nothing yet, crypto, ETFs, savings..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
             multiline
             style={styles.input}
           />
@@ -77,7 +78,7 @@ export default function EditPersonalContextScreen({ navigation }) {
             value={knowledgeAnswer}
             onChangeText={setKnowledgeAnswer}
             placeholder="e.g. basic terms, risks, returns..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
             multiline
             style={styles.input}
           />
@@ -89,7 +90,7 @@ export default function EditPersonalContextScreen({ navigation }) {
             value={motivationAnswer}
             onChangeText={setMotivationAnswer}
             placeholder="e.g. long-term growth, curiosity, financial independence..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
             multiline
             style={styles.input}
           />
@@ -111,21 +112,21 @@ export default function EditPersonalContextScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     headerRow: {
       flexDirection: 'row',
@@ -133,51 +134,42 @@ const createStyles = (colors) =>
       justifyContent: 'space-between',
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h1,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     closeButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surface,
       alignItems: 'center',
       justifyContent: 'center',
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      lineHeight: 20,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     field: {
       gap: spacing.xs,
     },
     label: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     input: {
-      minHeight: 96,
-      borderRadius: 16,
-      padding: spacing.md,
-      backgroundColor: colors.surfaceActive,
-      color: colors.textPrimary,
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
+      ...components.input.container,
+      ...components.input.multiline,
+      ...components.input.text,
       textAlignVertical: 'top',
     },
     noteCard: {
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 14,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.card,
       padding: spacing.md,
     },
     noteText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     actions: {
       flexDirection: 'row',

@@ -2,66 +2,47 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from './AppText';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, useTheme } from '../theme';
 
-export default function OnboardingAuthButton({ label, iconName, onPress, variant = 'dark' }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
-  const isLight = variant === 'light';
+export default function OnboardingAuthButton({ label, iconName, onPress }) {
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <Pressable
-      style={[styles.button, isLight && styles.buttonLight]}
+      style={styles.button}
       onPress={onPress}
     >
-      <View style={[styles.iconWrap, isLight && styles.iconWrapLight]}>
+      <View style={styles.iconWrap}>
         <Ionicons
           name={iconName}
-          size={18}
-          color={isLight ? colors.background : colors.textPrimary}
+          size={components.sizes.icon.md}
+          color={colors.text.primary}
         />
       </View>
-      <AppText style={[styles.label, isLight && styles.labelLight]}>{label}</AppText>
+      <AppText style={styles.label}>{label}</AppText>
     </Pressable>
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     button: {
-      backgroundColor: colors.surface,
-      borderRadius: 18,
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
+      ...components.button.base,
+      ...components.button.secondary,
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.md,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
-    },
-    buttonLight: {
-      backgroundColor: colors.textPrimary,
-      borderColor: 'transparent',
     },
     iconWrap: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: colors.surfaceActive,
+      width: components.sizes.square.md,
+      height: components.sizes.square.md,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surfaceActive,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    iconWrapLight: {
-      backgroundColor: 'rgba(0, 0, 0, 0.08)',
-    },
     label: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
-      color: colors.textPrimary,
-    },
-    labelLight: {
-      color: colors.background,
+      ...components.button.label,
     },
   });

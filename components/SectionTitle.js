@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import GlossaryText from './GlossaryText';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
-import useThemeColors from '../theme/useTheme';
+import { spacing, typography, useTheme } from '../theme';
 
 export default function SectionTitle({ title, subtitle }) {
-  const colors = useThemeColors();
+  const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <View style={styles.container}>
@@ -22,13 +20,11 @@ const createStyles = (colors) =>
       gap: spacing.xs,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      color: colors.textPrimary,
-      fontSize: typography.h2,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

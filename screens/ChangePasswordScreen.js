@@ -6,16 +6,13 @@ import { PrimaryButton, SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import useToast from '../utils/useToast';
 
 export default function ChangePasswordScreen({ navigation }) {
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [currentPassword, setCurrentPassword] = useState('');
   const [nextPassword, setNextPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,7 +40,7 @@ export default function ChangePasswordScreen({ navigation }) {
               value={currentPassword}
               onChangeText={setCurrentPassword}
               placeholder="Enter current password"
-              placeholderTextColor={colors.textSecondary}
+              placeholderTextColor={colors.text.secondary}
               secureTextEntry
               style={styles.input}
             />
@@ -54,7 +51,7 @@ export default function ChangePasswordScreen({ navigation }) {
               value={nextPassword}
               onChangeText={setNextPassword}
               placeholder="Create a new password"
-              placeholderTextColor={colors.textSecondary}
+              placeholderTextColor={colors.text.secondary}
               secureTextEntry
               style={styles.input}
             />
@@ -65,7 +62,7 @@ export default function ChangePasswordScreen({ navigation }) {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               placeholder="Confirm new password"
-              placeholderTextColor={colors.textSecondary}
+              placeholderTextColor={colors.text.secondary}
               secureTextEntry
               style={styles.input}
             />
@@ -87,49 +84,43 @@ export default function ChangePasswordScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     card: {
-      gap: spacing.md,
+      gap: components.layout.cardGap,
     },
     field: {
       gap: spacing.xs,
     },
     label: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     input: {
-      borderRadius: 14,
-      padding: spacing.sm,
-      backgroundColor: colors.surfaceActive,
-      color: colors.textPrimary,
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
+      ...components.input.container,
+      ...components.input.text,
     },
     forgotRow: {
       alignSelf: 'flex-start',
       marginTop: spacing.xs,
     },
     forgotText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.accent,
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
     actions: {
       gap: spacing.md,

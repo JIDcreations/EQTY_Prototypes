@@ -8,19 +8,16 @@ import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { getLessonOverviewCopy, getLocalizedLessons, getLocalizedModules } from '../utils/localization';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getLessonStatus } from '../utils/helpers';
 
 export default function LessonsScreen() {
   const navigation = useNavigation();
   const { progress, preferences } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const overviewCopy = useMemo(
     () => getLessonOverviewCopy(preferences?.language),
     [preferences?.language]
@@ -88,7 +85,11 @@ export default function LessonsScreen() {
                       />
                       {status === 'completed' ? (
                         <View style={styles.completedRow}>
-                          <Ionicons name="checkmark-circle" size={16} color={colors.accent} />
+                          <Ionicons
+                            name="checkmark-circle"
+                            size={components.sizes.icon.sm}
+                            color={colors.accent.primary}
+                          />
                           <GlossaryText text={overviewCopy.lessonFinished} style={styles.completedText} />
                         </View>
                       ) : null}
@@ -104,21 +105,21 @@ export default function LessonsScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.xl,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     module: {
       gap: spacing.md,
@@ -127,20 +128,18 @@ const createStyles = (colors) =>
       gap: spacing.xs,
     },
     moduleTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h1,
-      color: colors.textPrimary,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     moduleSubtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     moduleLessons: {
       gap: spacing.md,
     },
     lessonCard: {
-      gap: spacing.sm,
+      gap: components.layout.cardGap,
     },
     lessonRow: {
       flexDirection: 'row',
@@ -149,15 +148,13 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     lessonTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      ...typography.styles.h3,
+      color: colors.text.primary,
       flex: 1,
     },
     lessonDescription: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     completedRow: {
       flexDirection: 'row',
@@ -165,8 +162,7 @@ const createStyles = (colors) =>
       gap: spacing.xs,
     },
     completedText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

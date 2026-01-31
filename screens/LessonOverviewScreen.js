@@ -10,19 +10,16 @@ import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import { useApp } from '../utils/AppContext';
 import { getLessonContent, getLessonOverviewCopy, getLocalizedLessons, formatLessonModuleLabel } from '../utils/localization';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 
 export default function LessonOverviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { lessonId, entrySource } = route.params || {};
   const { preferences } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [isStructureOpen, setIsStructureOpen] = useState(false);
   const overviewCopy = useMemo(
     () => getLessonOverviewCopy(preferences?.language),
@@ -79,8 +76,8 @@ export default function LessonOverviewScreen() {
                 <View style={styles.structureToggle}>
                   <Ionicons
                     name={isStructureOpen ? 'chevron-up' : 'chevron-down'}
-                    size={18}
-                    color={colors.textSecondary}
+                    size={components.sizes.icon.md}
+                    color={colors.text.secondary}
                   />
                 </View>
               </Pressable>
@@ -101,7 +98,7 @@ export default function LessonOverviewScreen() {
           </View>
         </ScrollView>
 
-        <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
+        <View style={styles.footer}>
           <PrimaryButton
             label={overviewCopy.startLesson}
             onPress={() =>
@@ -113,27 +110,28 @@ export default function LessonOverviewScreen() {
             }
           />
           <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
+          <View style={{ height: insets.bottom }} />
         </View>
       </View>
     </SafeAreaView>
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.xl,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     layout: {
       flex: 1,
@@ -142,26 +140,22 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.title,
-      color: colors.textPrimary,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     subtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     moduleLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.accent,
-      letterSpacing: 0.4,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     learnCard: {
-      gap: spacing.md,
-      borderWidth: 1,
-      borderColor: toRgba(colors.accent, 0.18),
-      backgroundColor: colors.surfaceActive,
+      ...components.card.base,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
+      backgroundColor: colors.background.surfaceActive,
     },
     bulletList: {
       gap: spacing.sm,
@@ -172,53 +166,47 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     bulletIndex: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
+      width: components.sizes.square.xs,
+      height: components.sizes.square.xs,
+      borderRadius: components.radius.pill,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: toRgba(colors.accent, 0.18),
-      marginTop: 0,
+      backgroundColor: toRgba(colors.accent.primary, 0.18),
+      marginTop: spacing.none,
     },
     bulletIndexText: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.small,
-      color: colors.accent,
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
     bulletText: {
       flex: 1,
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textPrimary,
-      fontSize: typography.body,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     structureContainer: {
       gap: spacing.sm,
     },
     structureCard: {
-      borderWidth: 1,
-      borderColor: colors.divider,
-      backgroundColor: colors.surface,
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.md,
+      ...components.card.base,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
     },
     structureTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.h3,
+      color: colors.text.primary,
     },
     structureToggle: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
+      width: components.sizes.square.xs,
+      height: components.sizes.square.xs,
+      borderRadius: components.radius.pill,
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: colors.divider,
-      backgroundColor: colors.surfaceActive,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
+      backgroundColor: colors.background.surfaceActive,
     },
     structurePressed: {
-      opacity: 0.9,
+      opacity: components.opacity.value90,
     },
     structureRow: {
       flexDirection: 'row',
@@ -231,9 +219,8 @@ const createStyles = (colors) =>
       paddingTop: spacing.sm,
     },
     flowHeader: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     stepRow: {
       flexDirection: 'row',
@@ -241,31 +228,29 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     stepIndex: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      backgroundColor: colors.surfaceActive,
+      width: components.sizes.square.xs,
+      height: components.sizes.square.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surfaceActive,
       alignItems: 'center',
       justifyContent: 'center',
     },
     stepNumber: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.body,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     stepLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textSecondary,
-      fontSize: typography.body,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     footer: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.md,
       paddingBottom: spacing.lg,
       gap: spacing.md,
-      borderTopWidth: 1,
-      borderColor: colors.divider,
-      backgroundColor: colors.background,
+      borderTopWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
+      backgroundColor: colors.background.app,
     },
   });
 

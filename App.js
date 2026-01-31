@@ -9,11 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { spacing } from './theme/spacing';
-import { typography } from './theme/typography';
+import { colors, spacing, typography, useTheme } from './theme';
 import { AppProvider, useApp } from './utils/AppContext';
 import { GlossaryProvider } from './components/GlossaryProvider';
-import useThemeColors from './theme/useTheme';
 import HomeScreen from './screens/HomeScreen';
 import LessonsScreen from './screens/LessonsScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
@@ -29,7 +27,7 @@ const Stack = createStackNavigator();
 
 function Tabs() {
   const insets = useSafeAreaInsets();
-  const colors = useThemeColors();
+  const { colors, typography } = useTheme();
   const tabBarHeight = 64 + insets.bottom;
   const tabBarPaddingBottom = Math.max(insets.bottom, spacing.xs);
 
@@ -38,17 +36,16 @@ function Tabs() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.divider,
+          backgroundColor: colors.background.surface,
+          borderTopColor: colors.ui.divider,
           height: tabBarHeight,
           paddingTop: spacing.xs,
           paddingBottom: tabBarPaddingBottom,
         },
-        tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarActiveTintColor: colors.accent.primary,
+        tabBarInactiveTintColor: colors.text.secondary,
         tabBarLabelStyle: {
-          fontFamily: typography.fontFamilyMedium,
-          fontSize: 11,
+          ...typography.styles.small,
         },
         tabBarIcon: ({ color, size }) => {
           let iconName = 'home-outline';
@@ -70,10 +67,10 @@ function Tabs() {
 
 function RootStack() {
   const { isReady, authUser, preferences } = useApp();
-  const colors = useThemeColors();
+  const { colors } = useTheme();
 
   if (!isReady) {
-    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.background.app }} />;
   }
 
   const showOnboarding = !preferences?.hasOnboarded || !authUser;
@@ -97,7 +94,7 @@ function RootStack() {
 
 function AppShell() {
   const { preferences } = useApp();
-  const colors = useThemeColors();
+  const { colors } = useTheme();
   const isLight = preferences?.appearance === 'Light';
   const navTheme = useMemo(
     () => ({
@@ -105,18 +102,18 @@ function AppShell() {
       dark: !isLight,
       colors: {
         ...DefaultTheme.colors,
-        background: colors.background,
-        card: colors.surface,
-        text: colors.textPrimary,
-        border: colors.divider,
-        primary: colors.accent,
+        background: colors.background.app,
+        card: colors.background.surface,
+        text: colors.text.primary,
+        border: colors.ui.divider,
+        primary: colors.accent.primary,
       },
     }),
     [colors, isLight]
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background.app }}>
       <SafeAreaProvider>
         <GlossaryProvider>
           <NavigationContainer theme={navTheme}>
@@ -138,7 +135,7 @@ export default function App() {
   });
 
   if (!fontsLoaded) {
-    return <View style={{ flex: 1, backgroundColor: '#12161C' }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.dark.background.app }} />;
   }
 
   return (

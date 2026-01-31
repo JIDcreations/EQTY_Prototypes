@@ -16,18 +16,15 @@ import {
   getLocalizedLessons,
   getLocalizedModules,
 } from '../utils/localization';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const { progress, authUser, userContext, preferences } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [expandedFocus, setExpandedFocus] = useState(null);
   const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
 
@@ -155,8 +152,8 @@ export default function HomeScreen() {
                       />
                       <Ionicons
                         name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                        size={14}
-                        color={colors.textSecondary}
+                        size={components.sizes.icon.xs}
+                        color={colors.text.secondary}
                         style={styles.focusActionIcon}
                       />
                     </View>
@@ -176,21 +173,21 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: '#12161C',
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: '#12161C',
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.xl,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     header: {
       gap: spacing.sm,
@@ -204,35 +201,22 @@ const createStyles = (colors) =>
       gap: spacing.xs,
     },
     greeting: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.title - 2,
-      color: colors.textSecondary,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     name: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.title + 12,
-      color: colors.textPrimary,
-      lineHeight: 40,
+      ...typography.styles.display,
+      color: colors.text.primary,
     },
     moduleLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
       textAlign: 'left',
-      letterSpacing: 0.4,
     },
     heroCard: {
-      borderRadius: 28,
-      paddingVertical: spacing.xl,
-      gap: spacing.lg,
-      borderWidth: 1,
-      borderColor: colors.divider,
-      backgroundColor: colors.surface,
-      shadowColor: '#000',
-      shadowOpacity: 0.3,
-      shadowRadius: 24,
-      shadowOffset: { width: 0, height: 16 },
-      elevation: 10,
+      ...components.card.base,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
     },
     heroMetaRow: {
       flexDirection: 'row',
@@ -241,27 +225,22 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     heroTag: {
-      backgroundColor: toRgba(colors.textPrimary, 0.06),
-      borderWidth: 1,
-      borderColor: colors.divider,
+      backgroundColor: toRgba(colors.text.primary, 0.06),
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
     },
     heroMetaText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
       textTransform: 'uppercase',
-      letterSpacing: 1,
     },
     heroTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 30,
-      color: colors.textPrimary,
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     heroSubtitle: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textSecondary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     heroButton: {
       alignSelf: 'stretch',
@@ -270,31 +249,20 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     focusPressable: {
-      borderRadius: 22,
+      borderRadius: components.radius.card,
     },
     focusPressablePressed: {
-      opacity: 0.94,
-      transform: [{ scale: 0.99 }],
+      opacity: components.opacity.value94,
+      transform: [{ scale: components.transforms.scalePressed }],
     },
     focusCard: {
-      borderRadius: 22,
-      gap: spacing.sm,
-      borderWidth: 1,
-      borderColor: colors.divider,
-      backgroundColor: colors.surface,
-      shadowColor: '#000',
-      shadowOpacity: 0.22,
-      shadowRadius: 18,
-      shadowOffset: { width: 0, height: 12 },
-      elevation: 6,
+      ...components.card.base,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
     },
     focusCardExpanded: {
-      borderColor: toRgba(colors.textPrimary, 0.22),
-      backgroundColor: colors.surfaceActive,
-      shadowOpacity: 0.3,
-      shadowRadius: 22,
-      shadowOffset: { width: 0, height: 14 },
-      elevation: 8,
+      borderColor: toRgba(colors.text.primary, 0.22),
+      backgroundColor: colors.background.surfaceActive,
     },
     focusHeader: {
       flexDirection: 'row',
@@ -303,47 +271,39 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     focusLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
       textTransform: 'uppercase',
-      letterSpacing: 1.2,
     },
     focusActionPill: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.xs,
       paddingHorizontal: spacing.sm,
-      paddingVertical: 4,
-      borderRadius: 999,
-      borderWidth: 1,
-      borderColor: toRgba(colors.textPrimary, 0.16),
-      backgroundColor: toRgba(colors.textPrimary, 0.06),
+      paddingVertical: spacing.xs,
+      borderRadius: components.radius.pill,
+      borderWidth: components.borderWidth.thin,
+      borderColor: toRgba(colors.text.primary, 0.16),
+      backgroundColor: toRgba(colors.text.primary, 0.06),
     },
     focusActionText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     focusActionIcon: {
-      marginTop: 0,
+      marginTop: spacing.none,
     },
     focusTitle: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: typography.h2,
-      color: colors.textPrimary,
+      ...typography.styles.h3,
+      color: colors.text.primary,
     },
     focusSummary: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
-      lineHeight: 24,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     focusDetail: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
-      lineHeight: 20,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });
 

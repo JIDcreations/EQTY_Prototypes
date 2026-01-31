@@ -5,19 +5,16 @@ import AppText from '../components/AppText';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
-import useThemeColors from '../theme/useTheme';
-import { layout } from '../theme/layout';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getLanguageOptions, getSettingsCopy } from '../utils/localization';
 import useToast from '../utils/useToast';
 
 export default function LanguageScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
-  const colors = useThemeColors();
+  const { colors, components } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const toast = useToast();
   const options = useMemo(
     () => getLanguageOptions(preferences?.language),
@@ -67,35 +64,35 @@ export default function LanguageScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.background.app,
     },
     content: {
-      paddingHorizontal: layout.sideMargin,
+      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: spacing.lg,
-      gap: spacing.lg,
-      paddingBottom: 0,
+      gap: components.layout.contentGap,
+      paddingBottom: spacing.none,
     },
     card: {
       paddingVertical: spacing.xs,
     },
     row: {
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.md,
+      ...components.list.row,
+      paddingHorizontal: spacing.lg,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
     },
     rowDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.divider,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
     },
     rowLeft: {
       flexDirection: 'row',
@@ -103,31 +100,29 @@ const createStyles = (colors) =>
       gap: spacing.sm,
     },
     rowLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
-      color: colors.textPrimary,
+      ...typography.styles.body,
+      color: colors.text.primary,
     },
     activeLabel: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.small,
-      color: colors.textSecondary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     radio: {
-      width: 18,
-      height: 18,
-      borderRadius: 9,
-      borderWidth: 1,
-      borderColor: colors.textSecondary,
+      width: components.sizes.track.sm,
+      height: components.sizes.track.sm,
+      borderRadius: components.radius.pill,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.text.secondary,
       alignItems: 'center',
       justifyContent: 'center',
     },
     radioActive: {
-      borderColor: colors.accent,
+      borderColor: colors.accent.primary,
     },
     radioDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.sm,
+      height: components.sizes.dot.sm,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
   });

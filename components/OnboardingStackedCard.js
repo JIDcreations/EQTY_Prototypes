@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
+import { spacing, useTheme } from '../theme';
 
 export default function OnboardingStackedCard({
   children,
@@ -9,8 +8,8 @@ export default function OnboardingStackedCard({
   contentStyle,
   showHandle = true,
 }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <View style={[styles.stack, style]}>
@@ -24,7 +23,7 @@ export default function OnboardingStackedCard({
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     stack: {
       position: 'relative',
@@ -32,44 +31,47 @@ const createStyles = (colors) =>
     },
     ghostOne: {
       position: 'absolute',
-      top: 10,
-      left: 10,
-      right: 10,
-      height: 160,
-      borderRadius: 24,
-      backgroundColor: colors.surfaceActive,
-      opacity: 0.6,
+      top: components.offsets.stackedCard.insetSm,
+      left: components.offsets.stackedCard.insetSm,
+      right: components.offsets.stackedCard.insetSm,
+      height: components.sizes.card.stackHeight,
+      borderRadius: components.radius.card,
+      backgroundColor: colors.background.surfaceActive,
+      opacity: components.opacity.value60,
       transform: [{ rotate: '-1deg' }],
     },
     ghostTwo: {
       position: 'absolute',
-      top: 22,
-      left: 18,
-      right: 18,
-      height: 160,
-      borderRadius: 24,
-      backgroundColor: colors.surfaceActive,
-      opacity: 0.35,
+      top: components.offsets.stackedCard.insetLg,
+      left: components.offsets.stackedCard.insetMd,
+      right: components.offsets.stackedCard.insetMd,
+      height: components.sizes.card.stackHeight,
+      borderRadius: components.radius.card,
+      backgroundColor: colors.background.surfaceActive,
+      opacity: components.opacity.value35,
       transform: [{ rotate: '1.5deg' }],
     },
     card: {
-      backgroundColor: colors.surface,
-      borderRadius: 28,
+      backgroundColor: colors.background.surface,
+      borderRadius: components.radius.card,
       padding: spacing.lg,
-      gap: spacing.lg,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
-      shadowColor: '#000',
-      shadowOpacity: 0.22,
-      shadowRadius: 16,
-      shadowOffset: { width: 0, height: 10 },
-      elevation: 6,
+      gap: components.layout.cardGap,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
+      shadowColor: colors.background.app,
+      shadowOpacity: components.shadows.stackedCard.opacity,
+      shadowRadius: components.shadows.stackedCard.radius,
+      shadowOffset: {
+        width: components.shadows.stackedCard.offsetX,
+        height: components.shadows.stackedCard.offsetY,
+      },
+      elevation: components.shadows.stackedCard.elevation,
     },
     handle: {
-      width: 44,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: colors.surfaceActive,
+      width: components.sizes.handle.widthLg,
+      height: components.sizes.handle.height,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surfaceActive,
       alignSelf: 'center',
     },
   });

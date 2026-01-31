@@ -7,17 +7,15 @@ import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import useThemeColors from '../../theme/useTheme';
-import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
+import { spacing, typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { formatOnboardingQuestionLabel, getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingQuestionScreen({ navigation, route }) {
   const { question, field, step, total, nextRoute } = route.params;
   const { onboardingContext, updateOnboardingContext, preferences } = useApp();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const insets = useSafeAreaInsets();
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [answer, setAnswer] = useState(onboardingContext?.[field] || '');
@@ -33,11 +31,15 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={insets.top + spacing.lg}
+        keyboardVerticalOffset={insets.top}
       >
         <View style={styles.headerRow}>
           <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+            <Ionicons
+              name="chevron-back"
+              size={components.sizes.icon.lg}
+              color={colors.text.secondary}
+            />
           </Pressable>
           <OnboardingProgress
             current={step}
@@ -58,7 +60,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
             value={answer}
             onChangeText={setAnswer}
             placeholder={copy.question.placeholder}
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text.secondary}
             multiline
             style={styles.input}
           />
@@ -69,7 +71,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
       flex: 1,
@@ -86,10 +88,10 @@ const createStyles = (colors) =>
       gap: spacing.md,
     },
     backButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.background.surface,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -104,40 +106,31 @@ const createStyles = (colors) =>
       alignItems: 'center',
       gap: spacing.xs,
       alignSelf: 'flex-start',
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 999,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.pill,
       paddingHorizontal: spacing.sm,
-      paddingVertical: 4,
-      borderWidth: 1,
-      borderColor: colors.surfaceActive,
+      paddingVertical: spacing.xs,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.border,
     },
     badgeDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.accent,
+      width: components.sizes.dot.xs,
+      height: components.sizes.dot.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
     },
     badgeText: {
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: 11,
-      color: colors.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 1.2,
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
     title: {
-      fontFamily: typography.fontFamilyDemi,
-      fontSize: 24,
-      color: colors.textPrimary,
-      lineHeight: 32,
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     input: {
-      minHeight: 160,
-      borderRadius: 18,
-      padding: spacing.md,
-      backgroundColor: colors.surfaceActive,
-      color: colors.textPrimary,
-      fontFamily: typography.fontFamilyMedium,
-      fontSize: typography.body,
+      ...components.input.container,
+      ...components.input.multiline,
+      ...components.input.text,
       textAlignVertical: 'top',
     },
   });

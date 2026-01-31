@@ -1,28 +1,25 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { layout } from '../theme/layout';
-import useThemeColors from '../theme/useTheme';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+import { spacing, typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function Toast({ message, visible, onHide, duration = 1600 }) {
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(12)).current;
+  const translateY = useRef(new Animated.Value(spacing.md)).current;
   const toastStyle = useMemo(
     () => [
       styles.toast,
       {
-        left: layout.sideMargin,
-        right: layout.sideMargin,
-        bottom: insets.bottom + spacing.xl,
+        left: components.layout.pagePaddingHorizontal,
+        right: components.layout.pagePaddingHorizontal,
+        bottom: insets.bottom,
       },
     ],
-    [insets.bottom, styles.toast]
+    [components.layout.pagePaddingHorizontal, insets.bottom, styles.toast]
   );
 
   useEffect(() => {
@@ -47,7 +44,7 @@ export default function Toast({ message, visible, onHide, duration = 1600 }) {
             useNativeDriver: true,
           }),
           Animated.timing(translateY, {
-            toValue: 12,
+          toValue: spacing.md,
             duration: 180,
             useNativeDriver: true,
           }),
@@ -70,23 +67,23 @@ export default function Toast({ message, visible, onHide, duration = 1600 }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     toast: {
       position: 'absolute',
+      marginBottom: spacing.xl,
     },
     toastInner: {
-      backgroundColor: colors.surfaceActive,
-      borderRadius: 14,
+      backgroundColor: colors.background.surfaceActive,
+      borderRadius: components.radius.input,
       paddingVertical: spacing.sm,
       paddingHorizontal: spacing.md,
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.divider,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
     },
     toastText: {
-      fontFamily: typography.fontFamilyMedium,
-      color: colors.textPrimary,
-      fontSize: typography.small,
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
   });
