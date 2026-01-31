@@ -1446,6 +1446,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
     copy.messages.reflectionPlaceholder || content?.steps?.reflection?.placeholder;
   const canSend = text.trim().length > 0;
   const canContinue = !!response;
+  const isClosed = !!response;
 
   const buildResponse = (input) => {
     const normalized = (input || '').toLowerCase().trim();
@@ -1492,6 +1493,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
   };
 
   const handleSend = () => {
+    if (isClosed) return;
     if (!canSend) return;
     const trimmed = text.trim();
     setSubmittedText(trimmed);
@@ -1539,16 +1541,21 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
         </View>
       </ScrollView>
       <View style={styles.reflectionFooter}>
-        {response ? (
-          <View style={styles.reflectionSavedPill}>
+        {isClosed ? (
+          <View style={styles.reflectionClosedCard}>
             <Ionicons
-              name="sparkles-outline"
-              size={components.sizes.icon.xs}
+              name="lock-closed"
+              size={components.sizes.icon.sm}
               color={colors.text.secondary}
             />
-            <AppText style={styles.reflectionSavedText}>
-              {copy.messages.reflectionSaved}
-            </AppText>
+            <View style={styles.reflectionClosedTextWrap}>
+              <AppText style={styles.reflectionClosedTitle}>
+                {copy.messages.reflectionLockedTitle}
+              </AppText>
+              <AppText style={styles.reflectionClosedText}>
+                {copy.messages.reflectionLockedBody}
+              </AppText>
+            </View>
           </View>
         ) : null}
         <PrimaryButton
@@ -1556,34 +1563,37 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
           onPress={handleContinue}
           disabled={!canContinue}
         />
-        <View style={styles.reflectionComposer}>
-          <TextInput
-            style={styles.reflectionInput}
-            value={text}
-            onChangeText={(value) => {
-              setText(value);
-              setResponse(null);
-            }}
-            placeholder={placeholder}
-            placeholderTextColor={toRgba(colors.text.secondary, 0.7)}
-            multiline
-          />
-          <Pressable
-            onPress={handleSend}
-            disabled={!canSend}
-            style={({ pressed }) => [
-              styles.reflectionSendButton,
-              !canSend && styles.reflectionSendButtonDisabled,
-              pressed && canSend && styles.reflectionSendButtonPressed,
-            ]}
-          >
-            <Ionicons
-              name="arrow-up"
-              size={components.sizes.icon.sm}
-              color={canSend ? colors.text.primary : colors.text.secondary}
+        {isClosed ? null : (
+          <View style={styles.reflectionComposer}>
+            <TextInput
+              style={styles.reflectionInput}
+              value={text}
+              onChangeText={(value) => {
+                if (isClosed) return;
+                setText(value);
+                setResponse(null);
+              }}
+              placeholder={placeholder}
+              placeholderTextColor={toRgba(colors.text.secondary, 0.7)}
+              multiline
             />
-          </Pressable>
-        </View>
+            <Pressable
+              onPress={handleSend}
+              disabled={!canSend}
+              style={({ pressed }) => [
+                styles.reflectionSendButton,
+                !canSend && styles.reflectionSendButtonDisabled,
+                pressed && canSend && styles.reflectionSendButtonPressed,
+              ]}
+            >
+              <Ionicons
+                name="arrow-up"
+                size={components.sizes.icon.sm}
+                color={canSend ? colors.text.primary : colors.text.secondary}
+              />
+            </Pressable>
+          </View>
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -2615,21 +2625,49 @@ const createStyles = (colors, components) =>
     gap: spacing.md,
   },
   reflectionThread: {
-    gap: spacing.md,
+    gap: spacing.lg,
   },
   reflectionBody: {
     flex: 1,
-    gap: spacing.none,
+    gap: spacing.md,
   },
   reflectionScroll: {
     flex: 1,
   },
   reflectionScrollContent: {
-    paddingBottom: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xxl,
   },
   reflectionFooter: {
-    gap: spacing.sm,
+    gap: spacing.md,
     marginTop: 'auto',
+    paddingTop: spacing.sm,
+    borderTopWidth: components.borderWidth.thin,
+    borderTopColor: toRgba(colors.text.secondary, 0.25),
+  },
+  reflectionClosedCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
+  },
+  reflectionClosedTextWrap: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  reflectionClosedTitle: {
+    ...typography.styles.small,
+    color: colors.text.primary,
+    textTransform: 'uppercase',
+  },
+  reflectionClosedText: {
+    ...typography.styles.small,
+    color: colors.text.secondary,
   },
   chatBubble: {
     maxWidth: '92%',
@@ -2646,7 +2684,8 @@ const createStyles = (colors, components) =>
   },
   chatBubbleUser: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.background.surfaceActive,
+    borderColor: toRgba(colors.accent.primary, 0.6),
+    backgroundColor: toRgba(colors.accent.primary, 0.08),
   },
   chatLabel: {
     ...typography.styles.meta,

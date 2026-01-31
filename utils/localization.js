@@ -140,6 +140,9 @@ const LESSON_STEP_COPY = {
       reflectionQuestion: 'What did you learn from this lesson?',
       reflectionPlaceholder: 'Type your response here...',
       reflectionSaved: 'Saved to personalize upcoming lessons.',
+      reflectionLockedTitle: 'Response locked',
+      reflectionLockedBody:
+        'Saved to personalize upcoming lessons. You can’t add another response.',
       reflectionShort:
         'The lesson centers on defining each step before execution to keep decisions grounded.',
       reflectionStructure:
@@ -338,6 +341,9 @@ const LESSON_STEP_COPY = {
       reflectionQuestion: 'Wat heb je geleerd uit deze les?',
       reflectionPlaceholder: 'Typ hier je antwoord...',
       reflectionSaved: 'Opgeslagen om komende lessen te personaliseren.',
+      reflectionLockedTitle: 'Reactie vergrendeld',
+      reflectionLockedBody:
+        'Opgeslagen om komende lessen te personaliseren. Je kunt geen extra antwoord sturen.',
       reflectionShort:
         'De les draait om het definieren van elke stap voor uitvoering om beslissingen stevig te houden.',
       reflectionStructure:
