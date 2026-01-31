@@ -1700,36 +1700,56 @@ function IntroSummaryStep({ content, onComplete, copy }) {
           contentContainerStyle={styles.summaryScrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.processMap}>
-            <View style={styles.processLine} />
+          <View style={[styles.processMap, styles.summaryProcessMap]}>
             {stations.map((station, index) => {
               const isActive = index === activeIndex;
               return (
-                <View key={station.id} style={styles.processStationBlock}>
+                <View
+                  key={station.id}
+                  style={[styles.processStationBlock, styles.summaryStationBlock]}
+                >
                   <Pressable
                     onPress={() =>
                       setActiveIndex((prev) => (prev === index ? null : index))
                     }
                     style={[
                       styles.processStationRow,
-                      isActive && styles.processStationRowActive,
+                      styles.summaryStationRow,
+                      isActive && styles.summaryStationRowActive,
                     ]}
                   >
                     <View
                       style={[
-                        styles.processNode,
-                        isActive && styles.processNodeActive,
+                        styles.summaryIndexChip,
+                        isActive && styles.summaryIndexChipActive,
                       ]}
-                    />
-                    <View style={styles.processStationText}>
-                      <AppText style={styles.processStationIndex}>
+                    >
+                      <AppText
+                        style={[
+                          styles.summaryIndexText,
+                          isActive && styles.summaryIndexTextActive,
+                        ]}
+                      >
                         {index + 1}
                       </AppText>
-                      <AppText style={styles.processStationTitle}>
+                    </View>
+                    <View style={styles.summaryStationText}>
+                      <AppText
+                        style={[
+                          styles.processStationTitle,
+                          isActive && styles.summaryStationTitleActive,
+                        ]}
+                      >
                         {station.title}
                       </AppText>
                     </View>
-                    <View style={styles.processStationIndicator}>
+                    <View
+                      style={[
+                        styles.processStationIndicator,
+                        styles.summaryStationIndicator,
+                        isActive && styles.summaryStationIndicatorActive,
+                      ]}
+                    >
                       <Ionicons
                         name={isActive ? 'chevron-down' : 'chevron-forward'}
                         size={components.sizes.icon.sm}
@@ -1738,13 +1758,16 @@ function IntroSummaryStep({ content, onComplete, copy }) {
                     </View>
                   </Pressable>
                   {isActive ? (
-                    <View style={styles.processPanel}>
+                    <View style={[styles.processPanel, styles.summaryProcessPanel]}>
                       <AppText style={styles.processDescription}>
                         {station.description}
                       </AppText>
                       <View style={styles.processSubsteps}>
                         {station.substeps?.map((item) => (
-                          <View key={`${station.id}-${item}`} style={styles.processChip}>
+                          <View
+                            key={`${station.id}-${item}`}
+                            style={[styles.processChip, styles.summaryProcessChip]}
+                          >
                             <AppText style={styles.processChipText}>{item}</AppText>
                           </View>
                         ))}
@@ -2786,6 +2809,10 @@ const createStyles = (colors, components) =>
     gap: spacing.md,
     paddingLeft: spacing.lg,
   },
+  summaryProcessMap: {
+    paddingLeft: spacing.none,
+    gap: spacing.lg,
+  },
   processLine: {
     position: 'absolute',
     left: components.offsets.lesson.processLineLeft,
@@ -2798,6 +2825,9 @@ const createStyles = (colors, components) =>
   processStationBlock: {
     gap: spacing.xs,
   },
+  summaryStationBlock: {
+    gap: spacing.sm,
+  },
   processStationRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2808,6 +2838,19 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.input,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
+  },
+  summaryStationRow: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: components.radius.input,
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surface,
+    gap: spacing.md,
+  },
+  summaryStationRowActive: {
+    borderColor: toRgba(colors.accent.primary, 0.6),
+    backgroundColor: toRgba(colors.accent.primary, 0.08),
   },
   processNode: {
     width: components.sizes.dot.lg,
@@ -2827,6 +2870,10 @@ const createStyles = (colors, components) =>
     alignItems: 'center',
     gap: spacing.xs,
   },
+  summaryStationText: {
+    flex: 1,
+    gap: spacing.xs,
+  },
   processStationIndicator: {
     width: components.sizes.square.xs,
     height: components.sizes.square.xs,
@@ -2837,14 +2884,45 @@ const createStyles = (colors, components) =>
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surfaceActive,
   },
+  summaryStationIndicator: {
+    borderColor: toRgba(colors.text.secondary, 0.5),
+  },
+  summaryStationIndicatorActive: {
+    borderColor: toRgba(colors.accent.primary, 0.7),
+    backgroundColor: toRgba(colors.accent.primary, 0.12),
+  },
   processStationIndex: {
     ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   processStationTitle: {
-    ...typography.styles.h3,
+    ...typography.styles.bodyStrong,
     color: colors.text.primary,
     flexShrink: 1,
+  },
+  summaryStationTitleActive: {
+    color: colors.text.primary,
+  },
+  summaryIndexChip: {
+    width: components.sizes.square.md,
+    height: components.sizes.square.md,
+    borderRadius: components.radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: components.borderWidth.thin,
+    borderColor: colors.ui.divider,
+    backgroundColor: colors.background.surfaceActive,
+  },
+  summaryIndexChipActive: {
+    borderColor: toRgba(colors.accent.primary, 0.7),
+    backgroundColor: toRgba(colors.accent.primary, 0.18),
+  },
+  summaryIndexText: {
+    ...typography.styles.stepLabel,
+    color: colors.text.secondary,
+  },
+  summaryIndexTextActive: {
+    color: colors.text.primary,
   },
   processPanel: {
     marginLeft: spacing.lg,
@@ -2855,6 +2933,13 @@ const createStyles = (colors, components) =>
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surface,
     gap: spacing.sm,
+  },
+  summaryProcessPanel: {
+    marginLeft: components.sizes.square.md + spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderColor: toRgba(colors.text.secondary, 0.3),
+    backgroundColor: colors.background.surfaceActive,
   },
   processDescription: {
     ...typography.styles.body,
@@ -2872,6 +2957,10 @@ const createStyles = (colors, components) =>
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surfaceActive,
+  },
+  summaryProcessChip: {
+    borderColor: toRgba(colors.text.secondary, 0.35),
+    backgroundColor: colors.background.surface,
   },
   processChipText: {
     ...typography.styles.small,
