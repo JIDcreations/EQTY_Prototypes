@@ -42,7 +42,7 @@ export default function OnboardingScreen({
             <View pointerEvents="none" style={styles.glowBottom} />
           </>
         ) : null}
-        <View style={styles.safeArea}>
+        <View style={styles.scrollContainer}>
           <ScrollView
             style={styles.scroll}
             contentContainerStyle={[
@@ -85,13 +85,16 @@ const createStyles = (colors, components) =>
       flex: 1,
       ...components.screen.safeArea,
     },
+    scrollContainer: {
+      flex: 1,
+    },
     scroll: {
       flex: 1,
     },
     scrollContent: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: components.layout.spacing.xl,
-      paddingBottom: components.layout.spacing.none,
+      paddingTop: components.layout.safeArea.top + components.layout.spacing.xl,
+      paddingBottom: components.layout.safeArea.bottom,
       gap: components.layout.contentGap,
       minHeight: '100%',
     },

@@ -106,7 +106,7 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     scrollContent: {
       flexGrow: 1,
-      paddingBottom: components.layout.spacing.xxl,
+      paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xxl,
     },
     keyboard: {
       flex: 1,

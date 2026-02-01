@@ -11,11 +11,12 @@ export default function LessonStepContainer({
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const containerStyle = scrollEnabled
-    ? [styles.content, contentStyle]
+    ? [styles.content, styles.contentScroll, contentStyle]
     : [styles.content, styles.contentFixed, contentStyle];
+  const wrapperStyle = scrollEnabled ? styles.containerScroll : styles.safeArea;
 
   return (
-    <View style={styles.safeArea}>
+    <View style={wrapperStyle}>
       {scrollEnabled ? (
         <ScrollView
           contentContainerStyle={containerStyle}
@@ -39,11 +40,18 @@ const createStyles = (colors, components) =>
     safeArea: {
       ...components.screen.container,
     },
+    containerScroll: {
+      ...components.screen.containerScroll,
+    },
     content: {
       paddingTop: components.layout.spacing.lg,
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingBottom: components.layout.spacing.none,
       gap: components.layout.contentGap,
+    },
+    contentScroll: {
+      paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
+      paddingBottom: components.layout.safeArea.bottom,
     },
     contentFixed: {
       flex: 1,

@@ -230,6 +230,7 @@ export default function LessonStepScreen() {
           }}
           onPressTerm={handleTermPress}
           copy={copy}
+          keyboardOffset={keyboardOffset}
         />
       )}
       {step === 6 && (
@@ -1439,7 +1440,7 @@ function MultiExercise({ exercise, onNext, onPressTerm, copy }) {
   );
 }
 
-function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
+function ReflectionStep({ content, onSubmit, onPressTerm, copy, keyboardOffset }) {
   const { colors, components, styles } = useLessonStepStyles();
   const [text, setText] = useState('');
   const [submittedText, setSubmittedText] = useState('');

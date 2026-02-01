@@ -114,15 +114,15 @@ export default function LessonOverviewScreen() {
 const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
-      ...components.screen.container,
+      ...components.screen.containerScroll,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: components.layout.spacing.lg,
+      paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: components.layout.spacing.none,
+      paddingBottom: components.layout.safeArea.bottom,
     },
     header: {
       gap: components.layout.spacing.sm,

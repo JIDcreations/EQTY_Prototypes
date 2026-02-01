@@ -168,6 +168,10 @@ export const createComponents = (colors) => ({
       paddingLeft: layout.safeArea.left,
       paddingRight: layout.safeArea.right,
     },
+    containerScroll: {
+      flex: 1,
+      backgroundColor: colors.background.app,
+    },
   },
   button: {
     base: {
