@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
@@ -10,7 +9,7 @@ import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import { useApp } from '../utils/AppContext';
 import { getLessonContent, getLessonOverviewCopy, getLocalizedLessons, formatLessonModuleLabel } from '../utils/localization';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 
 export default function LessonOverviewScreen() {
   const navigation = useNavigation();
@@ -18,7 +17,6 @@ export default function LessonOverviewScreen() {
   const { lessonId, entrySource } = route.params || {};
   const { preferences } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [isStructureOpen, setIsStructureOpen] = useState(false);
   const overviewCopy = useMemo(
@@ -39,66 +37,63 @@ export default function LessonOverviewScreen() {
       : [lesson.shortDescription];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <View style={styles.layout}>
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.header}>
-            <AppText style={styles.moduleLabel}>{moduleLabel}</AppText>
-            <GlossaryText text={lesson.title} style={styles.title} />
-            <GlossaryText text={lesson.shortDescription} style={styles.subtitle} />
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <AppText style={styles.moduleLabel}>{moduleLabel}</AppText>
+          <GlossaryText text={lesson.title} style={styles.title} />
+          <GlossaryText text={lesson.shortDescription} style={styles.subtitle} />
+        </View>
+
+        <Card style={styles.learnCard}>
+          <SectionTitle title={overviewCopy.whatYoullLearn} subtitle={overviewCopy.keyTakeaways} />
+          <View style={styles.bulletList}>
+            {takeaways.map((item, index) => (
+              <View key={`${index}-${item}`} style={styles.bulletRow}>
+                <View style={styles.bulletIndex}>
+                  <AppText style={styles.bulletIndexText}>{index + 1}</AppText>
+                </View>
+                <GlossaryText text={item} style={styles.bulletText} />
+              </View>
+            ))}
           </View>
+        </Card>
 
-          <Card style={styles.learnCard}>
-            <SectionTitle title={overviewCopy.whatYoullLearn} subtitle={overviewCopy.keyTakeaways} />
-            <View style={styles.bulletList}>
-              {takeaways.map((item, index) => (
-                <View key={`${index}-${item}`} style={styles.bulletRow}>
-                  <View style={styles.bulletIndex}>
-                    <AppText style={styles.bulletIndexText}>{index + 1}</AppText>
-                  </View>
-                  <GlossaryText text={item} style={styles.bulletText} />
-                </View>
-              ))}
-            </View>
-          </Card>
-
-          <View style={styles.structureContainer}>
-            <Card style={styles.structureCard}>
-              <Pressable
-                onPress={() => setIsStructureOpen((prev) => !prev)}
-                style={({ pressed }) => [styles.structureRow, pressed && styles.structurePressed]}
-              >
-                <AppText style={styles.structureTitle}>{overviewCopy.lessonStructure}</AppText>
-                <View style={styles.structureToggle}>
-                  <Ionicons
-                    name={isStructureOpen ? 'chevron-up' : 'chevron-down'}
-                    size={components.sizes.icon.md}
-                    color={colors.text.secondary}
-                  />
-                </View>
-              </Pressable>
-              {isStructureOpen ? (
-                <View style={styles.stepList}>
-                  <AppText style={styles.flowHeader}>{overviewCopy.lessonFlowHeader}</AppText>
-                  {overviewCopy.stepLabels.map((label, index) => (
-                    <View key={label} style={styles.stepRow}>
-                      <View style={styles.stepIndex}>
-                        <GlossaryText text={index + 1} style={styles.stepNumber} />
-                      </View>
-                      <GlossaryText text={label} style={styles.stepLabel} />
+        <View style={styles.structureContainer}>
+          <Card style={styles.structureCard}>
+            <Pressable
+              onPress={() => setIsStructureOpen((prev) => !prev)}
+              style={({ pressed }) => [styles.structureRow, pressed && styles.structurePressed]}
+            >
+              <AppText style={styles.structureTitle}>{overviewCopy.lessonStructure}</AppText>
+              <View style={styles.structureToggle}>
+                <Ionicons
+                  name={isStructureOpen ? 'chevron-up' : 'chevron-down'}
+                  size={components.sizes.icon.md}
+                  color={colors.text.secondary}
+                />
+              </View>
+            </Pressable>
+            {isStructureOpen ? (
+              <View style={styles.stepList}>
+                <AppText style={styles.flowHeader}>{overviewCopy.lessonFlowHeader}</AppText>
+                {overviewCopy.stepLabels.map((label, index) => (
+                  <View key={label} style={styles.stepRow}>
+                    <View style={styles.stepIndex}>
+                      <GlossaryText text={index + 1} style={styles.stepNumber} />
                     </View>
-                  ))}
-                </View>
-              ) : null}
-            </Card>
-          </View>
-        </ScrollView>
+                    <GlossaryText text={label} style={styles.stepLabel} />
+                  </View>
+                ))}
+              </View>
+            ) : null}
+          </Card>
+        </View>
 
-        <View style={styles.footer}>
+        <View style={styles.ctaStack}>
           <PrimaryButton
             label={overviewCopy.startLesson}
             onPress={() =>
@@ -110,34 +105,27 @@ export default function LessonOverviewScreen() {
             }
           />
           <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
-          <View style={{ height: insets.bottom }} />
         </View>
-      </View>
-    </SafeAreaView>
+      </ScrollView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
-    },
-    layout: {
-      flex: 1,
+      paddingBottom: components.layout.spacing.none,
     },
     header: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     title: {
       ...typography.styles.h1,
@@ -158,12 +146,12 @@ const createStyles = (colors, components) =>
       backgroundColor: colors.background.surfaceActive,
     },
     bulletList: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     bulletRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     bulletIndex: {
       width: components.sizes.square.xs,
@@ -172,7 +160,7 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: toRgba(colors.accent.primary, 0.18),
-      marginTop: spacing.none,
+      marginTop: components.layout.spacing.none,
     },
     bulletIndexText: {
       ...typography.styles.small,
@@ -184,7 +172,7 @@ const createStyles = (colors, components) =>
       color: colors.text.primary,
     },
     structureContainer: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     structureCard: {
       ...components.card.base,
@@ -212,11 +200,11 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     stepList: {
-      gap: spacing.xs,
-      paddingTop: spacing.sm,
+      gap: components.layout.spacing.xs,
+      paddingTop: components.layout.spacing.sm,
     },
     flowHeader: {
       ...typography.styles.small,
@@ -225,7 +213,7 @@ const createStyles = (colors, components) =>
     stepRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     stepIndex: {
       width: components.sizes.square.xs,
@@ -240,17 +228,12 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     stepLabel: {
-      ...typography.styles.body,
+      ...typography.styles.stepLabel,
       color: colors.text.secondary,
     },
-    footer: {
-      paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.lg,
-      gap: spacing.md,
-      borderTopWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
-      backgroundColor: colors.background.app,
+    ctaStack: {
+      gap: components.layout.spacing.md,
+      paddingTop: components.layout.spacing.md,
     },
   });
 

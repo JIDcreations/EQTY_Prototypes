@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import AppText from '../../components/AppText';
 import OnboardingGesture from '../../components/OnboardingGesture';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import { spacing, typography, useTheme } from '../../theme';
+import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
@@ -50,10 +50,10 @@ const createStyles = (colors, components) =>
     container: {
       flex: 1,
       justifyContent: 'flex-start',
-      paddingBottom: spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
     },
     logoWrap: {
-      marginTop: spacing.xxl,
+      marginTop: components.layout.spacing.xxl,
       alignItems: 'center',
       justifyContent: 'flex-start',
     },
@@ -65,7 +65,7 @@ const createStyles = (colors, components) =>
       marginTop: 'auto',
       transform: [{ translateY: components.offsets.translate.lg }],
       width: '100%',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     title: {
       ...typography.styles.h1,
@@ -78,7 +78,7 @@ const createStyles = (colors, components) =>
       textAlign: 'left',
     },
     tapHint: {
-      marginTop: spacing.xl,
+      marginTop: components.layout.spacing.xl,
       ...typography.styles.small,
       color: colors.text.secondary,
       textAlign: 'center',

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SegmentedControl({ options, value, onChange }) {
@@ -33,12 +33,12 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.input,
-      padding: spacing.xs,
-      gap: spacing.xs,
+      padding: components.layout.spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     segment: {
       flex: 1,
-      paddingVertical: spacing.xs,
+      paddingVertical: components.layout.spacing.xs,
       borderRadius: components.radius.input,
       alignItems: 'center',
       justifyContent: 'center',

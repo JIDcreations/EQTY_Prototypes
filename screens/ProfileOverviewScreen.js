@@ -7,7 +7,6 @@ import {
   Switch,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
@@ -16,7 +15,7 @@ import SegmentedControl from '../components/SegmentedControl';
 import SettingsRow from '../components/SettingsRow';
 import SettingsSection from '../components/SettingsSection';
 import Toast from '../components/Toast';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import useToast from '../utils/useToast';
 
@@ -36,7 +35,6 @@ export default function ProfileOverviewScreen() {
   const navigation = useNavigation();
   const { authUser, onboardingContext, preferences, updatePreferences, logOut } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const toast = useToast();
 
@@ -99,10 +97,9 @@ export default function ProfileOverviewScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -257,28 +254,25 @@ export default function ProfileOverviewScreen() {
         <PrimaryButton label="Log out" onPress={handleLogOut} style={styles.logoutButton} />
       </ScrollView>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     header: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     title: {
       ...typography.styles.h1,
@@ -296,7 +290,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     contextBlock: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     contextLabel: {
       ...typography.styles.small,
@@ -310,7 +304,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     contextButton: {
-      marginTop: spacing.xs,
+      marginTop: components.layout.spacing.xs,
     },
     contextHelper: {
       ...typography.styles.small,
@@ -325,7 +319,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     textSizeHeader: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     textSizeList: {
       borderRadius: components.radius.card,
@@ -338,7 +332,7 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       ...components.list.row,
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: components.layout.spacing.lg,
       backgroundColor: colors.background.surfaceActive,
     },
     rowDivider: {
@@ -348,7 +342,7 @@ const createStyles = (colors, components) =>
     textSizeLeft: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     textSizeLabel: {
       ...typography.styles.body,
@@ -386,9 +380,9 @@ const createStyles = (colors, components) =>
     },
     previewCard: {
       backgroundColor: colors.background.surfaceActive,
-      padding: spacing.md,
+      padding: components.layout.spacing.md,
       borderRadius: components.radius.card,
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     previewTitle: {
       ...typography.styles.small,
@@ -399,6 +393,6 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     logoutButton: {
-      marginTop: spacing.sm,
+      marginTop: components.layout.spacing.sm,
     },
   });

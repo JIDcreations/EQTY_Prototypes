@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import ProgressBar from './ProgressBar';
 import GlossaryText from './GlossaryText';
 import AppText from './AppText';
@@ -54,7 +54,7 @@ export default function StepHeader({
 const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     topRow: {
       flexDirection: 'row',

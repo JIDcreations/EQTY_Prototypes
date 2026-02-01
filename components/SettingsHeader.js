@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SettingsHeader({ title, subtitle, onBack, rightAction }) {
@@ -33,7 +33,7 @@ export default function SettingsHeader({ title, subtitle, onBack, rightAction })
 const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     row: {
       flexDirection: 'row',

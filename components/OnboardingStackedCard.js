@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { spacing, useTheme } from '../theme';
+import { useTheme } from '../theme';
 
 export default function OnboardingStackedCard({
   children,
@@ -54,7 +54,7 @@ const createStyles = (colors, components) =>
     card: {
       backgroundColor: colors.background.surface,
       borderRadius: components.radius.card,
-      padding: spacing.lg,
+      padding: components.layout.spacing.lg,
       gap: components.layout.cardGap,
       borderWidth: components.borderWidth.thin,
       borderColor: colors.ui.border,

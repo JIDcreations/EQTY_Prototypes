@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AppText from './AppText';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 
 export default function OnboardingProgress({ current, total, label, style }) {
   const { colors, components } = useTheme();
@@ -28,7 +28,7 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     label: {
       ...typography.styles.stepLabel,
@@ -37,7 +37,7 @@ const createStyles = (colors, components) =>
     dots: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     dot: {
       width: components.sizes.track.sm,

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
@@ -8,7 +7,7 @@ import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { getLessonOverviewCopy, getLocalizedLessons, getLocalizedModules } from '../utils/localization';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getLessonStatus } from '../utils/helpers';
 
@@ -16,7 +15,6 @@ export default function LessonsScreen() {
   const navigation = useNavigation();
   const { progress, preferences } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const overviewCopy = useMemo(
     () => getLessonOverviewCopy(preferences?.language),
@@ -41,10 +39,9 @@ export default function LessonsScreen() {
   }, [localizedLessons, localizedModules]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <SectionTitle title="Lessons" subtitle="Curriculum overview" />
@@ -101,31 +98,28 @@ export default function LessonsScreen() {
           </View>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     module: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     moduleHeader: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     moduleTitle: {
       ...typography.styles.h2,
@@ -136,7 +130,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     moduleLessons: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     lessonCard: {
       gap: components.layout.cardGap,
@@ -145,7 +139,7 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     lessonTitle: {
       ...typography.styles.h3,
@@ -159,7 +153,7 @@ const createStyles = (colors, components) =>
     completedRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     completedText: {
       ...typography.styles.small,

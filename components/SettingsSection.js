@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SettingsSection({ title, helper, children }) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <View style={styles.section}>
@@ -16,10 +16,10 @@ export default function SettingsSection({ title, helper, children }) {
   );
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     section: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     title: {
       ...typography.styles.small,

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function SettingsRow({
@@ -49,7 +49,7 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     rowDivider: {
       borderBottomWidth: components.borderWidth.thin,
@@ -60,7 +60,7 @@ const createStyles = (colors, components) =>
     },
     rowContent: {
       flex: 1,
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     label: {
       ...typography.styles.body,
@@ -77,6 +77,6 @@ const createStyles = (colors, components) =>
     rowRight: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
   });

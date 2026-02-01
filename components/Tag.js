@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function Tag({ label, tone = 'default', style }) {
@@ -25,8 +25,8 @@ const toRgba = (hex, alpha) => {
 const createStyles = (colors, components) =>
   StyleSheet.create({
     base: {
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.xs,
+      paddingHorizontal: components.layout.spacing.md,
+      paddingVertical: components.layout.spacing.xs,
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.surfaceActive,
     },

@@ -5,7 +5,7 @@ import OnboardingGesture from '../../components/OnboardingGesture';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
-import { spacing, typography, useTheme } from '../../theme';
+import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
@@ -59,11 +59,11 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingBottom: spacing.xl,
-      paddingTop: spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
+      paddingTop: components.layout.spacing.xl,
     },
     header: {
-      paddingBottom: spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
     },
     content: {
       flex: 1,
@@ -71,17 +71,17 @@ const createStyles = (colors, components) =>
       transform: [{ translateY: components.offsets.translate.sm }],
     },
     cardHeader: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     badge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
       alignSelf: 'flex-start',
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.pill,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
+      paddingHorizontal: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
       borderColor: colors.ui.border,
     },

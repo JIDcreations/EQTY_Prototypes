@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { spacing, useTheme } from '../theme';
+import { useTheme } from '../theme';
 
 const toRgba = (hex, alpha) => {
   const cleaned = hex.replace('#', '');
@@ -23,7 +22,6 @@ export default function OnboardingScreen({
   showGlow = true,
 }) {
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const resolvedGradientColors =
     variant === 'accent'
@@ -44,20 +42,19 @@ export default function OnboardingScreen({
             <View pointerEvents="none" style={styles.glowBottom} />
           </>
         ) : null}
-        <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        <View style={styles.safeArea}>
           <ScrollView
             style={styles.scroll}
             contentContainerStyle={[
               styles.scrollContent,
               contentContainerStyle,
-              { paddingBottom: insets.bottom },
             ]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
             {children}
           </ScrollView>
-        </SafeAreaView>
+        </View>
       </LinearGradient>
     );
   }
@@ -71,9 +68,9 @@ export default function OnboardingScreen({
           <View pointerEvents="none" style={styles.glowBottom} />
         </>
       ) : null}
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+      <View style={styles.safeArea}>
         <View style={[styles.content, contentContainerStyle]}>{children}</View>
-      </SafeAreaView>
+      </View>
     </LinearGradient>
   );
 }
@@ -86,21 +83,23 @@ const createStyles = (colors, components) =>
     },
     safeArea: {
       flex: 1,
+      ...components.screen.safeArea,
     },
     scroll: {
       flex: 1,
     },
     scrollContent: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.xl,
-      paddingBottom: spacing.none,
+      paddingTop: components.layout.spacing.xl,
+      paddingBottom: components.layout.spacing.none,
       gap: components.layout.contentGap,
       minHeight: '100%',
     },
     content: {
       flex: 1,
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingVertical: spacing.xl,
+      paddingTop: components.layout.spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
     },
     glowTop: {
       position: 'absolute',

@@ -1,5 +1,4 @@
 import { layout } from './layout';
-import { spacing } from './spacing';
 import { typography } from './typography';
 
 const radius = {
@@ -154,11 +153,27 @@ export const createComponents = (colors) => ({
   shadows,
   transforms,
   layout,
+  screen: {
+    safeArea: {
+      paddingTop: layout.safeArea.top,
+      paddingBottom: layout.safeArea.bottom,
+      paddingLeft: layout.safeArea.left,
+      paddingRight: layout.safeArea.right,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.app,
+      paddingTop: layout.safeArea.top,
+      paddingBottom: layout.safeArea.bottom,
+      paddingLeft: layout.safeArea.left,
+      paddingRight: layout.safeArea.right,
+    },
+  },
   button: {
     base: {
       borderRadius: radius.button,
-      paddingVertical: spacing.lg,
-      paddingHorizontal: spacing.xl,
+      paddingVertical: layout.spacing.lg,
+      paddingHorizontal: layout.spacing.xl,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -186,8 +201,8 @@ export const createComponents = (colors) => ({
     base: {
       backgroundColor: colors.background.surface,
       borderRadius: radius.card,
-      padding: spacing.lg,
-      gap: spacing.md,
+      padding: layout.spacing.lg,
+      gap: layout.spacing.md,
     },
     title: {
       ...typography.styles.h3,
@@ -205,8 +220,8 @@ export const createComponents = (colors) => ({
   input: {
     container: {
       borderRadius: radius.input,
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
+      paddingVertical: layout.spacing.md,
+      paddingHorizontal: layout.spacing.lg,
       backgroundColor: colors.background.surfaceActive,
       borderWidth: borderWidth.thin,
       borderColor: colors.ui.border,
@@ -230,8 +245,8 @@ export const createComponents = (colors) => ({
   },
   list: {
     row: {
-      paddingVertical: spacing.md,
-      gap: spacing.sm,
+      paddingVertical: layout.spacing.md,
+      gap: layout.spacing.sm,
     },
     divider: {
       borderBottomWidth: borderWidth.thin,

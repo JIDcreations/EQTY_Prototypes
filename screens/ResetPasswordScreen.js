@@ -1,17 +1,16 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import useToast from '../utils/useToast';
 
 export default function ResetPasswordScreen({ navigation }) {
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [email, setEmail] = useState('');
   const toast = useToast();
@@ -22,16 +21,15 @@ export default function ResetPasswordScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeader title="Reset password" onBack={() => navigation.goBack()} />
         <Card style={styles.card}>
           <AppText style={styles.label}>Email address</AppText>
-          <TextInput
+          <AppTextInput
             value={email}
             onChangeText={setEmail}
             placeholder="name@email.com"
@@ -50,25 +48,22 @@ export default function ResetPasswordScreen({ navigation }) {
         </View>
       </ScrollView>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     card: {
       gap: components.layout.cardGap,
@@ -86,6 +81,6 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     actions: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
   });

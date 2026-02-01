@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../../components/AppText';
+import AppTextInput from '../../components/AppTextInput';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import { spacing, typography, useTheme } from '../../theme';
+import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { formatOnboardingQuestionLabel, getOnboardingCopy } from '../../utils/localization';
 
@@ -16,7 +16,6 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   const { onboardingContext, updateOnboardingContext, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const insets = useSafeAreaInsets();
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [answer, setAnswer] = useState(onboardingContext?.[field] || '');
   const localizedQuestion = copy.question.questions[field] || question;
@@ -31,7 +30,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={insets.top}
+        keyboardVerticalOffset={components.layout.safeArea.top}
       >
         <View style={styles.headerRow}>
           <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -56,7 +55,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
             </View>
             <AppText style={styles.title}>{localizedQuestion}</AppText>
           </View>
-          <TextInput
+          <AppTextInput
             value={answer}
             onChangeText={setAnswer}
             placeholder={copy.question.placeholder}
@@ -79,13 +78,13 @@ const createStyles = (colors, components) =>
     container: {
       flex: 1,
       justifyContent: 'space-between',
-      paddingBottom: spacing.xl,
-      gap: spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
+      gap: components.layout.spacing.xl,
     },
     headerRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     backButton: {
       width: components.sizes.square.lg,
@@ -99,17 +98,17 @@ const createStyles = (colors, components) =>
       flex: 1,
     },
     cardHeader: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     badge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
       alignSelf: 'flex-start',
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.pill,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
+      paddingHorizontal: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
       borderColor: colors.ui.border,
     },

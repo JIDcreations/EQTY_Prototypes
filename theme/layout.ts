@@ -16,6 +16,7 @@ export const layout = {
   columnType: 'stretch',
   baseline: 4,
   spacing: {
+    none: 0,
     xs: 8,
     sm: 12,
     md: 16,

@@ -6,13 +6,13 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import BottomSheet from '../components/BottomSheet';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
@@ -20,7 +20,7 @@ import { useGlossary } from '../components/GlossaryProvider';
 import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
 import StepHeader from '../components/StepHeader';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getScenarioVariant } from '../utils/helpers';
 import {
@@ -99,6 +99,7 @@ export default function LessonStepScreen() {
   const route = useRoute();
   const { lessonId, step = 1, entrySource } = route.params || {};
   const { userContext, onboardingContext, addReflection, completeLesson, preferences } = useApp();
+  const { components } = useTheme();
   const glossary = useGlossary();
   const isIntroScenario = lessonId === 'lesson_0' && step === 3;
 
@@ -147,7 +148,7 @@ export default function LessonStepScreen() {
   const disableOuterScroll =
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
   const containerContentStyle =
-    disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: spacing.none } : null;
+    disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: components.layout.spacing.none } : null;
   let flowPhaseLabel = copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
   if (lessonId === 'lesson_0' && step === 6) {
     flowPhaseLabel = 'Samenvatting';
@@ -352,14 +353,14 @@ function IntroConceptStep({ content, onNext, copy }) {
 }
 
 function IntroVisualizationStep({ onNext, copy }) {
-  const { styles } = useLessonStepStyles();
+  const { styles, components } = useLessonStepStyles();
   const [cardHeight, setCardHeight] = useState(null);
   const [expandedCards, setExpandedCards] = useState({});
-  const peek = spacing.lg;
+  const peek = components.layout.spacing.lg;
   const steps = copy.introVisualization.steps;
   const handleLayout = (event) => {
     const layoutHeight = event.nativeEvent.layout.height;
-    const nextHeight = Math.max(260, layoutHeight - peek - spacing.md);
+    const nextHeight = Math.max(260, layoutHeight - peek - components.layout.spacing.md);
     setCardHeight((prev) => (prev === nextHeight ? prev : nextHeight));
   };
 
@@ -597,7 +598,7 @@ function IntroScenarioStep({ onNext, copy }) {
 
 function ScenarioCurve({ variant, progress, label }) {
   const { styles, colors, components } = useLessonStepStyles();
-  const [size, setSize] = useState({ width: spacing.none, height: spacing.none });
+  const [size, setSize] = useState({ width: components.layout.spacing.none, height: components.layout.spacing.none });
   const clampedProgress = Math.max(0, Math.min(progress, 1));
   const points =
     variant === 'stable' ? STABLE_CURVE_POINTS : VOLATILE_CURVE_POINTS;
@@ -1059,8 +1060,8 @@ function IntroExerciseStep({ exercise, onNext, copy }) {
 }
 
 function ExerciseOutcomeLine({ mode }) {
-  const { styles } = useLessonStepStyles();
-  const [size, setSize] = useState({ width: spacing.none, height: spacing.none });
+  const { styles, components } = useLessonStepStyles();
+  const [size, setSize] = useState({ width: components.layout.spacing.none, height: components.layout.spacing.none });
   const points =
     mode === 'stable'
       ? [
@@ -1565,7 +1566,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
         />
         {isClosed ? null : (
           <View style={styles.reflectionComposer}>
-            <TextInput
+            <AppTextInput
               style={styles.reflectionInput}
               value={text}
               onChangeText={(value) => {
@@ -1791,15 +1792,15 @@ function IntroSummaryStep({ content, onComplete, copy }) {
 const createStyles = (colors, components) =>
   StyleSheet.create({
   stepBody: {
-    gap: spacing.lg,
+    gap: components.layout.spacing.lg,
   },
   conceptCard: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   introHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   introAccent: {
     width: components.sizes.track.sm,
@@ -1808,8 +1809,7 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.pill,
   },
   introLabel: {
-    ...typography.styles.small,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   introTitle: {
@@ -1838,7 +1838,7 @@ const createStyles = (colors, components) =>
   visualHint: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   hintBar: {
     width: components.sizes.track.sm,
@@ -1858,7 +1858,7 @@ const createStyles = (colors, components) =>
     height: components.sizes.hintBar.lg,
   },
   visualCard: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   journeyTitle: {
     ...typography.styles.h1,
@@ -1870,30 +1870,30 @@ const createStyles = (colors, components) =>
   },
   journeyPager: {
     flex: 1,
-    marginTop: spacing.sm,
+    marginTop: components.layout.spacing.sm,
   },
   journeyPagerContent: {
-    paddingBottom: spacing.none,
+    paddingBottom: components.layout.spacing.none,
   },
   journeyBody: {
     flex: 1,
   },
   journeyContent: {
     flex: 1,
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   journeyNextWrap: {
-    marginTop: spacing.md,
+    marginTop: components.layout.spacing.md,
   },
   journeyPage: {
     borderRadius: components.radius.card,
-    padding: spacing.lg,
+    padding: components.layout.spacing.lg,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surface,
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: components.layout.spacing.md,
   },
   journeyHeaderRow: {
     flexDirection: 'row',
@@ -1901,8 +1901,8 @@ const createStyles = (colors, components) =>
     justifyContent: 'space-between',
   },
   journeyStepChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: components.layout.spacing.md,
+    paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -1944,7 +1944,7 @@ const createStyles = (colors, components) =>
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surfaceActive,
-    padding: spacing.md,
+    padding: components.layout.spacing.md,
     height: components.sizes.chart.xl,
     overflow: 'hidden',
     justifyContent: 'center',
@@ -1957,21 +1957,20 @@ const createStyles = (colors, components) =>
     borderColor: toRgba(colors.text.secondary, 0.3),
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   journeyPlaceholderText: {
     ...typography.styles.small,
     color: colors.text.secondary,
   },
   processCard: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   processHeader: {
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   processTitle: {
-    ...typography.styles.body,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   processSubline: {
@@ -1980,11 +1979,11 @@ const createStyles = (colors, components) =>
   },
   segmentRow: {
     flexDirection: 'row',
-    gap: spacing.xs,
-    marginTop: spacing.sm,
+    gap: components.layout.spacing.xs,
+    marginTop: components.layout.spacing.sm,
   },
   segment: {
-    paddingVertical: spacing.lg,
+    paddingVertical: components.layout.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: components.radius.input,
@@ -2001,7 +2000,7 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   scenarioCard: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   scenarioMeaning: {
     ...typography.styles.body,
@@ -2009,30 +2008,29 @@ const createStyles = (colors, components) =>
   },
   scenarioCompareGrid: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
     alignItems: 'stretch',
-    marginTop: spacing.sm,
+    marginTop: components.layout.spacing.sm,
   },
   scenarioComparePanel: {
     flex: 1,
-    minWidth: spacing.none,
-    padding: spacing.md,
+    minWidth: components.layout.spacing.none,
+    padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surface,
-    gap: spacing.lg,
+    gap: components.layout.spacing.lg,
   },
   scenarioComparePanelReactive: {
     borderColor: toRgba(colors.text.secondary, 0.3),
     backgroundColor: colors.background.surfaceActive,
   },
   scenarioCompareHeader: {
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   scenarioCompareLabel: {
-    ...typography.styles.small,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   scenarioCompareSubline: {
@@ -2041,13 +2039,13 @@ const createStyles = (colors, components) =>
   },
   scenarioCompareSteps: {
     flexGrow: 1,
-    gap: spacing.sm,
-    paddingVertical: spacing.xs,
+    gap: components.layout.spacing.sm,
+    paddingVertical: components.layout.spacing.xs,
   },
   scenarioCompareRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   scenarioCompareTrack: {
     alignItems: 'center',
@@ -2081,7 +2079,7 @@ const createStyles = (colors, components) =>
   scenarioCompareLine: {
     width: components.sizes.line.thin,
     height: components.sizes.track.sm,
-    marginTop: spacing.xs,
+    marginTop: components.layout.spacing.xs,
     backgroundColor: toRgba(colors.text.secondary, 0.35),
   },
   scenarioCompareLineActive: {
@@ -2110,12 +2108,11 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   scenarioSliderWrap: {
-    marginTop: spacing.xl,
-    gap: spacing.sm,
+    marginTop: components.layout.spacing.xl,
+    gap: components.layout.spacing.sm,
   },
   scenarioSliderLabel: {
-    ...typography.styles.body,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   scenarioSliderHelper: {
@@ -2123,8 +2120,8 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   scenarioCurveWrap: {
-    gap: spacing.xs,
-    marginTop: spacing.sm,
+    gap: components.layout.spacing.xs,
+    marginTop: components.layout.spacing.sm,
   },
   scenarioCurveChart: {
     height: components.sizes.chart.md,
@@ -2141,19 +2138,18 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.pill,
   },
   scenarioCurveLabel: {
-    ...typography.styles.small,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   scenarioOutcomeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   outcomePressable: {
     flexBasis: '48%',
     flexGrow: 1,
-    minWidth: spacing.none,
+    minWidth: components.layout.spacing.none,
     borderRadius: components.radius.input,
   },
   outcomePressablePressed: {
@@ -2161,12 +2157,12 @@ const createStyles = (colors, components) =>
     transform: [{ scale: components.transforms.scalePressed }],
   },
   scenarioPanel: {
-    padding: spacing.md,
+    padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surfaceActive,
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   scenarioPanelHeader: {
     flexDirection: 'row',
@@ -2178,8 +2174,8 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   scenarioBadge: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: components.layout.spacing.md,
+    paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: toRgba(colors.accent.primary, 0.6),
@@ -2194,12 +2190,12 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   scenarioRail: {
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   scenarioRailRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   scenarioRailTrack: {
     alignItems: 'center',
@@ -2226,7 +2222,7 @@ const createStyles = (colors, components) =>
   scenarioRailLine: {
     width: components.sizes.line.thin,
     height: components.sizes.track.sm,
-    marginTop: spacing.xs,
+    marginTop: components.layout.spacing.xs,
     backgroundColor: toRgba(colors.text.secondary, 0.5),
   },
   scenarioRailLineBroken: {
@@ -2255,19 +2251,19 @@ const createStyles = (colors, components) =>
   scenarioRailLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   scenarioRailLabelColumn: {
     flex: 1,
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   scenarioConsequence: {
     ...typography.styles.small,
     color: colors.text.secondary,
   },
   scenarioPrematureBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: components.layout.spacing.sm,
+    paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: toRgba(colors.accent.primary, 0.6),
@@ -2277,8 +2273,8 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   outcomePanel: {
-    gap: spacing.sm,
-    padding: spacing.md,
+    gap: components.layout.spacing.sm,
+    padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2292,15 +2288,14 @@ const createStyles = (colors, components) =>
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   outcomeTitleStack: {
     flex: 1,
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   outcomeScenarioLabel: {
-    ...typography.styles.small,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   outcomeLabel: {
@@ -2310,9 +2305,9 @@ const createStyles = (colors, components) =>
   outcomeFocusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    gap: components.layout.spacing.xs,
+    paddingHorizontal: components.layout.spacing.sm,
+    paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: toRgba(colors.text.secondary, 0.4),
@@ -2357,10 +2352,10 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   optionList: {
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   option: {
-    padding: spacing.sm,
+    padding: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     backgroundColor: colors.background.surfaceActive,
     borderWidth: components.borderWidth.thin,
@@ -2379,23 +2374,23 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   insightCard: {
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   insightTitle: {
     ...typography.styles.h2,
     color: colors.text.primary,
   },
   exerciseCard: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   exerciseBody: {
     flex: 1,
   },
   exerciseContent: {
-    gap: spacing.lg,
+    gap: components.layout.spacing.lg,
   },
   exerciseSection: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   exerciseInstruction: {
     ...typography.styles.body,
@@ -2412,18 +2407,17 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   exerciseSectionLabel: {
-    ...typography.styles.small,
-    textTransform: 'uppercase',
+    ...typography.styles.stepLabel,
     color: colors.text.secondary,
   },
   exerciseSlots: {
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   exerciseSlot: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
+    gap: components.layout.spacing.sm,
+    padding: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2468,11 +2462,11 @@ const createStyles = (colors, components) =>
   exerciseChipList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   exerciseChip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2485,7 +2479,7 @@ const createStyles = (colors, components) =>
   exerciseActionRow: {
     flexDirection: 'column',
     alignItems: 'stretch',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   exerciseHintButton: {
     width: '100%',
@@ -2495,15 +2489,15 @@ const createStyles = (colors, components) =>
   },
   exerciseFooter: {
     marginTop: 'auto',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   exerciseHintBody: {
     ...typography.styles.body,
     color: colors.text.primary,
   },
   exerciseOutcome: {
-    gap: spacing.sm,
-    padding: spacing.md,
+    gap: components.layout.spacing.sm,
+    padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2551,14 +2545,14 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   sequenceList: {
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
+    gap: components.layout.spacing.sm,
+    marginBottom: components.layout.spacing.sm,
   },
   sequenceItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
+    gap: components.layout.spacing.sm,
+    padding: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     backgroundColor: colors.background.surfaceActive,
     borderWidth: components.borderWidth.thin,
@@ -2582,7 +2576,7 @@ const createStyles = (colors, components) =>
     flex: 1,
   },
   sliderRow: {
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   sliderTitle: {
     ...typography.styles.small,
@@ -2604,8 +2598,8 @@ const createStyles = (colors, components) =>
     opacity: components.opacity.value45,
   },
   resultsBlock: {
-    gap: spacing.sm,
-    marginTop: spacing.sm,
+    gap: components.layout.spacing.sm,
+    marginTop: components.layout.spacing.sm,
   },
   resultRow: {
     flexDirection: 'row',
@@ -2631,13 +2625,13 @@ const createStyles = (colors, components) =>
     backgroundColor: colors.accent.primary,
   },
   impactList: {
-    gap: spacing.xs,
-    marginTop: spacing.xs,
+    gap: components.layout.spacing.xs,
+    marginTop: components.layout.spacing.xs,
   },
   impactRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   impactText: {
     ...typography.styles.small,
@@ -2645,35 +2639,35 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   exerciseActions: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   reflectionThread: {
-    gap: spacing.lg,
+    gap: components.layout.spacing.lg,
   },
   reflectionBody: {
     flex: 1,
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   reflectionScroll: {
     flex: 1,
   },
   reflectionScrollContent: {
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xxl,
+    paddingTop: components.layout.spacing.sm,
+    paddingBottom: components.layout.spacing.xxl,
   },
   reflectionFooter: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
     marginTop: 'auto',
-    paddingTop: spacing.sm,
+    paddingTop: components.layout.spacing.sm,
     borderTopWidth: components.borderWidth.thin,
     borderTopColor: toRgba(colors.text.secondary, 0.25),
   },
   reflectionClosedCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    gap: components.layout.spacing.sm,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2681,7 +2675,7 @@ const createStyles = (colors, components) =>
   },
   reflectionClosedTextWrap: {
     flex: 1,
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   reflectionClosedTitle: {
     ...typography.styles.small,
@@ -2695,8 +2689,8 @@ const createStyles = (colors, components) =>
   chatBubble: {
     maxWidth: '92%',
     borderRadius: components.radius.input,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.md,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surfaceActive,
@@ -2714,7 +2708,7 @@ const createStyles = (colors, components) =>
     ...typography.styles.meta,
     color: colors.text.secondary,
     textTransform: 'uppercase',
-    marginBottom: spacing.xs,
+    marginBottom: components.layout.spacing.xs,
   },
   chatText: {
     ...typography.styles.body,
@@ -2724,7 +2718,7 @@ const createStyles = (colors, components) =>
     ...components.input.container,
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   reflectionInput: {
     flex: 1,
@@ -2753,9 +2747,9 @@ const createStyles = (colors, components) =>
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    gap: components.layout.spacing.xs,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2766,10 +2760,10 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   summaryCard: {
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   summaryHeaderBlock: {
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   summaryTitle: {
     ...typography.styles.h1,
@@ -2787,14 +2781,14 @@ const createStyles = (colors, components) =>
     flex: 1,
   },
   summaryContent: {
-    gap: spacing.lg,
+    gap: components.layout.spacing.lg,
     flex: 1,
   },
   summaryScroll: {
     flex: 1,
   },
   summaryScrollContent: {
-    paddingBottom: spacing.md,
+    paddingBottom: components.layout.spacing.md,
   },
   systemInsight: {
     ...typography.styles.body,
@@ -2806,47 +2800,47 @@ const createStyles = (colors, components) =>
   },
   processMap: {
     position: 'relative',
-    gap: spacing.md,
-    paddingLeft: spacing.lg,
+    gap: components.layout.spacing.md,
+    paddingLeft: components.layout.spacing.lg,
   },
   summaryProcessMap: {
-    paddingLeft: spacing.none,
-    gap: spacing.lg,
+    paddingLeft: components.layout.spacing.none,
+    gap: components.layout.spacing.lg,
   },
   processLine: {
     position: 'absolute',
     left: components.offsets.lesson.processLineLeft,
-    top: spacing.xs,
-    bottom: spacing.xs,
+    top: components.layout.spacing.xs,
+    bottom: components.layout.spacing.xs,
     width: components.sizes.line.thin,
     borderRadius: components.radius.pill,
     backgroundColor: toRgba(colors.text.secondary, 0.25),
   },
   processStationBlock: {
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   summaryStationBlock: {
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   processStationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   processStationRowActive: {
     backgroundColor: toRgba(colors.background.surfaceActive, 0.6),
     borderRadius: components.radius.input,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.sm,
   },
   summaryStationRow: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingVertical: components.layout.spacing.md,
+    paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surface,
-    gap: spacing.md,
+    gap: components.layout.spacing.md,
   },
   summaryStationRowActive: {
     borderColor: toRgba(colors.accent.primary, 0.6),
@@ -2868,11 +2862,11 @@ const createStyles = (colors, components) =>
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   summaryStationText: {
     flex: 1,
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   processStationIndicator: {
     width: components.sizes.square.xs,
@@ -2925,19 +2919,19 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   processPanel: {
-    marginLeft: spacing.lg,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    marginLeft: components.layout.spacing.lg,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
     backgroundColor: colors.background.surface,
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   summaryProcessPanel: {
-    marginLeft: components.sizes.square.md + spacing.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    marginLeft: components.sizes.square.md + components.layout.spacing.md,
+    paddingVertical: components.layout.spacing.md,
+    paddingHorizontal: components.layout.spacing.md,
     borderColor: toRgba(colors.text.secondary, 0.3),
     backgroundColor: colors.background.surfaceActive,
   },
@@ -2948,11 +2942,11 @@ const createStyles = (colors, components) =>
   processSubsteps: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.xs,
+    gap: components.layout.spacing.xs,
   },
   processChip: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingVertical: components.layout.spacing.sm,
+    paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
     borderColor: colors.ui.divider,
@@ -2967,12 +2961,12 @@ const createStyles = (colors, components) =>
     color: colors.text.primary,
   },
   takeawayList: {
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   takeawayRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: components.layout.spacing.sm,
   },
   takeawayText: {
     ...typography.styles.body,
@@ -2981,8 +2975,8 @@ const createStyles = (colors, components) =>
   videoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
+    gap: components.layout.spacing.sm,
+    padding: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     backgroundColor: colors.background.surface,
   },

@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
 import { SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 
 const FAQ_ITEMS = [
   {
@@ -42,14 +41,12 @@ const FAQ_ITEMS = [
 
 export default function FAQScreen({ navigation }) {
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeader
@@ -76,28 +73,25 @@ export default function FAQScreen({ navigation }) {
           />
         </Card>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     list: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     card: {
       gap: components.layout.cardGap,

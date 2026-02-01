@@ -8,8 +8,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, typography, useTheme } from './theme';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { colors, typography, useTheme } from './theme';
 import { AppProvider, useApp } from './utils/AppContext';
 import { GlossaryProvider } from './components/GlossaryProvider';
 import HomeScreen from './screens/HomeScreen';
@@ -26,10 +26,12 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function Tabs() {
-  const insets = useSafeAreaInsets();
-  const { colors, typography } = useTheme();
-  const tabBarHeight = 64 + insets.bottom;
-  const tabBarPaddingBottom = Math.max(insets.bottom, spacing.xs);
+  const { colors, typography, components } = useTheme();
+  const tabBarHeight = 64 + components.layout.safeArea.bottom;
+  const tabBarPaddingBottom = Math.max(
+    components.layout.safeArea.bottom,
+    components.layout.spacing.xs
+  );
 
   return (
     <Tab.Navigator
@@ -39,7 +41,7 @@ function Tabs() {
           backgroundColor: colors.background.surface,
           borderTopColor: colors.ui.divider,
           height: tabBarHeight,
-          paddingTop: spacing.xs,
+          paddingTop: components.layout.spacing.xs,
           paddingBottom: tabBarPaddingBottom,
         },
         tabBarActiveTintColor: colors.accent.primary,

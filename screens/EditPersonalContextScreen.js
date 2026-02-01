@@ -1,18 +1,17 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import Toast from '../components/Toast';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import useToast from '../utils/useToast';
 
 export default function EditPersonalContextScreen({ navigation }) {
   const { onboardingContext, updateOnboardingContext } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [experienceAnswer, setExperienceAnswer] = useState(
     onboardingContext?.experienceAnswer || ''
@@ -36,10 +35,9 @@ export default function EditPersonalContextScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerRow}>
@@ -60,7 +58,7 @@ export default function EditPersonalContextScreen({ navigation }) {
           <AppText style={styles.label}>
             What have you already done in terms of investing?
           </AppText>
-          <TextInput
+          <AppTextInput
             value={experienceAnswer}
             onChangeText={setExperienceAnswer}
             placeholder="e.g. nothing yet, crypto, ETFs, savings..."
@@ -74,7 +72,7 @@ export default function EditPersonalContextScreen({ navigation }) {
           <AppText style={styles.label}>
             What do you already know about investing today?
           </AppText>
-          <TextInput
+          <AppTextInput
             value={knowledgeAnswer}
             onChangeText={setKnowledgeAnswer}
             placeholder="e.g. basic terms, risks, returns..."
@@ -86,7 +84,7 @@ export default function EditPersonalContextScreen({ navigation }) {
 
         <View style={styles.field}>
           <AppText style={styles.label}>Why do you want to start investing?</AppText>
-          <TextInput
+          <AppTextInput
             value={motivationAnswer}
             onChangeText={setMotivationAnswer}
             placeholder="e.g. long-term growth, curiosity, financial independence..."
@@ -108,25 +106,22 @@ export default function EditPersonalContextScreen({ navigation }) {
         </View>
       </ScrollView>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     headerRow: {
       flexDirection: 'row',
@@ -150,7 +145,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     field: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     label: {
       ...typography.styles.small,
@@ -165,7 +160,7 @@ const createStyles = (colors, components) =>
     noteCard: {
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.card,
-      padding: spacing.md,
+      padding: components.layout.spacing.md,
     },
     noteText: {
       ...typography.styles.small,
@@ -173,7 +168,7 @@ const createStyles = (colors, components) =>
     },
     actions: {
       flexDirection: 'row',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     flex: {
       flex: 1,

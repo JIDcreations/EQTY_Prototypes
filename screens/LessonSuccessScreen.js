@@ -5,7 +5,7 @@ import OnboardingScreen from '../components/OnboardingScreen';
 import OnboardingStackedCard from '../components/OnboardingStackedCard';
 import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getLessonContent, getLessonStepCopy } from '../utils/localization';
 
@@ -66,8 +66,8 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingBottom: spacing.xl,
-      paddingTop: spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
+      paddingTop: components.layout.spacing.xl,
     },
     content: {
       flex: 1,
@@ -75,7 +75,7 @@ const createStyles = (colors, components) =>
       transform: [{ translateY: components.offsets.translate.sm }],
     },
     cardHeader: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     title: {
       ...typography.styles.h1,
@@ -90,7 +90,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     footer: {
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
     },
     accentOrbTop: {
       position: 'absolute',

@@ -2,14 +2,14 @@ import React, { createContext, useCallback, useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet from './BottomSheet';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export const GlossaryContext = createContext(null);
 
 export function GlossaryProvider({ children }) {
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [activeTerm, setActiveTerm] = useState(null);
 
   const openTerm = useCallback((term) => {
@@ -70,7 +70,7 @@ export function useGlossary() {
   return React.useContext(GlossaryContext);
 }
 
-const createStyles = (colors) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     sheetText: {
       ...typography.styles.body,
@@ -81,13 +81,13 @@ const createStyles = (colors) =>
       color: colors.text.primary,
     },
     glossarySection: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     learnMoreRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.sm,
-      paddingTop: spacing.xs,
+      gap: components.layout.spacing.sm,
+      paddingTop: components.layout.spacing.xs,
     },
     learnMoreText: {
       ...typography.styles.body,

@@ -4,7 +4,7 @@ import AppText from '../../components/AppText';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import { spacing, typography, useTheme } from '../../theme';
+import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
@@ -50,8 +50,8 @@ const createStyles = (colors, components) =>
     container: {
       flex: 1,
       justifyContent: 'space-between',
-      gap: spacing.xl,
-      paddingBottom: spacing.xl,
+      gap: components.layout.spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
     },
     topArea: {
       alignItems: 'center',
@@ -62,17 +62,17 @@ const createStyles = (colors, components) =>
       color: colors.text.primary,
     },
     cardHeader: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     badge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
       alignSelf: 'flex-start',
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.pill,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
+      paddingHorizontal: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
       borderColor: colors.ui.border,
     },

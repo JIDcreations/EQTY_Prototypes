@@ -1,25 +1,23 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function Toast({ message, visible, onHide, duration = 1600 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(spacing.md)).current;
+  const translateY = useRef(new Animated.Value(components.layout.spacing.md)).current;
   const toastStyle = useMemo(
     () => [
       styles.toast,
       {
         left: components.layout.pagePaddingHorizontal,
         right: components.layout.pagePaddingHorizontal,
-        bottom: insets.bottom,
+        bottom: components.layout.spacing.none,
       },
     ],
-    [components.layout.pagePaddingHorizontal, insets.bottom, styles.toast]
+    [components.layout.pagePaddingHorizontal, components.layout.spacing.none, styles.toast]
   );
 
   useEffect(() => {
@@ -43,11 +41,11 @@ export default function Toast({ message, visible, onHide, duration = 1600 }) {
             duration: 180,
             useNativeDriver: true,
           }),
-          Animated.timing(translateY, {
-          toValue: spacing.md,
-            duration: 180,
-            useNativeDriver: true,
-          }),
+        Animated.timing(translateY, {
+          toValue: components.layout.spacing.md,
+          duration: 180,
+          useNativeDriver: true,
+        }),
         ]).start(() => {
           if (onHide) onHide();
         });
@@ -71,13 +69,13 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     toast: {
       position: 'absolute',
-      marginBottom: spacing.xl,
+      marginBottom: components.layout.spacing.xl,
     },
     toastInner: {
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.input,
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.md,
+      paddingVertical: components.layout.spacing.sm,
+      paddingHorizontal: components.layout.spacing.md,
       alignItems: 'center',
       borderWidth: components.borderWidth.thin,
       borderColor: colors.ui.divider,

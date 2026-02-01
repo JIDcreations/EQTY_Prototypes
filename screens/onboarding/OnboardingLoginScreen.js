@@ -4,15 +4,15 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../../components/AppText';
+import AppTextInput from '../../components/AppTextInput';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import { spacing, typography, useTheme } from '../../theme';
+import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
@@ -67,7 +67,7 @@ export default function OnboardingLoginScreen({ navigation }) {
             <View style={styles.fields}>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.login.usernameLabel}</AppText>
-                <TextInput
+                <AppTextInput
                   value={username}
                   onChangeText={setUsername}
                   placeholder={copy.login.usernamePlaceholder}
@@ -78,7 +78,7 @@ export default function OnboardingLoginScreen({ navigation }) {
               </View>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.login.passwordLabel}</AppText>
-                <TextInput
+                <AppTextInput
                   value={password}
                   onChangeText={setPassword}
                   placeholder={copy.login.passwordPlaceholder}
@@ -106,7 +106,7 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     scrollContent: {
       flexGrow: 1,
-      paddingBottom: spacing.xxl,
+      paddingBottom: components.layout.spacing.xxl,
     },
     keyboard: {
       flex: 1,
@@ -114,8 +114,8 @@ const createStyles = (colors, components) =>
     layout: {
       flex: 1,
       justifyContent: 'space-between',
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.md,
+      paddingTop: components.layout.spacing.lg,
+      paddingBottom: components.layout.spacing.md,
     },
     topArea: {
       alignItems: 'center',
@@ -124,7 +124,7 @@ const createStyles = (colors, components) =>
     topRow: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: spacing.md,
+      marginBottom: components.layout.spacing.md,
       minHeight: components.sizes.input.minHeight,
     },
     logo: {
@@ -139,20 +139,20 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       position: 'absolute',
-      left: spacing.none,
+      left: components.layout.spacing.none,
     },
     cardHeader: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     badge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
       alignSelf: 'flex-start',
       backgroundColor: colors.background.surfaceActive,
       borderRadius: components.radius.pill,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
+      paddingHorizontal: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
       borderColor: colors.ui.border,
     },
@@ -167,7 +167,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     ctaBlock: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     loginLink: {
       ...typography.styles.small,
@@ -183,10 +183,10 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     fields: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     field: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     label: {
       ...typography.styles.small,

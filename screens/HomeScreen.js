@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
@@ -16,14 +15,13 @@ import {
   getLocalizedLessons,
   getLocalizedModules,
 } from '../utils/localization';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const { progress, authUser, userContext, preferences } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [expandedFocus, setExpandedFocus] = useState(null);
   const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
@@ -86,10 +84,9 @@ export default function HomeScreen() {
   ].filter((item) => item.summary);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -169,28 +166,25 @@ export default function HomeScreen() {
           })}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     header: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     headerMainRow: {
       flexDirection: 'row',
@@ -198,7 +192,7 @@ const createStyles = (colors, components) =>
     },
     headerGreeting: {
       flex: 1,
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     greeting: {
       ...typography.styles.body,
@@ -222,7 +216,7 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     heroTag: {
       backgroundColor: toRgba(colors.text.primary, 0.06),
@@ -246,7 +240,7 @@ const createStyles = (colors, components) =>
       alignSelf: 'stretch',
     },
     focusList: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     focusPressable: {
       borderRadius: components.radius.card,
@@ -268,19 +262,18 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     focusLabel: {
-      ...typography.styles.small,
+      ...typography.styles.stepLabel,
       color: colors.text.secondary,
-      textTransform: 'uppercase',
     },
     focusActionPill: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
+      gap: components.layout.spacing.xs,
+      paddingHorizontal: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.xs,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
       borderColor: toRgba(colors.text.primary, 0.16),
@@ -291,7 +284,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     focusActionIcon: {
-      marginTop: spacing.none,
+      marginTop: components.layout.spacing.none,
     },
     focusTitle: {
       ...typography.styles.h3,

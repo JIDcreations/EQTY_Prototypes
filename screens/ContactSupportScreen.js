@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import SettingsRow from '../components/SettingsRow';
 import Toast from '../components/Toast';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import useToast from '../utils/useToast';
 
 const CONTACT_CHANNELS = [
@@ -34,7 +34,6 @@ const SUPPORT_CHECKLIST = [
 
 export default function ContactSupportScreen({ navigation }) {
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -48,10 +47,9 @@ export default function ContactSupportScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -89,7 +87,7 @@ export default function ContactSupportScreen({ navigation }) {
         <Card style={styles.card}>
           <AppText style={styles.sectionTitle}>Send a request</AppText>
           <AppText style={styles.label}>Subject</AppText>
-          <TextInput
+          <AppTextInput
             value={subject}
             onChangeText={setSubject}
             placeholder="Short summary"
@@ -97,7 +95,7 @@ export default function ContactSupportScreen({ navigation }) {
             style={styles.input}
           />
           <AppText style={styles.label}>Message</AppText>
-          <TextInput
+          <AppTextInput
             value={message}
             onChangeText={setMessage}
             placeholder="Describe what you need help with"
@@ -113,25 +111,22 @@ export default function ContactSupportScreen({ navigation }) {
         </Card>
       </ScrollView>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     card: {
       gap: components.layout.cardGap,
@@ -141,10 +136,10 @@ const createStyles = (colors, components) =>
       color: colors.text.primary,
     },
     list: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     bulletList: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     bulletText: {
       ...typography.styles.small,

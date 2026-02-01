@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import { SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 
 const HELP_TOPICS = [
   {
@@ -52,7 +52,6 @@ const GUIDE_ITEMS = [
 
 export default function HelpCenterScreen({ navigation }) {
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [query, setQuery] = useState('');
   const filteredGuides = useMemo(() => {
@@ -65,10 +64,9 @@ export default function HelpCenterScreen({ navigation }) {
   }, [query]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -85,11 +83,11 @@ export default function HelpCenterScreen({ navigation }) {
               size={components.sizes.icon.md}
               color={colors.text.secondary}
             />
-            <TextInput
+            <AppTextInput
               value={query}
               onChangeText={setQuery}
               placeholder="Search help topics"
-            placeholderTextColor={colors.text.secondary}
+              placeholderTextColor={colors.text.secondary}
               style={styles.searchInput}
             />
             {query.length > 0 ? (
@@ -149,25 +147,22 @@ export default function HelpCenterScreen({ navigation }) {
           />
         </Card>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     card: {
       gap: components.layout.cardGap,
@@ -181,23 +176,23 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       backgroundColor: colors.background.surface,
       borderRadius: components.radius.input,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.md,
-      gap: spacing.sm,
+      paddingHorizontal: components.layout.spacing.lg,
+      paddingVertical: components.layout.spacing.md,
+      gap: components.layout.spacing.sm,
     },
     searchInput: {
       flex: 1,
       ...components.input.text,
     },
     clearButton: {
-      padding: spacing.xs,
+      padding: components.layout.spacing.xs,
     },
     helperText: {
       ...typography.styles.small,
       color: colors.text.secondary,
     },
     list: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     listItem: {
       ...components.list.row,

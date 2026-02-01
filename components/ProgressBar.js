@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { spacing, useTheme } from '../theme';
+import { useTheme } from '../theme';
 
 export default function ProgressBar({ progress }) {
   const { colors, components } = useTheme();
@@ -16,7 +16,7 @@ export default function ProgressBar({ progress }) {
 const createStyles = (colors, components) =>
   StyleSheet.create({
     track: {
-      height: spacing.sm,
+      height: components.layout.spacing.sm,
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.surfaceActive,
       overflow: 'hidden',

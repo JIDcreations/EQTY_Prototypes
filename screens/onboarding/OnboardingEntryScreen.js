@@ -6,7 +6,7 @@ import OnboardingAuthButton from '../../components/OnboardingAuthButton';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
-import { spacing, typography, useTheme } from '../../theme';
+import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
@@ -90,10 +90,10 @@ const createStyles = (colors, components) =>
     container: {
       flex: 1,
       justifyContent: 'space-between',
-      paddingBottom: spacing.xl,
+      paddingBottom: components.layout.spacing.xl,
     },
     header: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
       maxWidth: components.sizes.screen.maxContentWidth,
     },
     logo: {
@@ -103,7 +103,7 @@ const createStyles = (colors, components) =>
     kickerRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     kickerDot: {
       width: components.sizes.dot.xs,
@@ -124,7 +124,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     cardHeader: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     cardTitle: {
       ...typography.styles.h2,
@@ -135,7 +135,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     actions: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     link: {
       ...typography.styles.small,

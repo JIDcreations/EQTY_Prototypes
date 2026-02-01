@@ -8,12 +8,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
 export default function BottomSheet({ visible, title, onClose, children }) {
-  const insets = useSafeAreaInsets();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [isMounted, setIsMounted] = useState(visible);
@@ -87,7 +85,6 @@ export default function BottomSheet({ visible, title, onClose, children }) {
               </Pressable>
             </View>
             <View style={styles.content}>{children}</View>
-            <View style={{ height: insets.bottom }} />
           </Animated.View>
         </GestureDetector>
       </View>
@@ -124,8 +121,8 @@ const createStyles = (colors, components) => {
       borderTopLeftRadius: components.radius.card,
       borderTopRightRadius: components.radius.card,
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.xxl,
+      paddingTop: components.layout.spacing.md,
+      paddingBottom: components.layout.spacing.xxl + components.layout.safeArea.bottom,
     },
     handle: {
       width: components.sizes.handle.width,
@@ -133,13 +130,13 @@ const createStyles = (colors, components) => {
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.surface,
       alignSelf: 'center',
-      marginBottom: spacing.md,
+      marginBottom: components.layout.spacing.md,
     },
     headerRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: spacing.sm,
+      marginBottom: components.layout.spacing.sm,
     },
     title: {
       ...typography.styles.h2,
@@ -153,10 +150,10 @@ const createStyles = (colors, components) => {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: colors.background.surface,
-      marginLeft: spacing.sm,
+      marginLeft: components.layout.spacing.sm,
     },
     content: {
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
   });
 };

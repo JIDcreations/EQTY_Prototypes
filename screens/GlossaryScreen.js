@@ -1,17 +1,16 @@
 import React, { useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import Card from '../components/Card';
 import BottomSheet from '../components/BottomSheet';
 import SectionTitle from '../components/SectionTitle';
 import { glossaryTerms } from '../data/glossary';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 
 export default function GlossaryScreen() {
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [query, setQuery] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(null);
@@ -44,10 +43,9 @@ export default function GlossaryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -58,7 +56,7 @@ export default function GlossaryScreen() {
             size={components.sizes.icon.md}
             color={colors.text.secondary}
           />
-          <TextInput
+          <AppTextInput
             value={query}
             onChangeText={setQuery}
             placeholder="Search financial terms"
@@ -119,47 +117,44 @@ export default function GlossaryScreen() {
           </View>
         ) : null}
       </BottomSheet>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.background.surface,
       borderRadius: components.radius.input,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.md,
-      gap: spacing.sm,
+      paddingHorizontal: components.layout.spacing.lg,
+      paddingVertical: components.layout.spacing.md,
+      gap: components.layout.spacing.sm,
     },
     searchInput: {
       flex: 1,
       ...components.input.text,
     },
     clearButton: {
-      padding: spacing.xs,
+      padding: components.layout.spacing.xs,
     },
     list: {
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     termCard: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     termTitle: {
       ...typography.styles.h2,
@@ -174,7 +169,7 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     sheetSection: {
-      gap: spacing.xs,
+      gap: components.layout.spacing.xs,
     },
     sheetLabel: {
       ...typography.styles.small,
@@ -187,8 +182,8 @@ const createStyles = (colors, components) =>
     learnMoreRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.sm,
-      paddingTop: spacing.xs,
+      gap: components.layout.spacing.sm,
+      paddingTop: components.layout.spacing.xs,
     },
     learnMoreText: {
       ...typography.styles.body,

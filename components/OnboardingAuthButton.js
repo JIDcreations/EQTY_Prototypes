@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from './AppText';
-import { spacing, useTheme } from '../theme';
+import { useTheme } from '../theme';
 
 export default function OnboardingAuthButton({ label, iconName, onPress }) {
   const { colors, components } = useTheme();
@@ -32,7 +32,7 @@ const createStyles = (colors, components) =>
       ...components.button.secondary,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.md,
+      gap: components.layout.spacing.md,
     },
     iconWrap: {
       width: components.sizes.square.md,

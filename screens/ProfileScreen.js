@@ -1,17 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import Card from '../components/Card';
 import AppText from '../components/AppText';
+import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton } from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 
 export default function ProfileScreen() {
   const { userContext, updateUserContext } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [experience, setExperience] = useState(userContext.experience);
   const [knowledge, setKnowledge] = useState(userContext.knowledge);
@@ -29,17 +28,16 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <SectionTitle title="Profile" subtitle="Personal learning context" />
 
         <Card style={styles.card}>
           <AppText style={styles.label}>Experience</AppText>
-          <TextInput
+          <AppTextInput
             style={styles.input}
             value={experience}
             onChangeText={setExperience}
@@ -47,7 +45,7 @@ export default function ProfileScreen() {
             placeholderTextColor={colors.text.secondary}
           />
           <AppText style={styles.label}>Knowledge</AppText>
-          <TextInput
+          <AppTextInput
             style={styles.input}
             value={knowledge}
             onChangeText={setKnowledge}
@@ -55,7 +53,7 @@ export default function ProfileScreen() {
             placeholderTextColor={colors.text.secondary}
           />
           <AppText style={styles.label}>Motivation</AppText>
-          <TextInput
+          <AppTextInput
             style={styles.input}
             value={motivation}
             onChangeText={setMotivation}
@@ -82,25 +80,22 @@ export default function ProfileScreen() {
           <AppText style={styles.caption}>Light mode is coming soon.</AppText>
         </Card>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     card: {
       gap: components.layout.cardGap,

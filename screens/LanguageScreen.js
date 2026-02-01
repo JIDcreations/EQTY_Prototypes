@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
-import { spacing, typography, useTheme } from '../theme';
+import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import { getLanguageOptions, getSettingsCopy } from '../utils/localization';
 import useToast from '../utils/useToast';
@@ -13,7 +12,6 @@ import useToast from '../utils/useToast';
 export default function LanguageScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
   const { colors, components } = useTheme();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const toast = useToast();
   const options = useMemo(
@@ -26,10 +24,9 @@ export default function LanguageScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeader title={settingsCopy.languageTitle} onBack={() => navigation.goBack()} />
@@ -60,32 +57,29 @@ export default function LanguageScreen({ navigation }) {
         </Card>
       </ScrollView>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     container: {
+      ...components.screen.container,
       flex: 1,
       backgroundColor: colors.background.app,
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: spacing.lg,
+      paddingTop: components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: spacing.none,
+      paddingBottom: components.layout.spacing.none,
     },
     card: {
-      paddingVertical: spacing.xs,
+      paddingVertical: components.layout.spacing.xs,
     },
     row: {
       ...components.list.row,
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: components.layout.spacing.lg,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
@@ -97,7 +91,7 @@ const createStyles = (colors, components) =>
     rowLeft: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.sm,
+      gap: components.layout.spacing.sm,
     },
     rowLabel: {
       ...typography.styles.body,
