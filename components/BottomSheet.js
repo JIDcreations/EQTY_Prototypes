@@ -11,11 +11,32 @@ import Animated, {
 import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
-export default function BottomSheet({ visible, title, onClose, children }) {
+export default function BottomSheet({
+  visible,
+  title,
+  onClose,
+  children,
+  scrimOpacity: scrimOpacityOverride,
+}) {
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const scrimMaxOpacity =
+    typeof scrimOpacityOverride === 'number'
+      ? scrimOpacityOverride
+      : components.opacity.value50;
+  const styles = useMemo(
+    () => createStyles(colors, components, scrimMaxOpacity),
+    [colors, components, scrimMaxOpacity]
+  );
+  const sheetTranslateDistance =
+    components.layout.spacing.xxl * 2 +
+    components.layout.spacing.xl +
+    components.layout.spacing.md +
+    components.layout.spacing.sm +
+    components.layout.baseline;
+  const scrimFadeDistance = sheetTranslateDistance * 2;
+  const velocityCloseThreshold = sheetTranslateDistance * 10;
   const [isMounted, setIsMounted] = useState(visible);
-  const translateY = useSharedValue(120);
+  const translateY = useSharedValue(sheetTranslateDistance);
   const scrimOpacity = useSharedValue(0);
 
   const handleClose = () => {
@@ -25,17 +46,17 @@ export default function BottomSheet({ visible, title, onClose, children }) {
   useEffect(() => {
     if (visible) {
       setIsMounted(true);
-      translateY.value = 120;
+      translateY.value = sheetTranslateDistance;
       scrimOpacity.value = 0;
       translateY.value = withTiming(0, { duration: 220 });
       scrimOpacity.value = withTiming(1, { duration: 220 });
     } else if (isMounted) {
-      translateY.value = withTiming(120, { duration: 180 }, (finished) => {
+      translateY.value = withTiming(sheetTranslateDistance, { duration: 180 }, (finished) => {
         if (finished) runOnJS(setIsMounted)(false);
       });
       scrimOpacity.value = withTiming(0, { duration: 180 });
     }
-  }, [visible, isMounted, scrimOpacity, translateY]);
+  }, [visible, isMounted, scrimOpacity, sheetTranslateDistance, translateY]);
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -48,11 +69,13 @@ export default function BottomSheet({ visible, title, onClose, children }) {
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       translateY.value = Math.max(0, event.translationY);
-      const nextOpacity = 1 - Math.min(event.translationY / 240, 1) * 0.5;
+      const nextOpacity = 1 - Math.min(event.translationY / scrimFadeDistance, 1) * 0.5;
       scrimOpacity.value = Math.max(0, nextOpacity);
     })
     .onEnd((event) => {
-      const shouldClose = event.translationY > 120 || event.velocityY > 1200;
+      const shouldClose =
+        event.translationY > sheetTranslateDistance ||
+        event.velocityY > velocityCloseThreshold;
       if (shouldClose) {
         runOnJS(handleClose)();
       } else {
@@ -101,8 +124,8 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors, components) => {
-  const scrimColor = toRgba(colors.text.primary, 0.5);
+const createStyles = (colors, components, scrimMaxOpacity) => {
+  const scrimColor = toRgba(colors.text.primary, scrimMaxOpacity);
 
   return StyleSheet.create({
     container: {
@@ -120,6 +143,8 @@ const createStyles = (colors, components) => {
       backgroundColor: colors.background.surfaceActive,
       borderTopLeftRadius: components.radius.card,
       borderTopRightRadius: components.radius.card,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.spacing.md,
       paddingBottom: components.layout.spacing.xxl + components.layout.safeArea.bottom,

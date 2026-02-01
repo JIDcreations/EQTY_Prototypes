@@ -100,6 +100,10 @@ export default function LessonStepScreen() {
   const { lessonId, step = 1, entrySource } = route.params || {};
   const { userContext, onboardingContext, addReflection, completeLesson, preferences } = useApp();
   const { components } = useTheme();
+  const keyboardOffset =
+    components.layout.spacing.xxl +
+    components.layout.spacing.xl +
+    components.layout.spacing.md;
   const glossary = useGlossary();
   const isIntroScenario = lessonId === 'lesson_0' && step === 3;
 
@@ -1513,7 +1517,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 72 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? keyboardOffset : 0}
       style={[styles.stepBody, styles.reflectionBody]}
     >
       {intro ? <AppText style={styles.stepIntro}>{intro}</AppText> : null}
@@ -1936,7 +1940,6 @@ const createStyles = (colors, components) =>
   },
   journeyTapHint: {
     ...typography.styles.body,
-    textTransform: 'uppercase',
     color: colors.text.secondary,
   },
   journeyVisual: {
@@ -2680,7 +2683,6 @@ const createStyles = (colors, components) =>
   reflectionClosedTitle: {
     ...typography.styles.small,
     color: colors.text.primary,
-    textTransform: 'uppercase',
   },
   reflectionClosedText: {
     ...typography.styles.small,
@@ -2707,7 +2709,6 @@ const createStyles = (colors, components) =>
   chatLabel: {
     ...typography.styles.meta,
     color: colors.text.secondary,
-    textTransform: 'uppercase',
     marginBottom: components.layout.spacing.xs,
   },
   chatText: {

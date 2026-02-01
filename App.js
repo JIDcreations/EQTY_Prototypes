@@ -27,7 +27,7 @@ const Stack = createStackNavigator();
 
 function Tabs() {
   const { colors, typography, components } = useTheme();
-  const tabBarHeight = 64 + components.layout.safeArea.bottom;
+  const tabBarHeight = components.layout.spacing.xxl * 2 + components.layout.safeArea.bottom;
   const tabBarPaddingBottom = Math.max(
     components.layout.safeArea.bottom,
     components.layout.spacing.xs

@@ -63,6 +63,7 @@ export default function OnboardingEntryScreen({ navigation }) {
         visible={sheetVisible}
         title={copy.entry.sheetTitle}
         onClose={() => setSheetVisible(false)}
+        scrimOpacity={0}
       >
         <OnboardingAuthButton
           label={copy.entry.apple}

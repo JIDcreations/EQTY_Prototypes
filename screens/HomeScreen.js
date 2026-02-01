@@ -226,7 +226,6 @@ const createStyles = (colors, components) =>
     heroMetaText: {
       ...typography.styles.small,
       color: colors.text.secondary,
-      textTransform: 'uppercase',
     },
     heroTitle: {
       ...typography.styles.h2,

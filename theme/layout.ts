@@ -1,3 +1,9 @@
+/**
+ * SOURCE OF TRUTH — DO NOT MODIFY.
+ * All screens must use these layout tokens.
+ * No hardcoded spacing/margins allowed.
+ */
+
 export const layout = {
   canvas: {
     width: 402,
