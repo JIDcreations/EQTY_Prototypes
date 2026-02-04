@@ -5,7 +5,6 @@ import AppText from '../../components/AppText';
 import AppTextInput from '../../components/AppTextInput';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
@@ -20,6 +19,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [answer, setAnswer] = useState(onboardingContext?.[field] || '');
   const localizedQuestion = copy.question.questions[field] || question;
+  const primaryLabel = isLast ? copy.question.finishButton : copy.question.button;
 
   const handleNext = async () => {
     const trimmed = answer.trim();
@@ -37,14 +37,14 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
         return;
       }
       if (exitToTabs || setHasOnboardedOnComplete) {
-        navigation.navigate('Tabs');
+        navigation.navigate('Tabs', { screen: 'Home' });
         return;
       }
       if (navigation.canGoBack()) {
         navigation.goBack();
         return;
       }
-      navigation.navigate('Tabs');
+      navigation.navigate('Tabs', { screen: 'Home' });
       return;
     }
     navigation.navigate({
@@ -81,28 +81,37 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
             style={styles.progress}
           />
         </View>
-        <OnboardingStackedCard>
-          <View style={styles.cardHeader}>
-            <View style={styles.badge}>
-              <View style={styles.badgeDot} />
-              <AppText style={styles.badgeText}>{copy.question.badge}</AppText>
-            </View>
+        <View style={styles.contentBlock}>
+          <View style={styles.content}>
             <AppText style={styles.title}>{localizedQuestion}</AppText>
+            <AppTextInput
+              value={answer}
+              onChangeText={setAnswer}
+              placeholder={copy.question.placeholder}
+              placeholderTextColor={colors.text.secondary}
+              multiline
+              style={styles.input}
+            />
           </View>
-          <AppTextInput
-            value={answer}
-            onChangeText={setAnswer}
-            placeholder={copy.question.placeholder}
-            placeholderTextColor={colors.text.secondary}
-            multiline
-            style={styles.input}
+          <PrimaryButton
+            label={primaryLabel}
+            onPress={handleNext}
+            style={styles.primaryButton}
           />
-          <PrimaryButton label={copy.question.button} onPress={handleNext} />
-        </OnboardingStackedCard>
+        </View>
       </KeyboardAvoidingView>
     </OnboardingScreen>
   );
 }
+
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
@@ -111,9 +120,8 @@ const createStyles = (colors, components) =>
     },
     container: {
       flex: 1,
-      justifyContent: 'space-between',
-      paddingBottom: components.layout.spacing.xl,
-      gap: components.layout.spacing.xl,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
     },
     headerRow: {
       flexDirection: 'row',
@@ -124,37 +132,22 @@ const createStyles = (colors, components) =>
       width: components.sizes.square.lg,
       height: components.sizes.square.lg,
       borderRadius: components.radius.pill,
-      backgroundColor: colors.background.surface,
+      backgroundColor: colors.background.app,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
       alignItems: 'center',
       justifyContent: 'center',
     },
     progress: {
       flex: 1,
     },
-    cardHeader: {
-      gap: components.layout.spacing.sm,
+    contentBlock: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
     },
-    badge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: components.layout.spacing.xs,
-      alignSelf: 'flex-start',
-      backgroundColor: colors.background.surfaceActive,
-      borderRadius: components.radius.pill,
-      paddingHorizontal: components.layout.spacing.sm,
-      paddingVertical: components.layout.spacing.xs,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-    },
-    badgeDot: {
-      width: components.sizes.dot.xs,
-      height: components.sizes.dot.xs,
-      borderRadius: components.radius.pill,
-      backgroundColor: colors.accent.primary,
-    },
-    badgeText: {
-      ...typography.styles.stepLabel,
-      color: colors.text.secondary,
+    content: {
+      gap: components.layout.spacing.lg,
     },
     title: {
       ...typography.styles.h1,
@@ -164,6 +157,12 @@ const createStyles = (colors, components) =>
       ...components.input.container,
       ...components.input.multiline,
       ...components.input.text,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
       textAlignVertical: 'top',
+    },
+    primaryButton: {
+      paddingVertical: components.layout.spacing.md,
+      minHeight: components.sizes.input.minHeight,
     },
   });

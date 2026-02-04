@@ -609,6 +609,7 @@ const ONBOARDING_COPY = {
       badge: 'Your perspective',
       placeholder: 'Share a few thoughts...',
       button: 'Next',
+      finishButton: 'Go to Home',
       labelPrefix: 'Question',
       questions: {
         experienceAnswer: 'What have you already done in terms of investing?',
@@ -750,6 +751,7 @@ const ONBOARDING_COPY = {
       badge: 'Jouw perspectief',
       placeholder: 'Deel een paar gedachten...',
       button: 'Volgende',
+      finishButton: 'Ga naar home',
       labelPrefix: 'Vraag',
       questions: {
         experienceAnswer: 'Wat heb je al gedaan op vlak van investeren?',
