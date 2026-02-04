@@ -33,7 +33,11 @@ export default function OnboardingBasicInfoScreen({ navigation }) {
   };
 
   return (
-    <OnboardingScreen scroll contentContainerStyle={styles.scrollContent}>
+    <OnboardingScreen
+      backgroundVariant="bg3"
+      scroll
+      contentContainerStyle={styles.scrollContent}
+    >
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

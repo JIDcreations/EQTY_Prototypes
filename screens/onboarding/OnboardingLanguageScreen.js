@@ -27,7 +27,11 @@ export default function OnboardingLanguageScreen({ navigation, route }) {
   };
 
   return (
-    <OnboardingScreen contentContainerStyle={styles.screen} showGlow={false}>
+    <OnboardingScreen
+      backgroundVariant="bg3"
+      contentContainerStyle={styles.screen}
+      showGlow={false}
+    >
       <View style={styles.layout}>
         <View style={styles.header}>
           <View style={styles.titleBlock}>

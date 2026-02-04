@@ -1,6 +1,15 @@
 import { layout } from './layout';
 import { typography } from './typography';
 
+const toRgba = (hex: string, alpha: number) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 const radius = {
   button: 16,
   card: 24,
@@ -183,11 +192,13 @@ export const createComponents = (colors) => ({
     },
     primary: {
       backgroundColor: colors.accent.primary,
+      borderWidth: borderWidth.thin,
+      borderColor: toRgba(colors.text.onAccent, opacity.value20),
     },
     secondary: {
       backgroundColor: colors.background.surface,
       borderWidth: borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.text.primary, opacity.value20),
     },
     label: {
       ...typography.styles.bodyStrong,
@@ -228,7 +239,7 @@ export const createComponents = (colors) => ({
       paddingHorizontal: layout.spacing.lg,
       backgroundColor: colors.background.surfaceActive,
       borderWidth: borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.text.primary, opacity.value20),
       minHeight: sizes.input.minHeight,
     },
     multiline: {

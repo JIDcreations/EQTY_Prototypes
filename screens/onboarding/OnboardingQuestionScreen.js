@@ -61,7 +61,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   };
 
   return (
-    <OnboardingScreen contentContainerStyle={styles.screen}>
+    <OnboardingScreen backgroundVariant="bg3" contentContainerStyle={styles.screen}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

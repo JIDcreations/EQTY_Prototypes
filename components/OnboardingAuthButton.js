@@ -4,19 +4,45 @@ import { Ionicons } from '@expo/vector-icons';
 import AppText from './AppText';
 import { useTheme } from '../theme';
 
-export default function OnboardingAuthButton({ label, iconName, onPress }) {
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+export default function OnboardingAuthButton({
+  label,
+  iconName,
+  onPress,
+  iconSize,
+  iconContainerSize,
+  bordered = false,
+}) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const resolvedIconSize = iconSize ?? components.sizes.icon.md;
+  const resolvedIconContainerSize = iconContainerSize ?? components.sizes.square.md;
 
   return (
     <Pressable
-      style={styles.button}
+      style={[styles.button, bordered && styles.bordered]}
       onPress={onPress}
     >
-      <View style={styles.iconWrap}>
+      <View
+        style={[
+          styles.iconWrap,
+          {
+            width: resolvedIconContainerSize,
+            height: resolvedIconContainerSize,
+          },
+        ]}
+      >
         <Ionicons
           name={iconName}
-          size={components.sizes.icon.md}
+          size={resolvedIconSize}
           color={colors.text.primary}
         />
       </View>
@@ -34,9 +60,10 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       gap: components.layout.spacing.md,
     },
+    bordered: {
+      borderColor: toRgba(colors.text.primary, components.opacity.value35),
+    },
     iconWrap: {
-      width: components.sizes.square.md,
-      height: components.sizes.square.md,
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.surfaceActive,
       alignItems: 'center',

@@ -3,7 +3,10 @@ import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../theme';
 
-const backgroundImage = require('../assets/backgrounds/BG-1.png');
+const backgroundImages = {
+  bg2: require('../assets/backgrounds/BG-2.png'),
+  bg3: require('../assets/backgrounds/BG-3.png'),
+};
 
 const toRgba = (hex, alpha) => {
   const cleaned = hex.replace('#', '');
@@ -17,6 +20,7 @@ const toRgba = (hex, alpha) => {
 export default function OnboardingScreen({
   children,
   variant = 'default',
+  backgroundVariant = 'bg2',
   scroll = false,
   contentContainerStyle,
   style,
@@ -24,6 +28,7 @@ export default function OnboardingScreen({
 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const resolvedBackground = backgroundImages[backgroundVariant] || backgroundImages.bg2;
   const resolvedGradientColors = [
     toRgba(colors.background.app, components.opacity.value35),
     toRgba(colors.background.app, components.opacity.value35),
@@ -32,7 +37,7 @@ export default function OnboardingScreen({
   if (scroll) {
     return (
       <ImageBackground
-        source={backgroundImage}
+        source={resolvedBackground}
         style={[styles.background, style]}
         imageStyle={styles.backgroundImage}
         resizeMode="cover"
@@ -65,7 +70,7 @@ export default function OnboardingScreen({
 
   return (
     <ImageBackground
-      source={backgroundImage}
+      source={resolvedBackground}
       style={[styles.background, style]}
       imageStyle={styles.backgroundImage}
       resizeMode="cover"

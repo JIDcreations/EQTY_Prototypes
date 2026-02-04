@@ -33,7 +33,7 @@ export default function OnboardingEntryScreen({ navigation }) {
   };
 
   return (
-    <OnboardingScreen>
+    <OnboardingScreen backgroundVariant="bg3">
       <View style={styles.container}>
         <View style={styles.header}>
           <AppText style={styles.logo}>EQTY</AppText>
@@ -68,12 +68,18 @@ export default function OnboardingEntryScreen({ navigation }) {
         <OnboardingAuthButton
           label={copy.entry.apple}
           iconName="logo-apple"
+          iconSize={components.sizes.icon.lg}
+          iconContainerSize={components.sizes.square.lg}
+          bordered
           variant="light"
           onPress={handleApple}
         />
         <OnboardingAuthButton
           label={copy.entry.google}
           iconName="logo-google"
+          iconSize={components.sizes.icon.lg}
+          iconContainerSize={components.sizes.square.lg}
+          bordered
           onPress={handleGoogle}
         />
         <OnboardingAuthButton

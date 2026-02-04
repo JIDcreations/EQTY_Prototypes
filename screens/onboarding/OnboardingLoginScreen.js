@@ -43,7 +43,11 @@ export default function OnboardingLoginScreen({ navigation }) {
   };
 
   return (
-    <OnboardingScreen contentContainerStyle={styles.screen} showGlow={false}>
+    <OnboardingScreen
+      backgroundVariant="bg3"
+      contentContainerStyle={styles.screen}
+      showGlow={false}
+    >
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -116,7 +120,7 @@ export default function OnboardingLoginScreen({ navigation }) {
                 <Pressable onPress={handleApple} style={styles.socialButton}>
                   <Ionicons
                     name="logo-apple"
-                    size={components.sizes.icon.sm}
+                    size={components.sizes.icon.md}
                     color={colors.text.secondary}
                   />
                   <AppText style={styles.socialText}>{copy.login.socialApple}</AppText>
@@ -124,7 +128,7 @@ export default function OnboardingLoginScreen({ navigation }) {
                 <Pressable onPress={handleGoogle} style={styles.socialButton}>
                   <Ionicons
                     name="logo-google"
-                    size={components.sizes.icon.sm}
+                    size={components.sizes.icon.md}
                     color={colors.text.secondary}
                   />
                   <AppText style={styles.socialText}>{copy.login.socialGoogle}</AppText>
@@ -255,7 +259,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       borderRadius: components.radius.input,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.background.surface, components.opacity.value35),
+      borderColor: toRgba(colors.text.primary, components.opacity.value35),
       backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
       minHeight: components.sizes.input.minHeight,
       flexDirection: 'row',
