@@ -18,23 +18,15 @@ export default function OnboardingScreen({
   scroll = false,
   contentContainerStyle,
   style,
-  gradientColors,
-  showGlow = true,
+  showGlow = false,
 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const resolvedGradientColors =
-    variant === 'accent'
-      ? [
-          colors.background.app,
-          toRgba(colors.accent.primary, 0.08),
-          colors.background.surfaceActive,
-        ]
-      : [colors.background.app, colors.background.surface, colors.background.surfaceActive];
+  const resolvedGradientColors = [colors.background.app, colors.background.app];
 
   if (scroll) {
     return (
-      <LinearGradient colors={gradientColors || resolvedGradientColors} style={[styles.gradient, style]}>
+      <LinearGradient colors={resolvedGradientColors} style={[styles.gradient, style]}>
         {showGlow ? (
           <>
             <View pointerEvents="none" style={styles.glowTop} />
@@ -60,7 +52,7 @@ export default function OnboardingScreen({
   }
 
   return (
-    <LinearGradient colors={gradientColors || resolvedGradientColors} style={[styles.gradient, style]}>
+    <LinearGradient colors={resolvedGradientColors} style={[styles.gradient, style]}>
       {showGlow ? (
         <>
           <View pointerEvents="none" style={styles.glowTop} />

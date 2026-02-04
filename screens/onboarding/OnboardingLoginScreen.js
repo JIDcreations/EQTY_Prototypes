@@ -10,7 +10,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AppText from '../../components/AppText';
 import AppTextInput from '../../components/AppTextInput';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
@@ -23,6 +22,7 @@ export default function OnboardingLoginScreen({ navigation }) {
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleDone = async () => {
     const trimmed = username.trim();
@@ -34,36 +34,33 @@ export default function OnboardingLoginScreen({ navigation }) {
     await updatePreferences({ hasOnboarded: true });
   };
 
+  const handleApple = async () => {
+    await handleDone();
+  };
+
+  const handleGoogle = async () => {
+    await handleDone();
+  };
+
   return (
-    <OnboardingScreen scroll contentContainerStyle={styles.scrollContent}>
+    <OnboardingScreen contentContainerStyle={styles.screen} showGlow={false}>
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.layout}>
-          <View style={styles.topArea}>
-            <View style={styles.topRow}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Ionicons
-                  name="chevron-back"
-                  size={components.sizes.icon.lg}
-                  color={colors.text.secondary}
-                />
-              </Pressable>
-              <AppText style={styles.logo}>EQTY</AppText>
-            </View>
+          <View style={styles.header}>
+            <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Ionicons
+                name="chevron-back"
+                size={components.sizes.icon.lg}
+                color={colors.text.secondary}
+              />
+            </Pressable>
+            <AppText style={styles.headerTitle}>{copy.login.title}</AppText>
           </View>
 
-          <OnboardingStackedCard>
-            <View style={styles.cardHeader}>
-              <View style={styles.badge}>
-                <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>{copy.login.badge}</AppText>
-              </View>
-              <AppText style={styles.title}>{copy.login.title}</AppText>
-              <AppText style={styles.subtitle}>{copy.login.subtitle}</AppText>
-            </View>
-
+          <View style={styles.contentBlock}>
             <View style={styles.fields}>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.login.usernameLabel}</AppText>
@@ -78,24 +75,68 @@ export default function OnboardingLoginScreen({ navigation }) {
               </View>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.login.passwordLabel}</AppText>
-                <AppTextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder={copy.login.passwordPlaceholder}
-                  placeholderTextColor={colors.text.secondary}
-                  secureTextEntry
-                  style={styles.input}
-                />
+                <View style={styles.inputRow}>
+                  <AppTextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder={copy.login.passwordPlaceholder}
+                    placeholderTextColor={colors.text.secondary}
+                    secureTextEntry={!showPassword}
+                    style={styles.inputField}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword((current) => !current)}
+                    style={styles.eyeButton}
+                  >
+                    <Ionicons
+                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={components.sizes.icon.sm}
+                      color={colors.text.secondary}
+                    />
+                  </Pressable>
+                </View>
               </View>
             </View>
 
-            <View style={styles.ctaBlock}>
-              <PrimaryButton label={copy.login.button} onPress={handleDone} />
-              <Pressable onPress={() => navigation.navigate('OnboardingEmail')}>
-                <AppText style={styles.loginLink}>{copy.login.link}</AppText>
-              </Pressable>
+            <View style={styles.actions}>
+              <PrimaryButton
+                label={copy.login.button}
+                onPress={handleDone}
+                style={styles.primaryButton}
+              />
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <AppText style={styles.dividerText}>{copy.login.divider}</AppText>
+                <View style={styles.dividerLine} />
+              </View>
+              <View style={styles.socialRow}>
+                <Pressable onPress={handleApple} style={styles.socialButton}>
+                  <Ionicons
+                    name="logo-apple"
+                    size={components.sizes.icon.sm}
+                    color={colors.text.secondary}
+                  />
+                  <AppText style={styles.socialText}>{copy.login.socialApple}</AppText>
+                </Pressable>
+                <Pressable onPress={handleGoogle} style={styles.socialButton}>
+                  <Ionicons
+                    name="logo-google"
+                    size={components.sizes.icon.sm}
+                    color={colors.text.secondary}
+                  />
+                  <AppText style={styles.socialText}>{copy.login.socialGoogle}</AppText>
+                </Pressable>
+              </View>
+              <View style={styles.footer}>
+                <Pressable
+                  onPress={() => navigation.navigate('OnboardingEmail')}
+                  style={styles.linkInline}
+                >
+                  <AppText style={styles.loginLink}>{copy.login.link}</AppText>
+                </Pressable>
+              </View>
             </View>
-          </OnboardingStackedCard>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </OnboardingScreen>
@@ -104,96 +145,129 @@ export default function OnboardingLoginScreen({ navigation }) {
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xxl,
+    screen: {
+      flex: 1,
     },
     keyboard: {
       flex: 1,
     },
     layout: {
       flex: 1,
-      justifyContent: 'space-between',
-      paddingTop: components.layout.spacing.lg,
-      paddingBottom: components.layout.spacing.md,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
     },
-    topArea: {
-      alignItems: 'center',
-      justifyContent: 'center',
+    contentBlock: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
     },
-    topRow: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: components.layout.spacing.md,
-      minHeight: components.sizes.input.minHeight,
+    header: {
+      gap: components.layout.spacing.none,
     },
-    logo: {
-      ...typography.styles.display,
+    headerTitle: {
+      ...typography.styles.h1,
       color: colors.text.primary,
+      textAlign: 'left',
+      marginTop: components.layout.spacing.xxl,
     },
     backButton: {
       width: components.sizes.square.lg,
       height: components.sizes.square.lg,
       borderRadius: components.radius.pill,
-      backgroundColor: colors.background.surface,
+      backgroundColor: colors.background.app,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
       alignItems: 'center',
       justifyContent: 'center',
-      position: 'absolute',
-      left: components.layout.spacing.none,
+      position: 'relative',
     },
-    cardHeader: {
+    fields: {
+      gap: components.layout.cardGap,
+    },
+    field: {
       gap: components.layout.spacing.xs,
     },
-    badge: {
+    label: {
+      ...components.input.label,
+    },
+    input: {
+      ...components.input.container,
+      ...components.input.text,
+      borderColor: colors.background.surface,
+    },
+    inputRow: {
+      ...components.input.container,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: components.layout.spacing.xs,
-      alignSelf: 'flex-start',
-      backgroundColor: colors.background.surfaceActive,
-      borderRadius: components.radius.pill,
-      paddingHorizontal: components.layout.spacing.sm,
-      paddingVertical: components.layout.spacing.xs,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-    },
-    badgeDot: {
-      width: components.sizes.dot.xs,
-      height: components.sizes.dot.xs,
-      borderRadius: components.radius.pill,
-      backgroundColor: colors.accent.primary,
-    },
-    badgeText: {
-      ...typography.styles.stepLabel,
-      color: colors.text.secondary,
-    },
-    ctaBlock: {
       gap: components.layout.spacing.sm,
+      borderColor: colors.background.surface,
+    },
+    inputField: {
+      ...components.input.text,
+      flex: 1,
+      paddingVertical: components.layout.spacing.none,
+      paddingHorizontal: components.layout.spacing.none,
+    },
+    eyeButton: {
+      padding: components.layout.spacing.xs,
+    },
+    actions: {
+      gap: components.layout.spacing.md,
+    },
+    dividerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.sm,
+    },
+    dividerLine: {
+      flex: 1,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
+      opacity: components.opacity.value20,
+    },
+    dividerText: {
+      ...typography.styles.meta,
+      color: colors.text.secondary,
+      opacity: components.opacity.value60,
+    },
+    socialRow: {
+      flexDirection: 'row',
+      gap: components.layout.spacing.sm,
+    },
+    socialButton: {
+      flex: 1,
+      paddingVertical: components.layout.spacing.xs,
+      paddingHorizontal: components.layout.spacing.sm,
+      borderRadius: components.radius.input,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.background.surface,
+      backgroundColor: colors.background.app,
+      minHeight: components.sizes.input.minHeight,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: components.layout.spacing.sm,
+    },
+    socialText: {
+      ...typography.styles.small,
+      color: colors.text.secondary,
+      opacity: components.opacity.value80,
+    },
+    linkInline: {
+      paddingTop: components.layout.spacing.sm,
     },
     loginLink: {
       ...typography.styles.small,
       color: colors.text.secondary,
       textAlign: 'center',
     },
-    title: {
-      ...typography.styles.h1,
-      color: colors.text.primary,
+    footer: {
+      paddingTop: components.layout.spacing.sm,
+      alignItems: 'center',
     },
-    subtitle: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-    },
-    fields: {
-      gap: components.layout.spacing.md,
-    },
-    field: {
-      gap: components.layout.spacing.xs,
-    },
-    label: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-    },
-    input: {
-      ...components.input.container,
-      ...components.input.text,
+    primaryButton: {
+      paddingVertical: components.layout.spacing.md,
+      minHeight: components.sizes.input.minHeight,
     },
   });

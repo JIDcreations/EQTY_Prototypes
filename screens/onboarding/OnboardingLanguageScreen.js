@@ -30,7 +30,7 @@ export default function OnboardingLanguageScreen({ navigation, route }) {
     <OnboardingScreen contentContainerStyle={styles.screen} showGlow={false}>
       <View style={styles.layout}>
         <View style={styles.header}>
-          <View style={styles.topRow}>
+          <View style={styles.titleBlock}>
             <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
               <Ionicons
                 name="chevron-back"
@@ -39,11 +39,11 @@ export default function OnboardingLanguageScreen({ navigation, route }) {
               />
             </Pressable>
             <AppText style={styles.headerTitle}>{copy.language.title}</AppText>
+            <AppText style={styles.subtitle}>{copy.language.subtitle}</AppText>
           </View>
-          <AppText style={styles.subtitle}>{copy.language.subtitle}</AppText>
         </View>
 
-        <View style={styles.body}>
+        <View style={styles.contentBlock}>
           <View style={styles.list}>
             {options.map((option) => {
               const isActive = selected === option.value;
@@ -67,7 +67,13 @@ export default function OnboardingLanguageScreen({ navigation, route }) {
             })}
           </View>
 
-          <PrimaryButton label={copy.language.button} onPress={handleContinue} />
+          <View style={styles.actions}>
+            <PrimaryButton
+              label={copy.language.button}
+              onPress={handleContinue}
+              style={styles.primaryButton}
+            />
+          </View>
         </View>
       </View>
     </OnboardingScreen>
@@ -78,62 +84,61 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
       flex: 1,
-      paddingTop: 0,
-      paddingBottom: 0,
+      paddingBottom: components.layout.spacing.none,
     },
     layout: {
       flex: 1,
-      justifyContent: 'space-between',
-    },
-    topRow: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: components.sizes.input.minHeight,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
     },
     header: {
+      gap: components.layout.spacing.none,
+      paddingTop: components.layout.spacing.sm,
+    },
+    titleBlock: {
       gap: components.layout.spacing.xs,
     },
     headerTitle: {
-      ...typography.styles.h2,
+      ...typography.styles.h1,
       color: colors.text.primary,
-      textAlign: 'center',
+      textAlign: 'left',
+      marginTop: components.layout.spacing.xxl,
     },
     backButton: {
       width: components.sizes.square.lg,
       height: components.sizes.square.lg,
       borderRadius: components.radius.pill,
-      backgroundColor: colors.background.surface,
+      backgroundColor: colors.background.app,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
       alignItems: 'center',
       justifyContent: 'center',
-      position: 'absolute',
-      left: components.layout.spacing.none,
+      position: 'relative',
     },
     subtitle: {
       ...typography.styles.small,
       color: colors.text.secondary,
-      textAlign: 'center',
-    },
-    body: {
-      gap: components.layout.spacing.lg,
+      textAlign: 'left',
     },
     list: {
-      gap: components.layout.spacing.sm,
+      gap: components.layout.cardGap,
+      marginTop: components.layout.spacing.sm,
     },
     row: {
       ...components.input.container,
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: colors.background.surfaceActive,
-      borderColor: colors.ui.divider,
+      gap: components.layout.spacing.sm,
+      borderColor: colors.background.surface,
     },
     rowActive: {
-      borderColor: colors.accent.primary,
+      borderColor: colors.ui.divider,
     },
     rowLeft: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
+      flex: 1,
     },
     rowLabel: {
       ...typography.styles.body,
@@ -160,5 +165,17 @@ const createStyles = (colors, components) =>
       height: components.sizes.dot.sm,
       borderRadius: components.radius.pill,
       backgroundColor: colors.accent.primary,
+    },
+    actions: {
+      gap: components.layout.spacing.md,
+    },
+    primaryButton: {
+      paddingVertical: components.layout.spacing.md,
+      minHeight: components.sizes.input.minHeight,
+    },
+    contentBlock: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.lg,
     },
   });

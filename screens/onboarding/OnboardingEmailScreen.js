@@ -17,21 +17,9 @@ export default function OnboardingEmailScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [confirmTouched, setConfirmTouched] = useState(false);
-
-  const passwordMismatch =
-    password && confirmPassword && password.trim() !== confirmPassword.trim();
-  const showMismatch = passwordMismatch && (hasSubmitted || confirmTouched);
 
   const handleContinue = async () => {
-    setHasSubmitted(true);
-    if (passwordMismatch) {
-      return;
-    }
     await updatePreferences({ hasOnboarded: false });
     const trimmedUsername = username.trim();
     const trimmed = email.trim();
@@ -70,23 +58,20 @@ export default function OnboardingEmailScreen({ navigation }) {
       >
         <View style={styles.layout}>
           <View style={styles.header}>
-            <View style={styles.topRow}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Ionicons
-                  name="chevron-back"
-                  size={components.sizes.icon.lg}
-                  color={colors.text.secondary}
-                />
-              </Pressable>
-              <AppText style={styles.headerTitle}>{copy.email.title}</AppText>
-            </View>
-            <View style={styles.headerText} />
+            <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Ionicons
+                name="chevron-back"
+                size={components.sizes.icon.lg}
+                color={colors.text.secondary}
+              />
+            </Pressable>
+            <AppText style={styles.headerTitle}>{copy.email.title}</AppText>
           </View>
 
-          <View style={styles.body}>
-            <View style={styles.form}>
+          <View style={styles.contentBlock}>
+            <View style={styles.fields}>
               <View style={styles.field}>
-                <AppText style={styles.labelMuted}>{copy.email.usernameLabel}</AppText>
+                <AppText style={styles.nameLabel}>{copy.email.usernameLabel}</AppText>
                 <AppTextInput
                   value={username}
                   onChangeText={setUsername}
@@ -132,37 +117,14 @@ export default function OnboardingEmailScreen({ navigation }) {
                 </View>
                 <AppText style={styles.hint}>{copy.email.passwordHint}</AppText>
               </View>
-              <View style={styles.field}>
-                <AppText style={styles.label}>{copy.email.confirmLabel}</AppText>
-                <View style={styles.inputRow}>
-                  <AppTextInput
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    placeholder={copy.email.confirmPlaceholder}
-                    placeholderTextColor={colors.text.secondary}
-                    secureTextEntry={!showConfirmPassword}
-                    style={styles.inputField}
-                    onBlur={() => setConfirmTouched(true)}
-                  />
-                  <Pressable
-                    onPress={() => setShowConfirmPassword((current) => !current)}
-                    style={styles.eyeButton}
-                  >
-                    <Ionicons
-                      name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
-                      size={components.sizes.icon.sm}
-                      color={colors.text.secondary}
-                    />
-                  </Pressable>
-                </View>
-                {showMismatch ? (
-                  <AppText style={styles.error}>{copy.email.passwordMismatch}</AppText>
-                ) : null}
-              </View>
             </View>
 
             <View style={styles.actions}>
-              <PrimaryButton label={copy.email.button} onPress={handleContinue} />
+              <PrimaryButton
+                label={copy.email.button}
+                onPress={handleContinue}
+                style={styles.primaryButton}
+              />
               <View style={styles.dividerRow}>
                 <View style={styles.dividerLine} />
                 <AppText style={styles.dividerText}>{copy.email.divider}</AppText>
@@ -186,12 +148,14 @@ export default function OnboardingEmailScreen({ navigation }) {
                   <AppText style={styles.socialText}>{copy.email.socialGoogle}</AppText>
                 </Pressable>
               </View>
-              <Pressable
-                onPress={() => navigation.navigate('OnboardingLogin')}
-                style={styles.linkInline}
-              >
-                <AppText style={styles.loginLink}>{copy.email.link}</AppText>
-              </Pressable>
+              <View style={styles.footer}>
+                <Pressable
+                  onPress={() => navigation.navigate('OnboardingLogin')}
+                  style={styles.linkInline}
+                >
+                  <AppText style={styles.loginLink}>{copy.email.link}</AppText>
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>
@@ -204,8 +168,7 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
       flex: 1,
-      paddingTop: 0,
-      paddingBottom: 0,
+      paddingBottom: components.layout.spacing.none,
     },
     keyboard: {
       flex: 1,
@@ -213,82 +176,63 @@ const createStyles = (colors, components) =>
     layout: {
       flex: 1,
       justifyContent: 'flex-start',
-      gap: components.layout.spacing.lg,
+      gap: components.layout.spacing.xxl,
     },
     header: {
-      gap: components.layout.spacing.xs,
-    },
-    topRow: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: components.layout.spacing.none,
-      minHeight: components.sizes.input.minHeight,
+      gap: components.layout.spacing.none,
     },
     headerTitle: {
-      ...typography.styles.h2,
+      ...typography.styles.h1,
       color: colors.text.primary,
-    },
-    headerText: {
-      alignItems: 'center',
+      textAlign: 'left',
+      marginTop: components.layout.spacing.xxl,
     },
     backButton: {
       width: components.sizes.square.lg,
       height: components.sizes.square.lg,
       borderRadius: components.radius.pill,
-      backgroundColor: colors.background.surface,
+      backgroundColor: colors.background.app,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
       alignItems: 'center',
       justifyContent: 'center',
-      position: 'absolute',
-      left: components.layout.spacing.none,
+      position: 'relative',
     },
-    body: {
-      flex: 1,
-      gap: components.layout.spacing.lg,
-    },
-    form: {
-      gap: components.layout.spacing.sm,
+    fields: {
+      gap: components.layout.cardGap,
     },
     field: {
       gap: components.layout.spacing.xs,
     },
     label: {
-      ...typography.styles.small,
-      color: colors.text.primary,
+      ...components.input.label,
     },
-    labelMuted: {
-      ...typography.styles.meta,
-      color: colors.text.primary,
+    nameLabel: {
+      ...components.input.helper,
     },
     input: {
       ...components.input.container,
       ...components.input.text,
-      backgroundColor: colors.background.surfaceActive,
-      borderColor: colors.background.surfaceActive,
+      borderColor: colors.background.surface,
     },
     inputRow: {
       ...components.input.container,
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      backgroundColor: colors.background.surfaceActive,
-      borderColor: colors.background.surfaceActive,
+      borderColor: colors.background.surface,
     },
     inputField: {
       ...components.input.text,
       flex: 1,
-      paddingVertical: 0,
-      paddingHorizontal: 0,
+      paddingVertical: components.layout.spacing.none,
+      paddingHorizontal: components.layout.spacing.none,
     },
     eyeButton: {
       padding: components.layout.spacing.xs,
     },
     hint: {
-      ...typography.styles.meta,
-      color: colors.text.secondary,
-    },
-    error: {
-      ...typography.styles.meta,
-      color: colors.accent.primary,
+      ...components.input.helper,
     },
     actions: {
       gap: components.layout.spacing.md,
@@ -303,11 +247,12 @@ const createStyles = (colors, components) =>
       flex: 1,
       borderBottomWidth: components.borderWidth.thin,
       borderBottomColor: colors.ui.divider,
-      opacity: components.opacity.value35,
+      opacity: components.opacity.value20,
     },
     dividerText: {
       ...typography.styles.meta,
       color: colors.text.secondary,
+      opacity: components.opacity.value60,
     },
     socialRow: {
       flexDirection: 'row',
@@ -315,12 +260,13 @@ const createStyles = (colors, components) =>
     },
     socialButton: {
       flex: 1,
-      paddingVertical: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.xs,
       paddingHorizontal: components.layout.spacing.sm,
       borderRadius: components.radius.input,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
-      backgroundColor: colors.background.surface,
+      borderColor: colors.background.surface,
+      backgroundColor: colors.background.app,
+      minHeight: components.sizes.input.minHeight,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -329,6 +275,7 @@ const createStyles = (colors, components) =>
     socialText: {
       ...typography.styles.small,
       color: colors.text.secondary,
+      opacity: components.opacity.value80,
     },
     linkInline: {
       paddingTop: components.layout.spacing.sm,
@@ -337,5 +284,18 @@ const createStyles = (colors, components) =>
       ...typography.styles.small,
       color: colors.text.secondary,
       textAlign: 'center',
+    },
+    footer: {
+      paddingTop: components.layout.spacing.sm,
+      alignItems: 'center',
+    },
+    primaryButton: {
+      paddingVertical: components.layout.spacing.md,
+      minHeight: components.sizes.input.minHeight,
+    },
+    contentBlock: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
     },
   });
