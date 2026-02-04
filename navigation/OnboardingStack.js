@@ -1,8 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import OnboardingWelcomeScreen from '../screens/onboarding/OnboardingWelcomeScreen';
-import OnboardingPositioningScreen from '../screens/onboarding/OnboardingPositioningScreen';
-import OnboardingAIDisclaimerScreen from '../screens/onboarding/OnboardingAIDisclaimerScreen';
 import OnboardingEntryScreen from '../screens/onboarding/OnboardingEntryScreen';
 import OnboardingLoginScreen from '../screens/onboarding/OnboardingLoginScreen';
 import OnboardingEmailScreen from '../screens/onboarding/OnboardingEmailScreen';
@@ -10,7 +8,6 @@ import OnboardingBasicInfoScreen from '../screens/onboarding/OnboardingBasicInfo
 import OnboardingLanguageScreen from '../screens/onboarding/OnboardingLanguageScreen';
 import OnboardingQuestionsIntroScreen from '../screens/onboarding/OnboardingQuestionsIntroScreen';
 import OnboardingQuestionScreen from '../screens/onboarding/OnboardingQuestionScreen';
-import OnboardingConfirmationScreen from '../screens/onboarding/OnboardingConfirmationScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,8 +16,6 @@ export default function OnboardingStack() {
     <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }}>
       <Stack.Screen name="OnboardingWelcome" component={OnboardingWelcomeScreen} />
       <Stack.Screen name="OnboardingLanguage" component={OnboardingLanguageScreen} />
-      <Stack.Screen name="OnboardingPositioning" component={OnboardingPositioningScreen} />
-      <Stack.Screen name="OnboardingAIDisclaimer" component={OnboardingAIDisclaimerScreen} />
       <Stack.Screen name="OnboardingEntry" component={OnboardingEntryScreen} />
       <Stack.Screen name="OnboardingLogin" component={OnboardingLoginScreen} />
       <Stack.Screen name="OnboardingEmail" component={OnboardingEmailScreen} />
@@ -56,12 +51,8 @@ export default function OnboardingStack() {
           field: 'motivationAnswer',
           step: 3,
           total: 3,
-          nextRoute: 'OnboardingConfirmation',
+          isLast: true,
         }}
-      />
-      <Stack.Screen
-        name="OnboardingConfirmation"
-        component={OnboardingConfirmationScreen}
       />
     </Stack.Navigator>
   );

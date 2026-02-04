@@ -498,6 +498,8 @@ const ONBOARDING_COPY = {
       title: 'Welcome to EQTY',
       subtitle:
         'A calm space to understand investing, shaped around your pace and goals.',
+      primaryCta: 'Create account',
+      secondaryCta: 'Log in',
       tapHint: 'Tap to continue',
     },
     positioning: {
@@ -540,16 +542,23 @@ const ONBOARDING_COPY = {
     },
     email: {
       badge: 'Email sign up',
-      title: 'Create with email',
-      subtitle: 'No real authentication required for this demo.',
+      title: 'Create account',
+      subtitle: 'Set up your EQTY profile in seconds.',
+      usernameLabel: 'Name',
+      usernamePlaceholder: 'Your name',
+      socialApple: 'Apple',
+      socialGoogle: 'Google',
       emailLabel: 'Email',
       emailPlaceholder: 'you@example.com',
       passwordLabel: 'Password',
       passwordPlaceholder: '********',
+      passwordHint: 'Min. 8 characters',
       confirmLabel: 'Confirm password',
       confirmPlaceholder: '********',
-      button: 'Sign up',
-      link: 'Already have an account?',
+      passwordMismatch: 'Passwords do not match.',
+      divider: 'or',
+      button: 'Create account',
+      link: 'Already have an account? Log in',
     },
     basicInfo: {
       badge: 'Account setup',
@@ -570,9 +579,10 @@ const ONBOARDING_COPY = {
     },
     questionsIntro: {
       badge: 'Personal context',
-      title: 'Personalize your path',
-      subtitle: 'You will answer 3 questions.\nWe use them to adapt explanations and examples.',
-      tapHint: 'Tap to continue',
+      title: 'Personalize your experience',
+      subtitle: 'Answer 3 quick questions so we can tailor lessons to you.',
+      primaryButton: 'Start onboarding',
+      secondaryButton: 'Do this later',
       cardTitle: 'Your story in three beats',
       cardSubtitle: 'Short, honest, and easy.',
       bullets: [
@@ -582,6 +592,14 @@ const ONBOARDING_COPY = {
       ],
       note: 'Editable later in Profile.',
       button: 'Start',
+    },
+    questionsScreen: {
+      badge: 'Personal context',
+      title: 'Personalize your path',
+      subtitle:
+        'Answer 3 quick questions so the AI can personalize lesson content and examples based on your answers.',
+      primaryButton: 'Save & continue',
+      secondaryButton: 'Do later',
     },
     question: {
       badge: 'Your perspective',
@@ -604,12 +622,21 @@ const ONBOARDING_COPY = {
       ],
       button: 'Go to EQTY',
     },
+    gate: {
+      badge: 'Required',
+      title: 'Answer 3 questions to unlock Lesson 1',
+      subtitle: 'Your answers help personalize the lesson examples before you continue.',
+      primaryButton: 'Answer questions',
+      secondaryButton: 'Back',
+    },
   },
   nl: {
     welcome: {
       title: 'Welkom bij EQTY',
       subtitle:
         'Een rustige plek om investeren te begrijpen, afgestemd op jouw tempo en doelen.',
+      primaryCta: 'Maak account',
+      secondaryCta: 'Log in',
       tapHint: 'Tik om door te gaan',
     },
     positioning: {
@@ -652,16 +679,23 @@ const ONBOARDING_COPY = {
     },
     email: {
       badge: 'Aanmelden met e-mail',
-      title: 'Maak account met e-mail',
-      subtitle: 'Geen echte authenticatie nodig voor deze demo.',
+      title: 'Account aanmaken',
+      subtitle: 'Maak in enkele seconden je EQTY-profiel.',
+      usernameLabel: 'Naam',
+      usernamePlaceholder: 'Jouw naam',
+      socialApple: 'Apple',
+      socialGoogle: 'Google',
       emailLabel: 'E-mail',
       emailPlaceholder: 'jij@voorbeeld.com',
       passwordLabel: 'Wachtwoord',
       passwordPlaceholder: '********',
+      passwordHint: 'Min. 8 tekens',
       confirmLabel: 'Bevestig wachtwoord',
       confirmPlaceholder: '********',
-      button: 'Registreren',
-      link: 'Al een account?',
+      passwordMismatch: 'Wachtwoorden komen niet overeen.',
+      divider: 'of',
+      button: 'Account aanmaken',
+      link: 'Heb je al een account? Log in',
     },
     basicInfo: {
       badge: 'Account instellen',
@@ -682,9 +716,10 @@ const ONBOARDING_COPY = {
     },
     questionsIntro: {
       badge: 'Persoonlijke context',
-      title: 'Personaliseer je pad',
-      subtitle: 'Je beantwoordt 3 vragen.\nWe gebruiken ze om uitleg en voorbeelden aan te passen.',
-      tapHint: 'Tik om door te gaan',
+      title: 'Personaliseer je ervaring',
+      subtitle: 'Beantwoord 3 korte vragen zodat we lessen op jou afstemmen.',
+      primaryButton: 'Start onboarding',
+      secondaryButton: 'Doe dit later',
       cardTitle: 'Je verhaal in drie stappen',
       cardSubtitle: 'Kort, eerlijk en eenvoudig.',
       bullets: [
@@ -694,6 +729,14 @@ const ONBOARDING_COPY = {
       ],
       note: 'Later aanpasbaar in Profiel.',
       button: 'Start',
+    },
+    questionsScreen: {
+      badge: 'Persoonlijke context',
+      title: 'Personaliseer je pad',
+      subtitle:
+        'Beantwoord 3 korte vragen zodat de AI de lesinhoud en voorbeelden kan personaliseren op basis van jouw antwoorden.',
+      primaryButton: 'Opslaan en doorgaan',
+      secondaryButton: 'Later',
     },
     question: {
       badge: 'Jouw perspectief',
@@ -715,6 +758,13 @@ const ONBOARDING_COPY = {
         'Ze worden gebruikt om uitleg en voorbeelden aan te passen.',
       ],
       button: 'Ga naar EQTY',
+    },
+    gate: {
+      badge: 'Vereist',
+      title: 'Beantwoord 3 vragen om Les 1 te ontgrendelen',
+      subtitle: 'Je antwoorden helpen om lesvoorbeelden te personaliseren voordat je doorgaat.',
+      primaryButton: 'Beantwoord vragen',
+      secondaryButton: 'Terug',
     },
   },
 };
@@ -793,11 +843,13 @@ const SETTINGS_COPY = {
     languageTitle: 'Language',
     saved: 'Saved',
     selected: 'Selected',
+    onboardingQuestions: 'Onboarding questions',
   },
   nl: {
     languageTitle: 'Taal',
     saved: 'Opgeslagen',
     selected: 'Gekozen',
+    onboardingQuestions: 'Onboardingvragen',
   },
 };
 

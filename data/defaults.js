@@ -14,6 +14,12 @@ export const defaultOnboardingContext = {
   experienceAnswer: '',
   knowledgeAnswer: '',
   motivationAnswer: '',
+  onboardingComplete: false,
+  onboardingAnswers: {
+    q1: '',
+    q2: '',
+    q3: '',
+  },
 };
 
 export const defaultPreferences = {

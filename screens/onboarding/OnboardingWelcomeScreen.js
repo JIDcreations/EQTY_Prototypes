@@ -1,37 +1,50 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AppText from '../../components/AppText';
-import OnboardingGesture from '../../components/OnboardingGesture';
+import { PrimaryButton, SecondaryButton } from '../../components/Button';
 import OnboardingScreen from '../../components/OnboardingScreen';
 import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingWelcomeScreen({ navigation }) {
-  const { preferences } = useApp();
+  const { preferences, updatePreferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
+
+  const handleCreateAccount = async () => {
+    await updatePreferences({ hasOnboarded: false });
+    navigation.navigate('OnboardingLanguage', { nextRoute: 'OnboardingEmail' });
+  };
 
   return (
     <OnboardingScreen
       gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
+      contentContainerStyle={styles.screen}
     >
-      <OnboardingGesture onContinue={() => navigation.navigate('OnboardingLanguage')}>
-        <View style={styles.container}>
-          <View pointerEvents="none" style={styles.accentOrbTop} />
-          <View pointerEvents="none" style={styles.accentOrbBottom} />
-          <View style={styles.logoWrap}>
-            <AppText style={styles.logo}>EQTY</AppText>
-          </View>
-          <View style={styles.copyBlock}>
-            <AppText style={styles.title}>{copy.welcome.title}</AppText>
-            <AppText style={styles.subtitle}>{copy.welcome.subtitle}</AppText>
-          </View>
-          <AppText style={styles.tapHint}>{copy.welcome.tapHint}</AppText>
+      <View style={styles.container}>
+        <View pointerEvents="none" style={styles.accentOrbTop} />
+        <View pointerEvents="none" style={styles.accentOrbBottom} />
+        <View style={styles.logoWrap}>
+          <AppText style={styles.logo}>EQTY</AppText>
         </View>
-      </OnboardingGesture>
+        <View style={styles.copyBlock}>
+          <AppText style={styles.title}>{copy.welcome.title}</AppText>
+          <AppText style={styles.subtitle}>{copy.welcome.subtitle}</AppText>
+        </View>
+        <View style={styles.actions}>
+          <PrimaryButton
+            label={copy.welcome.primaryCta}
+            onPress={handleCreateAccount}
+          />
+          <SecondaryButton
+            label={copy.welcome.secondaryCta}
+            onPress={() => navigation.navigate('OnboardingLogin')}
+          />
+        </View>
+      </View>
     </OnboardingScreen>
   );
 }
@@ -47,10 +60,12 @@ const toRgba = (hex, alpha) => {
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
+    screen: {
+      paddingBottom: 0,
+    },
     container: {
       flex: 1,
-      justifyContent: 'flex-start',
-      paddingBottom: components.layout.spacing.xl,
+      justifyContent: 'space-between',
     },
     logoWrap: {
       marginTop: components.layout.spacing.xxl,
@@ -62,8 +77,6 @@ const createStyles = (colors, components) =>
       color: colors.text.primary,
     },
     copyBlock: {
-      marginTop: 'auto',
-      transform: [{ translateY: components.offsets.translate.lg }],
       width: '100%',
       gap: components.layout.spacing.sm,
     },
@@ -77,11 +90,8 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
       textAlign: 'left',
     },
-    tapHint: {
-      marginTop: components.layout.spacing.xl,
-      ...typography.styles.small,
-      color: colors.text.secondary,
-      textAlign: 'center',
+    actions: {
+      gap: components.layout.spacing.md,
     },
     accentOrbTop: {
       position: 'absolute',

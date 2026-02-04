@@ -42,7 +42,24 @@ export async function loadOnboardingContext() {
   if (!stored) return defaultOnboardingContext;
   try {
     const parsed = JSON.parse(stored);
-    return { ...defaultOnboardingContext, ...parsed };
+    const merged = { ...defaultOnboardingContext, ...parsed };
+    const parsedAnswers = merged.onboardingAnswers || {};
+    const nextAnswers = {
+      q1: parsedAnswers.q1 ?? merged.experienceAnswer ?? '',
+      q2: parsedAnswers.q2 ?? merged.knowledgeAnswer ?? '',
+      q3: parsedAnswers.q3 ?? merged.motivationAnswer ?? '',
+    };
+    const hasAllAnswers = [nextAnswers.q1, nextAnswers.q2, nextAnswers.q3].every(
+      (value) => value && value.trim()
+    );
+    return {
+      ...merged,
+      experienceAnswer: merged.experienceAnswer || nextAnswers.q1,
+      knowledgeAnswer: merged.knowledgeAnswer || nextAnswers.q2,
+      motivationAnswer: merged.motivationAnswer || nextAnswers.q3,
+      onboardingAnswers: nextAnswers,
+      onboardingComplete: merged.onboardingComplete || hasAllAnswers,
+    };
   } catch (error) {
     return defaultOnboardingContext;
   }

@@ -12,8 +12,9 @@ import { useApp } from '../../utils/AppContext';
 import { formatOnboardingQuestionLabel, getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingQuestionScreen({ navigation, route }) {
-  const { question, field, step, total, nextRoute } = route.params;
-  const { onboardingContext, updateOnboardingContext, preferences } = useApp();
+  const { question, field, step, total, nextRoute, isLast, returnTo, returnParams, exitToTabs, setHasOnboardedOnComplete } =
+    route.params;
+  const { onboardingContext, updateOnboardingContext, updatePreferences, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
@@ -21,8 +22,41 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
   const localizedQuestion = copy.question.questions[field] || question;
 
   const handleNext = async () => {
-    await updateOnboardingContext({ [field]: answer.trim() });
-    navigation.navigate(nextRoute);
+    const trimmed = answer.trim();
+    const updates = { [field]: trimmed };
+    if (isLast) {
+      updates.onboardingComplete = true;
+    }
+    await updateOnboardingContext(updates);
+    if (isLast) {
+      if (setHasOnboardedOnComplete) {
+        await updatePreferences({ hasOnboarded: true });
+      }
+      if (returnTo) {
+        navigation.navigate(returnTo, returnParams || {});
+        return;
+      }
+      if (exitToTabs || setHasOnboardedOnComplete) {
+        navigation.navigate('Tabs');
+        return;
+      }
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return;
+      }
+      navigation.navigate('Tabs');
+      return;
+    }
+    navigation.navigate({
+      name: nextRoute,
+      params: {
+        returnTo,
+        returnParams,
+        exitToTabs,
+        setHasOnboardedOnComplete,
+      },
+      merge: true,
+    });
   };
 
   return (

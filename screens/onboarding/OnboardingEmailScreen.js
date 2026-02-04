@@ -1,46 +1,75 @@
 import React, { useMemo, useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../../components/AppText';
 import AppTextInput from '../../components/AppTextInput';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingEmailScreen({ navigation }) {
-  const { updateAuthUser, preferences } = useApp();
+  const { updateAuthUser, updatePreferences, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
+
+  const passwordMismatch =
+    password && confirmPassword && password.trim() !== confirmPassword.trim();
+  const showMismatch = passwordMismatch && (hasSubmitted || confirmTouched);
 
   const handleContinue = async () => {
+    setHasSubmitted(true);
+    if (passwordMismatch) {
+      return;
+    }
+    await updatePreferences({ hasOnboarded: false });
+    const trimmedUsername = username.trim();
     const trimmed = email.trim();
+    if (trimmedUsername) {
+      await updateAuthUser({ username: trimmedUsername });
+    }
     if (trimmed) {
       await updateAuthUser({ email: trimmed });
     }
-    navigation.navigate('OnboardingBasicInfo');
+    navigation.navigate('OnboardingQuestionsIntro');
+  };
+
+  const handleApple = async () => {
+    await updatePreferences({ hasOnboarded: false });
+    const trimmedUsername = username.trim();
+    if (trimmedUsername) {
+      await updateAuthUser({ username: trimmedUsername });
+    }
+    navigation.navigate('OnboardingQuestionsIntro');
+  };
+
+  const handleGoogle = async () => {
+    await updatePreferences({ hasOnboarded: false });
+    const trimmedUsername = username.trim();
+    if (trimmedUsername) {
+      await updateAuthUser({ username: trimmedUsername });
+    }
+    navigation.navigate('OnboardingQuestionsIntro');
   };
 
   return (
-    <OnboardingScreen scroll contentContainerStyle={styles.scrollContent}>
+    <OnboardingScreen contentContainerStyle={styles.screen} showGlow={false}>
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.layout}>
-          <View style={styles.topArea}>
+          <View style={styles.header}>
             <View style={styles.topRow}>
               <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                 <Ionicons
@@ -49,21 +78,24 @@ export default function OnboardingEmailScreen({ navigation }) {
                   color={colors.text.secondary}
                 />
               </Pressable>
-              <AppText style={styles.logo}>EQTY</AppText>
+              <AppText style={styles.headerTitle}>{copy.email.title}</AppText>
             </View>
+            <View style={styles.headerText} />
           </View>
 
-          <OnboardingStackedCard>
-            <View style={styles.cardHeader}>
-              <View style={styles.badge}>
-                <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>{copy.email.badge}</AppText>
+          <View style={styles.body}>
+            <View style={styles.form}>
+              <View style={styles.field}>
+                <AppText style={styles.labelMuted}>{copy.email.usernameLabel}</AppText>
+                <AppTextInput
+                  value={username}
+                  onChangeText={setUsername}
+                  placeholder={copy.email.usernamePlaceholder}
+                  placeholderTextColor={colors.text.secondary}
+                  autoCapitalize="none"
+                  style={styles.input}
+                />
               </View>
-              <AppText style={styles.title}>{copy.email.title}</AppText>
-              <AppText style={styles.subtitle}>{copy.email.subtitle}</AppText>
-            </View>
-
-            <View style={styles.fields}>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.email.emailLabel}</AppText>
                 <AppTextInput
@@ -78,35 +110,90 @@ export default function OnboardingEmailScreen({ navigation }) {
               </View>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.email.passwordLabel}</AppText>
-                <AppTextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder={copy.email.passwordPlaceholder}
-                  placeholderTextColor={colors.text.secondary}
-                  secureTextEntry
-                  style={styles.input}
-                />
+                <View style={styles.inputRow}>
+                  <AppTextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder={copy.email.passwordPlaceholder}
+                    placeholderTextColor={colors.text.secondary}
+                    secureTextEntry={!showPassword}
+                    style={styles.inputField}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword((current) => !current)}
+                    style={styles.eyeButton}
+                  >
+                    <Ionicons
+                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={components.sizes.icon.sm}
+                      color={colors.text.secondary}
+                    />
+                  </Pressable>
+                </View>
+                <AppText style={styles.hint}>{copy.email.passwordHint}</AppText>
               </View>
               <View style={styles.field}>
                 <AppText style={styles.label}>{copy.email.confirmLabel}</AppText>
-                <AppTextInput
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  placeholder={copy.email.confirmPlaceholder}
-                  placeholderTextColor={colors.text.secondary}
-                  secureTextEntry
-                  style={styles.input}
-                />
+                <View style={styles.inputRow}>
+                  <AppTextInput
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholder={copy.email.confirmPlaceholder}
+                    placeholderTextColor={colors.text.secondary}
+                    secureTextEntry={!showConfirmPassword}
+                    style={styles.inputField}
+                    onBlur={() => setConfirmTouched(true)}
+                  />
+                  <Pressable
+                    onPress={() => setShowConfirmPassword((current) => !current)}
+                    style={styles.eyeButton}
+                  >
+                    <Ionicons
+                      name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={components.sizes.icon.sm}
+                      color={colors.text.secondary}
+                    />
+                  </Pressable>
+                </View>
+                {showMismatch ? (
+                  <AppText style={styles.error}>{copy.email.passwordMismatch}</AppText>
+                ) : null}
               </View>
             </View>
 
-            <View style={styles.ctaBlock}>
+            <View style={styles.actions}>
               <PrimaryButton label={copy.email.button} onPress={handleContinue} />
-              <Pressable onPress={() => navigation.navigate('OnboardingLogin')}>
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <AppText style={styles.dividerText}>{copy.email.divider}</AppText>
+                <View style={styles.dividerLine} />
+              </View>
+              <View style={styles.socialRow}>
+                <Pressable onPress={handleApple} style={styles.socialButton}>
+                  <Ionicons
+                    name="logo-apple"
+                    size={components.sizes.icon.sm}
+                    color={colors.text.secondary}
+                  />
+                  <AppText style={styles.socialText}>{copy.email.socialApple}</AppText>
+                </Pressable>
+                <Pressable onPress={handleGoogle} style={styles.socialButton}>
+                  <Ionicons
+                    name="logo-google"
+                    size={components.sizes.icon.sm}
+                    color={colors.text.secondary}
+                  />
+                  <AppText style={styles.socialText}>{copy.email.socialGoogle}</AppText>
+                </Pressable>
+              </View>
+              <Pressable
+                onPress={() => navigation.navigate('OnboardingLogin')}
+                style={styles.linkInline}
+              >
                 <AppText style={styles.loginLink}>{copy.email.link}</AppText>
               </Pressable>
             </View>
-          </OnboardingStackedCard>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </OnboardingScreen>
@@ -115,32 +202,34 @@ export default function OnboardingEmailScreen({ navigation }) {
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xxl,
+    screen: {
+      flex: 1,
+      paddingTop: 0,
+      paddingBottom: 0,
     },
     keyboard: {
       flex: 1,
     },
     layout: {
       flex: 1,
-      justifyContent: 'space-between',
-      paddingTop: components.layout.spacing.lg,
-      paddingBottom: components.layout.spacing.md,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.lg,
     },
-    topArea: {
-      alignItems: 'center',
-      justifyContent: 'center',
+    header: {
+      gap: components.layout.spacing.xs,
     },
     topRow: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: components.layout.spacing.md,
+      marginBottom: components.layout.spacing.none,
       minHeight: components.sizes.input.minHeight,
     },
-    logo: {
-      ...typography.styles.display,
+    headerTitle: {
+      ...typography.styles.h2,
       color: colors.text.primary,
+    },
+    headerText: {
+      alignItems: 'center',
     },
     backButton: {
       width: components.sizes.square.lg,
@@ -152,56 +241,97 @@ const createStyles = (colors, components) =>
       position: 'absolute',
       left: components.layout.spacing.none,
     },
-    cardHeader: {
-      gap: components.layout.spacing.xs,
+    body: {
+      flex: 1,
+      gap: components.layout.spacing.lg,
     },
-    badge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: components.layout.spacing.xs,
-      alignSelf: 'flex-start',
-      backgroundColor: colors.background.surfaceActive,
-      borderRadius: components.radius.pill,
-      paddingHorizontal: components.layout.spacing.sm,
-      paddingVertical: components.layout.spacing.xs,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-    },
-    badgeDot: {
-      width: components.sizes.dot.xs,
-      height: components.sizes.dot.xs,
-      borderRadius: components.radius.pill,
-      backgroundColor: colors.accent.primary,
-    },
-    badgeText: {
-      ...typography.styles.stepLabel,
-      color: colors.text.secondary,
-    },
-    title: {
-      ...typography.styles.h1,
-      color: colors.text.primary,
-    },
-    subtitle: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-    },
-    fields: {
-      gap: components.layout.spacing.md,
+    form: {
+      gap: components.layout.spacing.sm,
     },
     field: {
       gap: components.layout.spacing.xs,
     },
     label: {
       ...typography.styles.small,
-      color: colors.text.secondary,
+      color: colors.text.primary,
+    },
+    labelMuted: {
+      ...typography.styles.meta,
+      color: colors.text.primary,
     },
     input: {
       ...components.input.container,
       ...components.input.text,
+      backgroundColor: colors.background.surfaceActive,
+      borderColor: colors.background.surfaceActive,
     },
-    ctaBlock: {
+    inputRow: {
+      ...components.input.container,
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: components.layout.spacing.sm,
-      marginTop: components.layout.spacing.sm,
+      backgroundColor: colors.background.surfaceActive,
+      borderColor: colors.background.surfaceActive,
+    },
+    inputField: {
+      ...components.input.text,
+      flex: 1,
+      paddingVertical: 0,
+      paddingHorizontal: 0,
+    },
+    eyeButton: {
+      padding: components.layout.spacing.xs,
+    },
+    hint: {
+      ...typography.styles.meta,
+      color: colors.text.secondary,
+    },
+    error: {
+      ...typography.styles.meta,
+      color: colors.accent.primary,
+    },
+    actions: {
+      gap: components.layout.spacing.md,
+    },
+    dividerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: components.layout.spacing.sm,
+      paddingVertical: components.layout.spacing.sm,
+    },
+    dividerLine: {
+      flex: 1,
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: colors.ui.divider,
+      opacity: components.opacity.value35,
+    },
+    dividerText: {
+      ...typography.styles.meta,
+      color: colors.text.secondary,
+    },
+    socialRow: {
+      flexDirection: 'row',
+      gap: components.layout.spacing.sm,
+    },
+    socialButton: {
+      flex: 1,
+      paddingVertical: components.layout.spacing.sm,
+      paddingHorizontal: components.layout.spacing.sm,
+      borderRadius: components.radius.input,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
+      backgroundColor: colors.background.surface,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: components.layout.spacing.sm,
+    },
+    socialText: {
+      ...typography.styles.small,
+      color: colors.text.secondary,
+    },
+    linkInline: {
+      paddingTop: components.layout.spacing.sm,
     },
     loginLink: {
       ...typography.styles.small,

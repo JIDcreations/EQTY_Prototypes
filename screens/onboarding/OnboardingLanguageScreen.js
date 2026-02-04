@@ -3,13 +3,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../../components/AppText';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import OnboardingStackedCard from '../../components/OnboardingStackedCard';
 import { PrimaryButton } from '../../components/Button';
 import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getLanguageOptions, getOnboardingCopy } from '../../utils/localization';
 
-export default function OnboardingLanguageScreen({ navigation }) {
+export default function OnboardingLanguageScreen({ navigation, route }) {
   const { preferences, updatePreferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
@@ -20,15 +19,17 @@ export default function OnboardingLanguageScreen({ navigation }) {
   );
   const [selected, setSelected] = useState(preferences?.language || 'English');
 
+  const nextRoute = route?.params?.nextRoute || 'OnboardingEntry';
+
   const handleContinue = async () => {
     await updatePreferences({ language: selected });
-    navigation.navigate('OnboardingPositioning');
+    navigation.navigate(nextRoute);
   };
 
   return (
-    <OnboardingScreen contentContainerStyle={styles.screen}>
+    <OnboardingScreen contentContainerStyle={styles.screen} showGlow={false}>
       <View style={styles.layout}>
-        <View style={styles.topArea}>
+        <View style={styles.header}>
           <View style={styles.topRow}>
             <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
               <Ionicons
@@ -37,47 +38,37 @@ export default function OnboardingLanguageScreen({ navigation }) {
                 color={colors.text.secondary}
               />
             </Pressable>
-            <AppText style={styles.logo}>EQTY</AppText>
+            <AppText style={styles.headerTitle}>{copy.language.title}</AppText>
           </View>
+          <AppText style={styles.subtitle}>{copy.language.subtitle}</AppText>
         </View>
 
-        <OnboardingStackedCard contentStyle={styles.cardContent}>
-          <View style={styles.cardBody}>
-            <View style={styles.cardHeader}>
-              <View style={styles.badge}>
-                <View style={styles.badgeDot} />
-                <AppText style={styles.badgeText}>{copy.language.badge}</AppText>
-              </View>
-              <AppText style={styles.title}>{copy.language.title}</AppText>
-              <AppText style={styles.subtitle}>{copy.language.subtitle}</AppText>
-            </View>
-
-            <View style={styles.list}>
-              {options.map((option, index) => {
-                const isActive = selected === option.value;
-                return (
-                  <Pressable
-                    key={option.value}
-                    onPress={() => setSelected(option.value)}
-                    style={[styles.row, index !== options.length - 1 && styles.rowDivider]}
-                  >
-                    <View style={styles.rowLeft}>
-                      <View style={[styles.radio, isActive && styles.radioActive]}>
-                        {isActive ? <View style={styles.radioDot} /> : null}
-                      </View>
-                      <AppText style={styles.rowLabel}>{option.label}</AppText>
+        <View style={styles.body}>
+          <View style={styles.list}>
+            {options.map((option) => {
+              const isActive = selected === option.value;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => setSelected(option.value)}
+                  style={[styles.row, isActive && styles.rowActive]}
+                >
+                  <View style={styles.rowLeft}>
+                    <View style={[styles.radio, isActive && styles.radioActive]}>
+                      {isActive ? <View style={styles.radioDot} /> : null}
                     </View>
-                    {isActive ? (
-                      <AppText style={styles.activeLabel}>{copy.language.selected}</AppText>
-                    ) : null}
-                  </Pressable>
-                );
-              })}
-            </View>
+                    <AppText style={styles.rowLabel}>{option.label}</AppText>
+                  </View>
+                  {isActive ? (
+                    <AppText style={styles.activeLabel}>{copy.language.selected}</AppText>
+                  ) : null}
+                </Pressable>
+              );
+            })}
           </View>
 
           <PrimaryButton label={copy.language.button} onPress={handleContinue} />
-        </OnboardingStackedCard>
+        </View>
       </View>
     </OnboardingScreen>
   );
@@ -87,26 +78,25 @@ const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
       flex: 1,
+      paddingTop: 0,
+      paddingBottom: 0,
     },
     layout: {
       flex: 1,
       justifyContent: 'space-between',
-      paddingTop: components.layout.spacing.lg,
-      paddingBottom: components.layout.spacing.md,
-    },
-    topArea: {
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     topRow: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: components.layout.spacing.md,
       minHeight: components.sizes.input.minHeight,
     },
-    logo: {
-      ...typography.styles.display,
+    header: {
+      gap: components.layout.spacing.xs,
+    },
+    headerTitle: {
+      ...typography.styles.h2,
       color: colors.text.primary,
+      textAlign: 'center',
     },
     backButton: {
       width: components.sizes.square.lg,
@@ -118,63 +108,27 @@ const createStyles = (colors, components) =>
       position: 'absolute',
       left: components.layout.spacing.none,
     },
-    cardHeader: {
-      gap: components.layout.spacing.xs,
-    },
-    cardContent: {
-      minHeight: components.sizes.screen.minPanelHeight,
-      justifyContent: 'space-between',
-    },
-    cardBody: {
-      gap: components.layout.spacing.lg,
-    },
-    badge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: components.layout.spacing.xs,
-      alignSelf: 'flex-start',
-      backgroundColor: colors.background.surfaceActive,
-      borderRadius: components.radius.pill,
-      paddingHorizontal: components.layout.spacing.sm,
-      paddingVertical: components.layout.spacing.xs,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-    },
-    badgeDot: {
-      width: components.sizes.dot.xs,
-      height: components.sizes.dot.xs,
-      borderRadius: components.radius.pill,
-      backgroundColor: colors.accent.primary,
-    },
-    badgeText: {
-      ...typography.styles.stepLabel,
-      color: colors.text.secondary,
-    },
-    title: {
-      ...typography.styles.h1,
-      color: colors.text.primary,
-    },
     subtitle: {
       ...typography.styles.small,
       color: colors.text.secondary,
+      textAlign: 'center',
+    },
+    body: {
+      gap: components.layout.spacing.lg,
     },
     list: {
-      borderRadius: components.radius.card,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-      overflow: 'hidden',
+      gap: components.layout.spacing.sm,
     },
     row: {
-      ...components.list.row,
-      paddingHorizontal: components.layout.spacing.lg,
+      ...components.input.container,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       backgroundColor: colors.background.surfaceActive,
+      borderColor: colors.ui.divider,
     },
-    rowDivider: {
-      borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
+    rowActive: {
+      borderColor: colors.accent.primary,
     },
     rowLeft: {
       flexDirection: 'row',

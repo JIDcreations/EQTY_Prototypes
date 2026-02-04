@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useMemo } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -21,12 +21,17 @@ import LessonOverviewScreen from './screens/LessonOverviewScreen';
 import LessonStepScreen from './screens/LessonStepScreen';
 import GlossaryDetailScreen from './screens/GlossaryDetailScreen';
 import LessonSuccessScreen from './screens/LessonSuccessScreen';
+import OnboardingQuestionScreen from './screens/onboarding/OnboardingQuestionScreen';
+import OnboardingRequiredScreen from './screens/OnboardingRequiredScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function Tabs() {
   const { colors, typography, components } = useTheme();
+  const { onboardingContext } = useApp();
+  const styles = useMemo(() => createTabStyles(colors, components), [colors, components]);
+  const showOnboardingBadge = !onboardingContext?.onboardingComplete;
   const tabBarHeight = components.layout.spacing.xxl * 2 + components.layout.safeArea.bottom;
   const tabBarPaddingBottom = Math.max(
     components.layout.safeArea.bottom,
@@ -55,6 +60,14 @@ function Tabs() {
           if (route.name === 'Lessons') iconName = 'book-outline';
           if (route.name === 'Glossary') iconName = 'list-outline';
           if (route.name === 'Profile') iconName = 'person-outline';
+          if (route.name === 'Profile') {
+            return (
+              <View style={styles.iconWrap}>
+                <Ionicons name={iconName} size={size} color={color} />
+                {showOnboardingBadge ? <View style={styles.iconBadge} /> : null}
+              </View>
+            );
+          }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
@@ -66,6 +79,24 @@ function Tabs() {
     </Tab.Navigator>
   );
 }
+
+const createTabStyles = (colors, components) =>
+  StyleSheet.create({
+    iconWrap: {
+      position: 'relative',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    iconBadge: {
+      position: 'absolute',
+      top: components.layout.spacing.none,
+      right: components.layout.spacing.none,
+      width: components.sizes.dot.xs,
+      height: components.sizes.dot.xs,
+      borderRadius: components.radius.pill,
+      backgroundColor: colors.accent.primary,
+    },
+  });
 
 function RootStack() {
   const { isReady, authUser, preferences } = useApp();
@@ -84,6 +115,40 @@ function RootStack() {
       ) : (
         <>
           <Stack.Screen name="Tabs" component={Tabs} />
+          <Stack.Screen name="OnboardingRequired" component={OnboardingRequiredScreen} />
+          <Stack.Screen
+            name="OnboardingQuestionExperience"
+            component={OnboardingQuestionScreen}
+            initialParams={{
+              question: 'What have you already done in terms of investing?',
+              field: 'experienceAnswer',
+              step: 1,
+              total: 3,
+              nextRoute: 'OnboardingQuestionKnowledge',
+            }}
+          />
+          <Stack.Screen
+            name="OnboardingQuestionKnowledge"
+            component={OnboardingQuestionScreen}
+            initialParams={{
+              question: 'What do you already know about investing today?',
+              field: 'knowledgeAnswer',
+              step: 2,
+              total: 3,
+              nextRoute: 'OnboardingQuestionMotivation',
+            }}
+          />
+          <Stack.Screen
+            name="OnboardingQuestionMotivation"
+            component={OnboardingQuestionScreen}
+            initialParams={{
+              question: 'Why do you want to start investing?',
+              field: 'motivationAnswer',
+              step: 3,
+              total: 3,
+              isLast: true,
+            }}
+          />
           <Stack.Screen name="LessonOverview" component={LessonOverviewScreen} />
           <Stack.Screen name="LessonStep" component={LessonStepScreen} />
           <Stack.Screen name="LessonSuccess" component={LessonSuccessScreen} />

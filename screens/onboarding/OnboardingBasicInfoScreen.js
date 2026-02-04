@@ -17,7 +17,7 @@ import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingBasicInfoScreen({ navigation }) {
-  const { updateAuthUser, preferences } = useApp();
+  const { updateAuthUser, updatePreferences, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
@@ -29,7 +29,7 @@ export default function OnboardingBasicInfoScreen({ navigation }) {
     if (trimmed) {
       await updateAuthUser({ username: trimmed, name: trimmed, birthdate: birthdate.trim() });
     }
-    navigation.navigate('OnboardingQuestionsIntro');
+    await updatePreferences({ hasOnboarded: true });
   };
 
   return (

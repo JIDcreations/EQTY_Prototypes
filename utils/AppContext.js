@@ -88,7 +88,31 @@ export function AppProvider({ children }) {
   };
 
   const updateOnboardingContext = async (updates) => {
-    const next = { ...onboardingContext, ...updates };
+    const nextBase = { ...onboardingContext, ...updates };
+    const nextAnswers = {
+      q1:
+        updates?.onboardingAnswers?.q1 ??
+        updates?.experienceAnswer ??
+        nextBase?.experienceAnswer ??
+        '',
+      q2:
+        updates?.onboardingAnswers?.q2 ??
+        updates?.knowledgeAnswer ??
+        nextBase?.knowledgeAnswer ??
+        '',
+      q3:
+        updates?.onboardingAnswers?.q3 ??
+        updates?.motivationAnswer ??
+        nextBase?.motivationAnswer ??
+        '',
+    };
+    const next = {
+      ...nextBase,
+      onboardingAnswers: nextAnswers,
+      experienceAnswer: nextBase?.experienceAnswer || nextAnswers.q1,
+      knowledgeAnswer: nextBase?.knowledgeAnswer || nextAnswers.q2,
+      motivationAnswer: nextBase?.motivationAnswer || nextAnswers.q3,
+    };
     setOnboardingContext(next);
     await saveOnboardingContext(next);
     const derived = deriveUserContextFromOnboarding(next);

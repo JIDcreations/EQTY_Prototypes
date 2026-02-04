@@ -15,7 +15,7 @@ export default function LessonOverviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { lessonId, entrySource } = route.params || {};
-  const { preferences } = useApp();
+  const { preferences, onboardingContext } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [isStructureOpen, setIsStructureOpen] = useState(false);
@@ -35,6 +35,8 @@ export default function LessonOverviewScreen() {
     content?.steps?.summary?.takeaways?.length > 0
       ? content.steps.summary.takeaways
       : [lesson.shortDescription];
+  const isLessonGateRequired =
+    lesson.id === 'lesson_1' && !onboardingContext?.onboardingComplete;
 
   return (
     <View style={styles.container}>
@@ -96,13 +98,17 @@ export default function LessonOverviewScreen() {
         <View style={styles.ctaStack}>
           <PrimaryButton
             label={overviewCopy.startLesson}
-            onPress={() =>
+            onPress={() => {
+              if (isLessonGateRequired) {
+                navigation.navigate('OnboardingRequired', { entrySource });
+                return;
+              }
               navigation.navigate('LessonStep', {
                 lessonId: lesson.id,
                 step: 1,
                 entrySource,
-              })
-            }
+              });
+            }}
           />
           <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
         </View>

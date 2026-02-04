@@ -18,6 +18,7 @@ import Toast from '../components/Toast';
 import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 import useToast from '../utils/useToast';
+import { getSettingsCopy } from '../utils/localization';
 
 const APPEARANCE_OPTIONS = [
   { label: 'Dark', value: 'Dark' },
@@ -37,6 +38,11 @@ export default function ProfileOverviewScreen() {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const toast = useToast();
+  const settingsCopy = useMemo(
+    () => getSettingsCopy(preferences?.language),
+    [preferences?.language]
+  );
+  const showOnboardingHighlight = !onboardingContext?.onboardingComplete;
 
   const previewAnswers = useMemo(() => {
     const fallback = 'Not set yet.';
@@ -153,6 +159,45 @@ export default function ProfileOverviewScreen() {
 
         <SettingsSection title="Personal context (AI)">
           <Card style={styles.card}>
+            {showOnboardingHighlight ? (
+              <View style={styles.onboardingRowHighlight}>
+                <SettingsRow
+                  label={settingsCopy.onboardingQuestions}
+                  onPress={() =>
+                    navigation.navigate({
+                      name: 'OnboardingQuestionExperience',
+                      params: {
+                        returnTo: 'Tabs',
+                        returnParams: {
+                          screen: 'Profile',
+                          params: { screen: 'ProfileOverview' },
+                        },
+                      },
+                      merge: true,
+                    })
+                  }
+                  isLast
+                />
+              </View>
+            ) : (
+              <SettingsRow
+                label={settingsCopy.onboardingQuestions}
+                onPress={() =>
+                  navigation.navigate({
+                    name: 'OnboardingQuestionExperience',
+                    params: {
+                      returnTo: 'Tabs',
+                      returnParams: {
+                        screen: 'Profile',
+                        params: { screen: 'ProfileOverview' },
+                      },
+                    },
+                    merge: true,
+                  })
+                }
+                isLast
+              />
+            )}
             <View style={styles.contextBlock}>
               <AppText style={styles.contextLabel}>Investing experience so far</AppText>
               <AppText
@@ -309,6 +354,12 @@ const createStyles = (colors, components) =>
     contextHelper: {
       ...typography.styles.small,
       color: colors.text.secondary,
+    },
+    onboardingRowHighlight: {
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.accent.primary,
+      borderRadius: components.radius.input,
+      overflow: 'hidden',
     },
     cardTitle: {
       ...typography.styles.h3,

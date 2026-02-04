@@ -1,43 +1,51 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AppText from '../../components/AppText';
-import OnboardingGesture from '../../components/OnboardingGesture';
 import OnboardingScreen from '../../components/OnboardingScreen';
-import OnboardingStackedCard from '../../components/OnboardingStackedCard';
+import { PrimaryButton, SecondaryButton } from '../../components/Button';
 import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingQuestionsIntroScreen({ navigation }) {
-  const { preferences } = useApp();
+  const { preferences, updatePreferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
+
+  const handleSkip = async () => {
+    await updatePreferences({ hasOnboarded: true });
+  };
 
   return (
     <OnboardingScreen
       gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
     >
-      <OnboardingGesture onContinue={() => navigation.navigate('OnboardingQuestionExperience')}>
-        <View style={styles.container}>
-          <View pointerEvents="none" style={styles.accentOrbTop} />
-          <View pointerEvents="none" style={styles.accentOrbBottom} />
-          <View style={styles.content}>
-            <OnboardingStackedCard>
-              <View style={styles.cardHeader}>
-                <View style={styles.badge}>
-                  <View style={styles.badgeDot} />
-                  <AppText style={styles.badgeText}>{copy.questionsIntro.badge}</AppText>
-                </View>
-                <AppText style={styles.title}>{copy.questionsIntro.title}</AppText>
-              </View>
-              <AppText style={styles.subtitle}>{copy.questionsIntro.subtitle}</AppText>
-              <AppText style={styles.tapHint}>{copy.questionsIntro.tapHint}</AppText>
-            </OnboardingStackedCard>
-          </View>
+      <View style={styles.container}>
+        <View pointerEvents="none" style={styles.accentOrbTop} />
+        <View pointerEvents="none" style={styles.accentOrbBottom} />
+        <View style={styles.content}>
+          <AppText style={styles.title}>{copy.questionsIntro.title}</AppText>
+          <AppText style={styles.subtitle}>{copy.questionsIntro.subtitle}</AppText>
         </View>
-      </OnboardingGesture>
+        <View style={styles.actions}>
+          <PrimaryButton
+            label={copy.questionsIntro.primaryButton}
+            onPress={() =>
+              navigation.navigate({
+                name: 'OnboardingQuestionExperience',
+                params: {
+                  exitToTabs: true,
+                  setHasOnboardedOnComplete: true,
+                },
+                merge: true,
+              })
+            }
+          />
+          <SecondaryButton label={copy.questionsIntro.secondaryButton} onPress={handleSkip} />
+        </View>
+      </View>
     </OnboardingScreen>
   );
 }
@@ -57,36 +65,11 @@ const createStyles = (colors, components) =>
       flex: 1,
       paddingBottom: components.layout.spacing.xl,
       paddingTop: components.layout.spacing.xl,
+      justifyContent: 'space-between',
     },
     content: {
-      flex: 1,
-      justifyContent: 'center',
-      transform: [{ translateY: components.offsets.translate.sm }],
-    },
-    cardHeader: {
       gap: components.layout.spacing.sm,
-    },
-    badge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: components.layout.spacing.xs,
-      alignSelf: 'flex-start',
-      backgroundColor: colors.background.surfaceActive,
-      borderRadius: components.radius.pill,
-      paddingHorizontal: components.layout.spacing.sm,
-      paddingVertical: components.layout.spacing.xs,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-    },
-    badgeDot: {
-      width: components.sizes.dot.xs,
-      height: components.sizes.dot.xs,
-      borderRadius: components.radius.pill,
-      backgroundColor: colors.accent.primary,
-    },
-    badgeText: {
-      ...typography.styles.stepLabel,
-      color: colors.text.secondary,
+      paddingTop: components.layout.spacing.xxl,
     },
     title: {
       ...typography.styles.h1,
@@ -96,10 +79,8 @@ const createStyles = (colors, components) =>
       ...typography.styles.body,
       color: colors.text.secondary,
     },
-    tapHint: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-      textAlign: 'right',
+    actions: {
+      gap: components.layout.spacing.md,
     },
     accentOrbTop: {
       position: 'absolute',
