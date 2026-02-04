@@ -143,10 +143,10 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       gap: components.layout.spacing.sm,
       backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.background.surface, components.opacity.value35),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     rowActive: {
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     rowLeft: {
       flexDirection: 'row',

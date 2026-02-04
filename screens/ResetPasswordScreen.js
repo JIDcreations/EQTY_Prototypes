@@ -138,7 +138,7 @@ const createStyles = (colors, components) =>
       ...components.input.container,
       ...components.input.text,
       backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.background.surface, components.opacity.value35),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     hint: {
       ...components.input.helper,
