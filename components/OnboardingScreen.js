@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../theme';
+
+const backgroundImage = require('../assets/backgrounds/BG-1.png');
 
 const toRgba = (hex, alpha) => {
   const cleaned = hex.replace('#', '');
@@ -22,11 +24,53 @@ export default function OnboardingScreen({
 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const resolvedGradientColors = [colors.background.app, colors.background.app];
+  const resolvedGradientColors = [
+    toRgba(colors.background.app, components.opacity.value35),
+    toRgba(colors.background.app, components.opacity.value35),
+  ];
 
   if (scroll) {
     return (
-      <LinearGradient colors={resolvedGradientColors} style={[styles.gradient, style]}>
+      <ImageBackground
+        source={backgroundImage}
+        style={[styles.background, style]}
+        imageStyle={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <LinearGradient colors={resolvedGradientColors} style={styles.gradient}>
+          {showGlow ? (
+            <>
+              <View pointerEvents="none" style={styles.glowTop} />
+              <View pointerEvents="none" style={styles.glowMid} />
+              <View pointerEvents="none" style={styles.glowBottom} />
+            </>
+          ) : null}
+          <View style={styles.scrollContainer}>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={[
+                styles.scrollContent,
+                contentContainerStyle,
+              ]}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {children}
+            </ScrollView>
+          </View>
+        </LinearGradient>
+      </ImageBackground>
+    );
+  }
+
+  return (
+    <ImageBackground
+      source={backgroundImage}
+      style={[styles.background, style]}
+      imageStyle={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <LinearGradient colors={resolvedGradientColors} style={styles.gradient}>
         {showGlow ? (
           <>
             <View pointerEvents="none" style={styles.glowTop} />
@@ -34,44 +78,25 @@ export default function OnboardingScreen({
             <View pointerEvents="none" style={styles.glowBottom} />
           </>
         ) : null}
-        <View style={styles.scrollContainer}>
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={[
-              styles.scrollContent,
-              contentContainerStyle,
-            ]}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {children}
-          </ScrollView>
+        <View style={styles.safeArea}>
+          <View style={[styles.content, contentContainerStyle]}>{children}</View>
         </View>
       </LinearGradient>
-    );
-  }
-
-  return (
-    <LinearGradient colors={resolvedGradientColors} style={[styles.gradient, style]}>
-      {showGlow ? (
-        <>
-          <View pointerEvents="none" style={styles.glowTop} />
-          <View pointerEvents="none" style={styles.glowMid} />
-          <View pointerEvents="none" style={styles.glowBottom} />
-        </>
-      ) : null}
-      <View style={styles.safeArea}>
-        <View style={[styles.content, contentContainerStyle]}>{children}</View>
-      </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
+    background: {
+      flex: 1,
+    },
+    backgroundImage: {
+      opacity: 1,
+    },
     gradient: {
       flex: 1,
-      backgroundColor: colors.background.app,
+      backgroundColor: toRgba(colors.background.app, 0),
     },
     safeArea: {
       flex: 1,

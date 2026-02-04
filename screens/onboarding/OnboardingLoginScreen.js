@@ -146,6 +146,15 @@ export default function OnboardingLoginScreen({ navigation }) {
   );
 }
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
@@ -196,14 +205,16 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
-      borderColor: colors.background.surface,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
     },
     inputRow: {
       ...components.input.container,
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      borderColor: colors.background.surface,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
     },
     inputField: {
       ...components.input.text,
@@ -244,8 +255,8 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       borderRadius: components.radius.input,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.background.surface,
-      backgroundColor: colors.background.app,
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
       minHeight: components.sizes.input.minHeight,
       flexDirection: 'row',
       alignItems: 'center',

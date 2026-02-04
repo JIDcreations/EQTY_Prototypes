@@ -8,12 +8,13 @@ import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingQuestionsIntroScreen({ navigation }) {
-  const { preferences, updatePreferences } = useApp();
+  const { preferences, updatePreferences, updateAuthUser } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
   const handleSkip = async () => {
+    await updateAuthUser({});
     await updatePreferences({ hasOnboarded: true });
   };
 
@@ -24,8 +25,6 @@ export default function OnboardingQuestionsIntroScreen({ navigation }) {
       contentContainerStyle={styles.screen}
     >
       <View style={styles.container}>
-        <View pointerEvents="none" style={styles.accentOrbTop} />
-        <View pointerEvents="none" style={styles.accentOrbBottom} />
         <View style={styles.logoWrap}>
           <AppText style={styles.logo}>EQTY</AppText>
         </View>
@@ -47,7 +46,11 @@ export default function OnboardingQuestionsIntroScreen({ navigation }) {
               })
             }
           />
-          <SecondaryButton label={copy.questionsIntro.secondaryButton} onPress={handleSkip} />
+          <SecondaryButton
+            label={copy.questionsIntro.secondaryButton}
+            onPress={handleSkip}
+            style={styles.secondaryButton}
+          />
         </View>
       </View>
     </OnboardingScreen>
@@ -96,22 +99,8 @@ const createStyles = (colors, components) =>
     actions: {
       gap: components.layout.spacing.md,
     },
-    accentOrbTop: {
-      position: 'absolute',
-      top: components.offsets.onboarding.orbTopMd,
-      left: components.offsets.onboarding.orbLeftLg,
-      width: components.sizes.illustration.md,
-      height: components.sizes.illustration.md,
-      borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.background.surface, 0.6),
-    },
-    accentOrbBottom: {
-      position: 'absolute',
-      bottom: components.offsets.onboarding.orbBottomMd,
-      right: components.offsets.onboarding.orbRightSm,
-      width: components.sizes.illustration.lg,
-      height: components.sizes.illustration.lg,
-      borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.accent.primary, 0.08),
+    secondaryButton: {
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
     },
   });

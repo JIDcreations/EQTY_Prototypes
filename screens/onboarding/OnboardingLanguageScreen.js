@@ -80,6 +80,15 @@ export default function OnboardingLanguageScreen({ navigation, route }) {
   );
 }
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 const createStyles = (colors, components) =>
   StyleSheet.create({
     screen: {
@@ -129,7 +138,8 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      borderColor: colors.background.surface,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
     },
     rowActive: {
       borderColor: colors.ui.divider,

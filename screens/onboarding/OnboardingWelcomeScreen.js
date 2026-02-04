@@ -25,8 +25,6 @@ export default function OnboardingWelcomeScreen({ navigation }) {
       contentContainerStyle={styles.screen}
     >
       <View style={styles.container}>
-        <View pointerEvents="none" style={styles.accentOrbTop} />
-        <View pointerEvents="none" style={styles.accentOrbBottom} />
         <View style={styles.logoWrap}>
           <AppText style={styles.logo}>EQTY</AppText>
         </View>
@@ -42,6 +40,7 @@ export default function OnboardingWelcomeScreen({ navigation }) {
           <SecondaryButton
             label={copy.welcome.secondaryCta}
             onPress={() => navigation.navigate('OnboardingLogin')}
+            style={styles.secondaryButton}
           />
         </View>
       </View>
@@ -93,22 +92,8 @@ const createStyles = (colors, components) =>
     actions: {
       gap: components.layout.spacing.md,
     },
-    accentOrbTop: {
-      position: 'absolute',
-      top: components.offsets.onboarding.orbTopSm,
-      left: components.offsets.onboarding.orbLeftSm,
-      width: components.sizes.illustration.sm,
-      height: components.sizes.illustration.sm,
-      borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.background.surfaceActive, 0.6),
-    },
-    accentOrbBottom: {
-      position: 'absolute',
-      bottom: components.offsets.onboarding.orbBottomLg,
-      right: components.offsets.onboarding.orbRightSm,
-      width: components.sizes.illustration.lg,
-      height: components.sizes.illustration.lg,
-      borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.background.surface, 0.7),
+    secondaryButton: {
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
     },
   });
