@@ -13,7 +13,7 @@ import { formatOnboardingQuestionLabel, getOnboardingCopy } from '../../utils/lo
 export default function OnboardingQuestionScreen({ navigation, route }) {
   const { question, field, step, total, nextRoute, isLast, returnTo, returnParams, exitToTabs, setHasOnboardedOnComplete } =
     route.params;
-  const { onboardingContext, updateOnboardingContext, updatePreferences, preferences } = useApp();
+  const { onboardingContext, updateOnboardingContext, updatePreferences, updateAuthUser, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
@@ -37,6 +37,7 @@ export default function OnboardingQuestionScreen({ navigation, route }) {
         return;
       }
       if (exitToTabs || setHasOnboardedOnComplete) {
+        await updateAuthUser({});
         navigation.navigate('Tabs', { screen: 'Home' });
         return;
       }
