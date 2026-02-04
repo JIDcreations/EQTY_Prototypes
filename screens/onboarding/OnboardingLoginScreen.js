@@ -73,11 +73,11 @@ export default function OnboardingLoginScreen({ navigation }) {
                   style={styles.input}
                 />
               </View>
-              <View style={styles.field}>
-                <AppText style={styles.label}>{copy.login.passwordLabel}</AppText>
-                <View style={styles.inputRow}>
-                  <AppTextInput
-                    value={password}
+            <View style={styles.field}>
+              <AppText style={styles.label}>{copy.login.passwordLabel}</AppText>
+              <View style={styles.inputRow}>
+                <AppTextInput
+                  value={password}
                     onChangeText={setPassword}
                     placeholder={copy.login.passwordPlaceholder}
                     placeholderTextColor={colors.text.secondary}
@@ -95,6 +95,9 @@ export default function OnboardingLoginScreen({ navigation }) {
                     />
                   </Pressable>
                 </View>
+                <Pressable onPress={() => navigation.navigate('ResetPassword')}>
+                  <AppText style={styles.forgotLink}>{copy.login.forgotPassword}</AppText>
+                </Pressable>
               </View>
             </View>
 
@@ -253,6 +256,11 @@ const createStyles = (colors, components) =>
       ...typography.styles.small,
       color: colors.text.secondary,
       opacity: components.opacity.value80,
+    },
+    forgotLink: {
+      ...typography.styles.small,
+      color: colors.text.secondary,
+      marginTop: components.layout.spacing.xs,
     },
     linkInline: {
       paddingTop: components.layout.spacing.sm,

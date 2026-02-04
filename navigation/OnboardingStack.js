@@ -8,6 +8,7 @@ import OnboardingBasicInfoScreen from '../screens/onboarding/OnboardingBasicInfo
 import OnboardingLanguageScreen from '../screens/onboarding/OnboardingLanguageScreen';
 import OnboardingQuestionsIntroScreen from '../screens/onboarding/OnboardingQuestionsIntroScreen';
 import OnboardingQuestionScreen from '../screens/onboarding/OnboardingQuestionScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ export default function OnboardingStack() {
       <Stack.Screen name="OnboardingEntry" component={OnboardingEntryScreen} />
       <Stack.Screen name="OnboardingLogin" component={OnboardingLoginScreen} />
       <Stack.Screen name="OnboardingEmail" component={OnboardingEmailScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       <Stack.Screen name="OnboardingBasicInfo" component={OnboardingBasicInfoScreen} />
       <Stack.Screen name="OnboardingQuestionsIntro" component={OnboardingQuestionsIntroScreen} />
       <Stack.Screen

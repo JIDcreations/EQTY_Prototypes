@@ -21,11 +21,15 @@ export default function OnboardingQuestionsIntroScreen({ navigation }) {
     <OnboardingScreen
       gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
+      contentContainerStyle={styles.screen}
     >
       <View style={styles.container}>
         <View pointerEvents="none" style={styles.accentOrbTop} />
         <View pointerEvents="none" style={styles.accentOrbBottom} />
-        <View style={styles.content}>
+        <View style={styles.logoWrap}>
+          <AppText style={styles.logo}>EQTY</AppText>
+        </View>
+        <View style={styles.copyBlock}>
           <AppText style={styles.title}>{copy.questionsIntro.title}</AppText>
           <AppText style={styles.subtitle}>{copy.questionsIntro.subtitle}</AppText>
         </View>
@@ -61,15 +65,25 @@ const toRgba = (hex, alpha) => {
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
+    screen: {
+      paddingBottom: 0,
+    },
     container: {
       flex: 1,
-      paddingBottom: components.layout.spacing.xl,
-      paddingTop: components.layout.spacing.xl,
       justifyContent: 'space-between',
     },
-    content: {
+    logoWrap: {
+      marginTop: components.layout.spacing.xxl,
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+    },
+    logo: {
+      ...typography.styles.display,
+      color: colors.text.primary,
+    },
+    copyBlock: {
+      width: '100%',
       gap: components.layout.spacing.sm,
-      paddingTop: components.layout.spacing.xxl,
     },
     title: {
       ...typography.styles.h1,
