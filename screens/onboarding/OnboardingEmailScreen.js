@@ -139,7 +139,7 @@ export default function OnboardingEmailScreen({ navigation }) {
                   <Ionicons
                     name="logo-apple"
                     size={components.sizes.icon.md}
-                    color={colors.text.secondary}
+                    color={colors.background.app}
                   />
                   <AppText style={styles.socialText}>{copy.email.socialApple}</AppText>
                 </Pressable>
@@ -147,7 +147,7 @@ export default function OnboardingEmailScreen({ navigation }) {
                   <Ionicons
                     name="logo-google"
                     size={components.sizes.icon.md}
-                    color={colors.text.secondary}
+                    color={colors.background.app}
                   />
                   <AppText style={styles.socialText}>{copy.email.socialGoogle}</AppText>
                 </Pressable>
@@ -206,7 +206,7 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.app,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
       alignItems: 'center',
       justifyContent: 'center',
       position: 'relative',
@@ -226,16 +226,16 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.background.surface, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     inputRow: {
       ...components.input.container,
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.background.surface, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     inputField: {
       ...components.input.text,
@@ -279,8 +279,8 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       borderRadius: components.radius.input,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.text.primary, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.app, components.opacity.value20),
+      backgroundColor: colors.text.primary,
       minHeight: components.sizes.input.minHeight,
       flexDirection: 'row',
       alignItems: 'center',
@@ -289,8 +289,8 @@ const createStyles = (colors, components) =>
     },
     socialText: {
       ...typography.styles.small,
-      color: colors.text.secondary,
-      opacity: components.opacity.value80,
+      color: colors.background.app,
+      opacity: components.opacity.value90,
     },
     linkInline: {
       paddingTop: components.layout.spacing.sm,

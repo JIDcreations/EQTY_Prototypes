@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
-import Card from '../components/Card';
-import SettingsHeader from '../components/SettingsHeader';
+import OnboardingScreen from '../components/OnboardingScreen';
 import Toast from '../components/Toast';
 import { typography, useTheme } from '../theme';
 import useToast from '../utils/useToast';
@@ -21,64 +21,127 @@ export default function ResetPasswordScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+    <OnboardingScreen
+      backgroundVariant="bg3"
+      contentContainerStyle={styles.screen}
+      showGlow={false}
+    >
+      <KeyboardAvoidingView
+        style={styles.keyboard}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <SettingsHeader title="Reset password" onBack={() => navigation.goBack()} />
-        <Card style={styles.card}>
-          <AppText style={styles.label}>Email address</AppText>
-          <AppTextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="name@email.com"
-            placeholderTextColor={colors.text.secondary}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            style={styles.input}
-          />
-          <AppText style={styles.hint}>
-            We'll send a reset link to your email.
-          </AppText>
-        </Card>
-        <View style={styles.actions}>
-          <PrimaryButton label="Send reset link" onPress={handleSend} disabled={!email.trim()} />
-          <SecondaryButton label="Cancel" onPress={() => navigation.goBack()} />
+        <View style={styles.layout}>
+          <View style={styles.header}>
+            <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Ionicons
+                name="chevron-back"
+                size={components.sizes.icon.lg}
+                color={colors.text.secondary}
+              />
+            </Pressable>
+            <AppText style={styles.headerTitle}>Reset password</AppText>
+          </View>
+
+          <View style={styles.contentBlock}>
+            <View style={styles.fields}>
+              <View style={styles.field}>
+                <AppText style={styles.label}>Email address</AppText>
+                <AppTextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="name@email.com"
+                  placeholderTextColor={colors.text.secondary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  style={styles.input}
+                />
+              </View>
+              <AppText style={styles.hint}>
+                We'll send a reset link to your email.
+              </AppText>
+            </View>
+
+            <View style={styles.actions}>
+              <PrimaryButton
+                label="Send reset link"
+                onPress={handleSend}
+                disabled={!email.trim()}
+              />
+              <SecondaryButton label="Cancel" onPress={() => navigation.goBack()} />
+            </View>
+          </View>
         </View>
-      </ScrollView>
+      </KeyboardAvoidingView>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
-    </View>
+    </OnboardingScreen>
   );
 }
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    container: {
-      ...components.screen.containerScroll,
+    screen: {
       flex: 1,
+      paddingBottom: components.layout.spacing.none,
+    },
+    keyboard: {
+      flex: 1,
+    },
+    layout: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
+    },
+    contentBlock: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      gap: components.layout.spacing.xxl,
+    },
+    header: {
+      gap: components.layout.spacing.none,
+    },
+    headerTitle: {
+      ...typography.styles.h1,
+      color: colors.text.primary,
+      textAlign: 'left',
+      marginTop: components.layout.spacing.xxl,
+    },
+    backButton: {
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
       backgroundColor: colors.background.app,
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
     },
-    content: {
-      paddingHorizontal: components.layout.pagePaddingHorizontal,
-      paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
-      gap: components.layout.contentGap,
-      paddingBottom: components.layout.safeArea.bottom,
-    },
-    card: {
+    fields: {
       gap: components.layout.cardGap,
     },
+    field: {
+      gap: components.layout.spacing.xs,
+    },
     label: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
+      ...components.input.label,
     },
     input: {
       ...components.input.container,
       ...components.input.text,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.background.surface, components.opacity.value35),
     },
     hint: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
+      ...components.input.helper,
     },
     actions: {
       gap: components.layout.spacing.md,

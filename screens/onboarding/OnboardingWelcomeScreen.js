@@ -15,7 +15,7 @@ export default function OnboardingWelcomeScreen({ navigation }) {
 
   const handleCreateAccount = async () => {
     await updatePreferences({ hasOnboarded: false });
-    navigation.navigate('OnboardingLanguage', { nextRoute: 'OnboardingEmail' });
+    navigation.navigate('OnboardingEmail');
   };
 
   return (
