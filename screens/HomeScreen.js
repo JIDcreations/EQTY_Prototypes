@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,112 +6,112 @@ import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
+import OnboardingScreen from '../components/OnboardingScreen';
+import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
-import Tag from '../components/Tag';
 import {
-  formatHomeLessonCount,
-  formatHomeModuleLabel,
   getHomeCopy,
   getLocalizedLessons,
-  getLocalizedModules,
 } from '../utils/localization';
 import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { progress, authUser, userContext, preferences } = useApp();
+  const { progress, authUser, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const [expandedFocus, setExpandedFocus] = useState(null);
   const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
 
   const localizedLessons = useMemo(
     () => getLocalizedLessons(preferences?.language),
     [preferences?.language]
   );
-  const localizedModules = useMemo(
-    () => getLocalizedModules(preferences?.language),
-    [preferences?.language]
+  const sortedLessons = useMemo(
+    () => [...localizedLessons].sort((a, b) => a.order - b.order),
+    [localizedLessons]
   );
-  const totalLessons = localizedLessons.length;
+  const totalLessons = sortedLessons.length;
   const currentLesson =
-    localizedLessons.find((lesson) => lesson.id === progress.currentLessonId) ||
-    localizedLessons[0];
-  const currentOrder = currentLesson?.order || 1;
-  const currentModuleIndex = localizedModules.findIndex(
-    (module) => module.id === currentLesson?.moduleId
+    sortedLessons.find((lesson) => lesson.id === progress.currentLessonId) ||
+    sortedLessons[0];
+  const currentLessonIndex = sortedLessons.findIndex(
+    (lesson) => lesson.id === currentLesson?.id
   );
-  const currentModule = localizedModules[currentModuleIndex];
+  const lessonPosition = currentLessonIndex >= 0 ? currentLessonIndex + 1 : 1;
+  const completedLessonIds = progress.completedLessonIds || [];
+  const completedCount = Math.min(
+    completedLessonIds.filter((lessonId) =>
+      sortedLessons.some((lesson) => lesson.id === lessonId)
+    ).length,
+    totalLessons
+  );
+  const seriesProgress = totalLessons > 0 ? completedCount / totalLessons : 0;
 
   const greeting = getGreeting(homeCopy);
   const displayName = getDisplayName(authUser, homeCopy);
-  const moduleNumber = currentModule?.id?.split('_')[1];
-  const moduleLabel =
-    currentModuleIndex >= 0 && currentModule
-      ? formatHomeModuleLabel(
-          preferences?.language,
-          moduleNumber,
-          currentModule.title,
-          currentModuleIndex
-        )
-      : homeCopy.moduleFocus;
-  const moduleDescription = currentModule?.description || homeCopy.moduleFallbackDescription;
-  const motivation = formatSentence(userContext?.motivation, homeCopy.defaultMotivation);
-
-  const focusSections = [
-    {
-      id: 'concept',
-      label: homeCopy.labels.concept,
-      title: currentLesson?.title || homeCopy.coreConceptFallback,
-      summary: currentLesson?.shortDescription,
-      detail: homeCopy.conceptDetail(currentLesson?.title),
-    },
-    {
-      id: 'scenario',
-      label: homeCopy.labels.scenario,
-      title: homeCopy.titles.scenario,
-      summary: homeCopy.scenarioSummary(moduleLabel),
-      detail: homeCopy.scenarioDetail(currentLesson?.title, moduleDescription),
-    },
-    {
-      id: 'exercise',
-      label: homeCopy.labels.exercise,
-      title: homeCopy.titles.exercise,
-      summary: homeCopy.exerciseSummary(motivation),
-      detail: homeCopy.exerciseDetail,
-    },
-  ].filter((item) => item.summary);
+  const lessonTitle = currentLesson?.title || homeCopy.lessonFallbackTitle;
+  const lessonDescription = currentLesson?.shortDescription || homeCopy.lessonFallbackDescription;
+  const primaryCtaLabel =
+    completedCount > 0 ? homeCopy.continueLesson : homeCopy.startLesson;
+  const heroDescription = shortenToLine(lessonDescription, 60);
+  const greetingLine = `${greeting}, ${displayName}`;
+  const learningPathLessons = sortedLessons
+    .slice(currentLessonIndex + 1, currentLessonIndex + 4)
+    .map((lesson, index) => ({
+      id: lesson.id,
+      position: currentLessonIndex + 2 + index,
+      title: lesson.title,
+    }));
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <View style={styles.headerMainRow}>
-            <View style={styles.headerGreeting}>
-              <GlossaryText text={`${greeting},`} style={styles.greeting} />
-              <GlossaryText text={displayName} style={styles.name} />
-            </View>
+    <OnboardingScreen
+      scroll
+      backgroundVariant="bg3"
+      contentContainerStyle={styles.content}
+    >
+      <View style={styles.header}>
+        <View style={styles.headerMainRow}>
+          <View style={styles.headerGreeting}>
+            <GlossaryText text={greetingLine} style={styles.greeting} />
           </View>
-        </View>
-
-        <GlossaryText text={moduleLabel} style={styles.moduleLabel} numberOfLines={2} />
-
-        <Card style={styles.heroCard}>
-          <View style={styles.heroMetaRow}>
-            <Tag label={homeCopy.todaysLessonTag} style={styles.heroTag} />
-            <GlossaryText
-              text={formatHomeLessonCount(preferences?.language, currentOrder, totalLessons)}
-              style={styles.heroMetaText}
+          <Pressable
+            onPress={() => navigation.navigate('Profile')}
+            style={styles.profileButton}
+            hitSlop={components.layout.spacing.sm}
+          >
+            <Ionicons
+              name="person-outline"
+              size={components.sizes.icon.lg}
+              color={colors.text.primary}
             />
-          </View>
-          <AppText style={styles.heroTitle}>{currentLesson?.title}</AppText>
-          <AppText style={styles.heroSubtitle}>{currentLesson?.shortDescription}</AppText>
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.trajectoryBlock}>
+        <GlossaryText
+          text={homeCopy.lessonPosition(lessonPosition, totalLessons)}
+          style={styles.trajectoryMeta}
+        />
+        <ProgressBar progress={seriesProgress} />
+      </View>
+
+      <View style={styles.section}>
+        <Card style={styles.heroCard}>
+          <GlossaryText
+            text={homeCopy.lessonShort(lessonPosition)}
+            style={styles.heroStepLabel}
+            numberOfLines={1}
+          />
+          <GlossaryText text={lessonTitle} style={styles.heroTitle} />
+          {heroDescription ? (
+            <AppText style={styles.heroSubtitle} numberOfLines={1}>
+              {heroDescription}
+            </AppText>
+          ) : null}
           <PrimaryButton
-            label={homeCopy.startLesson}
+            label={primaryCtaLabel}
             onPress={() =>
               navigation.navigate('LessonOverview', {
                 lessonId: currentLesson?.id,
@@ -121,66 +121,54 @@ export default function HomeScreen() {
             style={styles.heroButton}
           />
         </Card>
+      </View>
 
-        <SectionTitle title={homeCopy.todaysFocusTitle} subtitle={homeCopy.todaysFocusSubtitle} />
-        <View style={styles.focusList}>
-          {focusSections.map((section) => {
-            const isExpanded = expandedFocus === section.id;
-            return (
-              <Pressable
-                key={section.id}
-                onPress={() =>
-                  setExpandedFocus((current) =>
-                    current === section.id ? null : section.id
-                  )
-                }
-                style={({ pressed }) => [
-                  styles.focusPressable,
-                  pressed && styles.focusPressablePressed,
-                ]}
-              >
-                <Card style={[styles.focusCard, isExpanded && styles.focusCardExpanded]}>
-                  <View style={styles.focusHeader}>
-                    <GlossaryText text={section.label} style={styles.focusLabel} />
-                    <View style={styles.focusActionPill}>
-                      <GlossaryText
-                        text={isExpanded ? homeCopy.hideDetails : homeCopy.viewDetails}
-                        style={styles.focusActionText}
-                      />
-                      <Ionicons
-                        name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                        size={components.sizes.icon.xs}
-                        color={colors.text.secondary}
-                        style={styles.focusActionIcon}
-                      />
-                    </View>
-                  </View>
-                  <GlossaryText text={section.title} style={styles.focusTitle} />
-                  <GlossaryText text={section.summary} style={styles.focusSummary} />
-                  {isExpanded ? (
-                    <GlossaryText text={section.detail} style={styles.focusDetail} />
-                  ) : null}
-                </Card>
-              </Pressable>
-            );
-          })}
+      <View style={styles.section}>
+        <View style={styles.learningHeader}>
+          <SectionTitle title={homeCopy.learningPathTitle} />
+          <Pressable onPress={() => navigation.navigate('Lessons')}>
+            <AppText style={styles.viewAll}>{homeCopy.viewAll}</AppText>
+          </Pressable>
         </View>
-      </ScrollView>
-    </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.learningList}
+        >
+          {learningPathLessons.map((lesson) => (
+            <Pressable
+              key={lesson.id}
+              onPress={() =>
+                navigation.navigate('LessonOverview', {
+                  lessonId: lesson.id,
+                  entrySource: 'HomeUpcoming',
+                })
+              }
+              style={({ pressed }) => [
+                styles.learningItem,
+                pressed && styles.learningItemPressed,
+              ]}
+            >
+              <Card style={styles.learningCard}>
+                <GlossaryText
+                  text={homeCopy.lessonShort(lesson.position)}
+                  style={styles.learningMeta}
+                />
+                <GlossaryText text={lesson.title} style={styles.learningTitle} />
+              </Card>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+
+    </OnboardingScreen>
   );
 }
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    container: {
-      ...components.screen.containerScroll,
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     content: {
-      paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
-      gap: components.layout.contentGap,
       paddingBottom: components.layout.safeArea.bottom,
     },
     header: {
@@ -188,122 +176,123 @@ const createStyles = (colors, components) =>
     },
     headerMainRow: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: components.layout.spacing.md,
     },
     headerGreeting: {
       flex: 1,
-      gap: components.layout.spacing.xs,
     },
     greeting: {
-      ...typography.styles.body,
-      color: colors.text.secondary,
-    },
-    name: {
-      ...typography.styles.display,
+      ...typography.styles.h2,
       color: colors.text.primary,
     },
-    moduleLabel: {
+    profileButton: {
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: components.borderWidth.thin,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+    },
+    section: {
+      gap: components.layout.spacing.md,
+    },
+    trajectoryBlock: {
+      gap: components.layout.spacing.sm,
+    },
+    trajectoryMeta: {
       ...typography.styles.small,
       color: colors.text.secondary,
-      textAlign: 'left',
     },
     heroCard: {
       ...components.card.base,
+      padding: components.layout.spacing.xl,
+      gap: components.layout.spacing.lg,
+      width: '100%',
+      maxWidth: components.layout.contentWidth,
+      alignSelf: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value60),
+      overflow: 'hidden',
     },
-    heroMetaRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: components.layout.spacing.sm,
-    },
-    heroTag: {
-      backgroundColor: toRgba(colors.text.primary, 0.06),
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
-    },
-    heroMetaText: {
-      ...typography.styles.small,
+    heroStepLabel: {
+      ...typography.styles.stepLabel,
       color: colors.text.secondary,
+      maxWidth: '100%',
     },
     heroTitle: {
-      ...typography.styles.h2,
+      ...typography.styles.h1,
       color: colors.text.primary,
+      flexShrink: 1,
+      maxWidth: '100%',
+      width: '100%',
     },
     heroSubtitle: {
       ...typography.styles.body,
       color: colors.text.secondary,
+      flexShrink: 1,
+      maxWidth: '100%',
+      width: '100%',
     },
     heroButton: {
       alignSelf: 'stretch',
     },
-    focusList: {
-      gap: components.layout.spacing.md,
-    },
-    focusPressable: {
-      borderRadius: components.radius.card,
-    },
-    focusPressablePressed: {
-      opacity: components.opacity.value94,
-      transform: [{ scale: components.transforms.scalePressed }],
-    },
-    focusCard: {
-      ...components.card.base,
-      borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
-    },
-    focusCardExpanded: {
-      borderColor: toRgba(colors.text.primary, 0.22),
-      backgroundColor: colors.background.surfaceActive,
-    },
-    focusHeader: {
+    learningHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: components.layout.spacing.md,
     },
-    focusLabel: {
+    viewAll: {
+      ...typography.styles.small,
+      color: colors.accent.primary,
+    },
+    learningList: {
+      gap: components.layout.spacing.md,
+      paddingBottom: components.layout.spacing.xs,
+      paddingRight: components.layout.spacing.lg,
+    },
+    learningItem: {
+      borderRadius: components.radius.card,
+    },
+    learningItemPressed: {
+      opacity: components.opacity.value94,
+      transform: [{ scale: components.transforms.scalePressed }],
+    },
+    learningCard: {
+      ...components.card.base,
+      width: components.sizes.illustration.xl,
+      borderWidth: components.borderWidth.thin,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      padding: components.layout.spacing.lg,
+      gap: components.layout.spacing.sm,
+    },
+    learningMeta: {
       ...typography.styles.stepLabel,
       color: colors.text.secondary,
     },
-    focusActionPill: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: components.layout.spacing.xs,
-      paddingHorizontal: components.layout.spacing.sm,
-      paddingVertical: components.layout.spacing.xs,
-      borderRadius: components.radius.pill,
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.text.primary, 0.16),
-      backgroundColor: toRgba(colors.text.primary, 0.06),
-    },
-    focusActionText: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-    },
-    focusActionIcon: {
-      marginTop: components.layout.spacing.none,
-    },
-    focusTitle: {
+    learningTitle: {
       ...typography.styles.h3,
       color: colors.text.primary,
-    },
-    focusSummary: {
-      ...typography.styles.body,
-      color: colors.text.primary,
-    },
-    focusDetail: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
+      flexShrink: 1,
     },
   });
 
-const getGreeting = (homeCopy) => {
-  const hour = new Date().getHours();
-  if (hour < 12) return homeCopy.greetingMorning;
-  if (hour < 18) return homeCopy.greetingAfternoon;
-  return homeCopy.greetingEvening;
+const getGreeting = (homeCopy) => homeCopy.greetingHi || 'Hi';
+
+const shortenToLine = (value, maxChars) => {
+  if (!value) return '';
+  const normalized = value.trim().replace(/\s+/g, ' ');
+  if (normalized.length <= maxChars) return normalized;
+  const slice = normalized.slice(0, maxChars);
+  const lastSpace = slice.lastIndexOf(' ');
+  const trimmed = lastSpace > 20 ? slice.slice(0, lastSpace) : slice;
+  return trimmed.replace(/[.,;:]$/, '');
 };
 
 const getDisplayName = (authUser, homeCopy) => {
@@ -315,12 +304,6 @@ const getDisplayName = (authUser, homeCopy) => {
   const first = cleaned.split(' ').filter(Boolean)[0];
   if (!first) return homeCopy.defaultName;
   return first.charAt(0).toUpperCase() + first.slice(1);
-};
-
-const formatSentence = (value, fallback) => {
-  const trimmed = value?.trim();
-  if (!trimmed) return fallback;
-  return trimmed.endsWith('.') ? trimmed : `${trimmed}.`;
 };
 
 const toRgba = (hex, alpha) => {

@@ -44,7 +44,20 @@ export default function LessonsScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <SectionTitle title="Lessons" subtitle="Curriculum overview" />
+        <View style={styles.headerRow}>
+          <SectionTitle title="Lessons" subtitle="Curriculum overview" />
+          <Pressable
+            onPress={() => navigation.navigate('Profile')}
+            style={styles.profileButton}
+            hitSlop={components.layout.spacing.sm}
+          >
+            <Ionicons
+              name="person-outline"
+              size={components.sizes.icon.lg}
+              color={colors.text.primary}
+            />
+          </Pressable>
+        </View>
 
         {modulesWithLessons.map((module) => (
           <View key={module.id} style={styles.module}>
@@ -114,6 +127,22 @@ const createStyles = (colors, components) =>
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
       paddingBottom: components.layout.safeArea.bottom,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: components.layout.spacing.md,
+    },
+    profileButton: {
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
+      backgroundColor: colors.background.surface,
     },
     module: {
       gap: components.layout.spacing.md,

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
@@ -10,6 +11,7 @@ import { glossaryTerms } from '../data/glossary';
 import { typography, useTheme } from '../theme';
 
 export default function GlossaryScreen() {
+  const navigation = useNavigation();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const [query, setQuery] = useState('');
@@ -49,7 +51,20 @@ export default function GlossaryScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <SectionTitle title="Glossary" subtitle="Quick definitions" />
+        <View style={styles.headerRow}>
+          <SectionTitle title="Glossary" subtitle="Quick definitions" />
+          <Pressable
+            onPress={() => navigation.navigate('Profile')}
+            style={styles.profileButton}
+            hitSlop={components.layout.spacing.sm}
+          >
+            <Ionicons
+              name="person-outline"
+              size={components.sizes.icon.lg}
+              color={colors.text.primary}
+            />
+          </Pressable>
+        </View>
         <View style={styles.searchBar}>
           <Ionicons
             name="search"
@@ -133,6 +148,22 @@ const createStyles = (colors, components) =>
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
       paddingBottom: components.layout.safeArea.bottom,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: components.layout.spacing.md,
+    },
+    profileButton: {
+      width: components.sizes.square.lg,
+      height: components.sizes.square.lg,
+      borderRadius: components.radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: components.borderWidth.thin,
+      borderColor: colors.ui.divider,
+      backgroundColor: colors.background.surface,
     },
     searchBar: {
       flexDirection: 'row',

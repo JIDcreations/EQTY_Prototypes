@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -29,9 +29,6 @@ const Stack = createStackNavigator();
 
 function Tabs() {
   const { colors, typography, components } = useTheme();
-  const { onboardingContext } = useApp();
-  const styles = useMemo(() => createTabStyles(colors, components), [colors, components]);
-  const showOnboardingBadge = !onboardingContext?.onboardingComplete;
   const tabBarHeight = components.layout.spacing.xxl * 2 + components.layout.safeArea.bottom;
   const tabBarPaddingBottom = Math.max(
     components.layout.safeArea.bottom,
@@ -60,14 +57,6 @@ function Tabs() {
           if (route.name === 'Lessons') iconName = 'book-outline';
           if (route.name === 'Glossary') iconName = 'list-outline';
           if (route.name === 'Profile') iconName = 'person-outline';
-          if (route.name === 'Profile') {
-            return (
-              <View style={styles.iconWrap}>
-                <Ionicons name={iconName} size={size} color={color} />
-                {showOnboardingBadge ? <View style={styles.iconBadge} /> : null}
-              </View>
-            );
-          }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
@@ -75,28 +64,17 @@ function Tabs() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Lessons" component={LessonsScreen} />
       <Tab.Screen name="Glossary" component={GlossaryScreen} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={{
+          tabBarButton: () => null,
+          tabBarItemStyle: { display: 'none' },
+        }}
+      />
     </Tab.Navigator>
   );
 }
-
-const createTabStyles = (colors, components) =>
-  StyleSheet.create({
-    iconWrap: {
-      position: 'relative',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    iconBadge: {
-      position: 'absolute',
-      top: components.layout.spacing.none,
-      right: components.layout.spacing.none,
-      width: components.sizes.dot.xs,
-      height: components.sizes.dot.xs,
-      borderRadius: components.radius.pill,
-      backgroundColor: colors.accent.primary,
-    },
-  });
 
 function RootStack() {
   const { isReady, authUser, preferences } = useApp();

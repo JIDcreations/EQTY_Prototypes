@@ -27,7 +27,17 @@ export default function LessonOverviewScreen() {
     () => getLocalizedLessons(preferences?.language),
     [preferences?.language]
   );
-  const lesson = localizedLessons.find((item) => item.id === lessonId) || localizedLessons[0];
+  const lesson = localizedLessons.find((item) => item.id === lessonId);
+  if (!lesson) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <AppText style={styles.fallbackTitle}>Lesson not found</AppText>
+          <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
+        </View>
+      </View>
+    );
+  }
   const content = getLessonContent(lesson.id, preferences?.language);
   const moduleNumber = lesson.moduleId?.split('_')[1];
   const moduleLabel = formatLessonModuleLabel(preferences?.language, moduleNumber, lesson.order);
@@ -140,6 +150,10 @@ const createStyles = (colors, components) =>
     subtitle: {
       ...typography.styles.body,
       color: colors.text.secondary,
+    },
+    fallbackTitle: {
+      ...typography.styles.h2,
+      color: colors.text.primary,
     },
     moduleLabel: {
       ...typography.styles.small,
