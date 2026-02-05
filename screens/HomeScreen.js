@@ -106,9 +106,7 @@ export default function HomeScreen() {
           />
           <GlossaryText text={lessonTitle} style={styles.heroTitle} />
           {heroDescription ? (
-            <AppText style={styles.heroSubtitle} numberOfLines={1}>
-              {heroDescription}
-            </AppText>
+            <AppText style={styles.heroSubtitle}>{heroDescription}</AppText>
           ) : null}
           <PrimaryButton
             label={primaryCtaLabel}
