@@ -162,7 +162,7 @@ export default function LessonsScreen() {
                           <GlossaryText
                             text={module.description}
                             style={styles.moduleSubtitle}
-                            numberOfLines={1}
+                            numberOfLines={2}
                             ellipsizeMode="tail"
                           />
                         ) : null}
@@ -232,7 +232,7 @@ export default function LessonsScreen() {
                                 <GlossaryText
                                   text={lesson.shortDescription}
                                   style={styles.lessonDescription}
-                                  numberOfLines={1}
+                                  numberOfLines={2}
                                   ellipsizeMode="tail"
                                 />
                               </View>
@@ -424,15 +424,16 @@ const createStyles = (colors, components) =>
     },
     moduleLessons: {
       gap: components.layout.spacing.md,
-      paddingLeft: components.layout.spacing.sm,
+      alignItems: 'center',
     },
     lessonCard: {
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
       borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
+      backgroundColor: colors.background.surfaceActive,
       padding: components.layout.spacing.md,
       gap: components.layout.spacing.sm,
+      width: components.layout.contentWidth - components.layout.spacing.xxl,
     },
     lessonCardPressed: {
       opacity: components.opacity.value94,
@@ -453,6 +454,7 @@ const createStyles = (colors, components) =>
     lessonCopy: {
       flex: 1,
       gap: components.layout.spacing.xs,
+      minWidth: 0,
     },
     lessonNumber: {
       ...typography.styles.small,
