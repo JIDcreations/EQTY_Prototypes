@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
@@ -7,6 +7,7 @@ import Card from '../components/Card';
 import { PrimaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
+import OnboardingStackedCard from '../components/OnboardingStackedCard';
 import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
 import {
@@ -47,6 +48,8 @@ export default function HomeScreen() {
     totalLessons
   );
   const seriesProgress = totalLessons > 0 ? completedCount / totalLessons : 0;
+  const displaySeriesProgress =
+    seriesProgress === 0 ? 0.06 : Math.min(1, Math.max(0, seriesProgress));
 
   const greeting = getGreeting(homeCopy);
   const displayName = getDisplayName(authUser, homeCopy);
@@ -54,15 +57,46 @@ export default function HomeScreen() {
   const lessonDescription = currentLesson?.shortDescription || homeCopy.lessonFallbackDescription;
   const primaryCtaLabel =
     completedCount > 0 ? homeCopy.continueLesson : homeCopy.startLesson;
-  const heroDescription = shortenToLine(lessonDescription, 60);
+  const heroDescription = lessonDescription;
   const greetingLine = `${greeting}, ${displayName}`;
-  const learningPathLessons = sortedLessons
-    .slice(currentLessonIndex + 1, currentLessonIndex + 4)
-    .map((lesson, index) => ({
-      id: lesson.id,
-      position: currentLessonIndex + 2 + index,
-      title: lesson.title,
-    }));
+  const themes = useMemo(
+    () => [
+      { id: 't0', order: 0, title: 'Fundament', lessons: 1, state: 'in-progress' },
+      { id: 't1', order: 1, title: 'Target', lessons: 2, state: 'upcoming' },
+      {
+        id: 't2',
+        order: 2,
+        title: 'Drivers',
+        lessons: 4,
+        state: 'upcoming',
+      },
+      {
+        id: 't3',
+        order: 3,
+        title: 'Financial Investment Strategy',
+        lessons: 6,
+        state: 'upcoming',
+      },
+      { id: 't4', order: 4, title: 'Capital Allocation', lessons: 4, state: 'upcoming' },
+      { id: 't5', order: 5, title: 'Investment Vehicles', lessons: 5, state: 'upcoming' },
+      {
+        id: 't6',
+        order: 6,
+        title: 'Execution',
+        lessons: 3,
+        state: 'upcoming',
+      },
+      { id: 't7', order: 7, title: 'Afsluitende module', lessons: 1, state: 'upcoming' },
+    ],
+    []
+  );
+  const quickActions = useMemo(
+    () => [
+      { id: 'resources', title: 'Bronnen', icon: 'book-outline', target: 'Glossary' },
+      { id: 'videos', title: 'Video’s', icon: 'play-circle-outline', target: 'Lessons' },
+    ],
+    []
+  );
 
   return (
     <OnboardingScreen
@@ -70,35 +104,45 @@ export default function HomeScreen() {
       backgroundVariant="bg3"
       contentContainerStyle={styles.content}
     >
-      <View style={styles.header}>
-        <View style={styles.headerMainRow}>
-          <View style={styles.headerGreeting}>
-            <GlossaryText text={greetingLine} style={styles.greeting} />
+      <View style={styles.topBlock}>
+        <View style={styles.header}>
+          <View style={styles.headerMainRow}>
+            <View style={styles.headerGreeting}>
+              <GlossaryText text={greetingLine} style={styles.greeting} />
+            </View>
+            <Pressable
+              onPress={() => navigation.navigate('Profile')}
+              style={styles.profileButton}
+              hitSlop={components.layout.spacing.sm}
+            >
+              <Ionicons
+                name="person-outline"
+                size={components.sizes.icon.lg}
+                color={colors.text.primary}
+              />
+            </Pressable>
           </View>
-          <Pressable
-            onPress={() => navigation.navigate('Profile')}
-            style={styles.profileButton}
-            hitSlop={components.layout.spacing.sm}
-          >
-            <Ionicons
-              name="person-outline"
-              size={components.sizes.icon.lg}
-              color={colors.text.primary}
+        </View>
+        <View style={styles.trajectoryBlock}>
+          <View style={styles.trajectoryRow}>
+            <AppText style={styles.trajectoryLabel}>Voortgang</AppText>
+            <GlossaryText
+              text={homeCopy.lessonPosition(lessonPosition, totalLessons)}
+              style={styles.trajectoryMeta}
             />
-          </Pressable>
+          </View>
+          <View style={styles.trajectoryBar}>
+            <ProgressBar progress={displaySeriesProgress} />
+          </View>
         </View>
       </View>
 
-      <View style={styles.trajectoryBlock}>
-        <GlossaryText
-          text={homeCopy.lessonPosition(lessonPosition, totalLessons)}
-          style={styles.trajectoryMeta}
-        />
-        <ProgressBar progress={seriesProgress} />
-      </View>
-
       <View style={styles.section}>
-        <Card style={styles.heroCard}>
+        <OnboardingStackedCard
+          style={styles.heroStack}
+          contentStyle={styles.heroCard}
+          showHandle={false}
+        >
           <GlossaryText
             text={homeCopy.lessonShort(lessonPosition)}
             style={styles.heroStepLabel}
@@ -118,45 +162,75 @@ export default function HomeScreen() {
             }
             style={styles.heroButton}
           />
-        </Card>
+        </OnboardingStackedCard>
       </View>
 
       <View style={styles.section}>
-        <View style={styles.learningHeader}>
-          <SectionTitle title={homeCopy.learningPathTitle} />
+        <View style={styles.sectionHeader}>
+          <SectionTitle title="Verken het leerpad" />
           <Pressable onPress={() => navigation.navigate('Lessons')}>
-            <AppText style={styles.viewAll}>{homeCopy.viewAll}</AppText>
+            <AppText style={styles.viewAll}>Bekijk alles</AppText>
           </Pressable>
         </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.learningList}
-        >
-          {learningPathLessons.map((lesson) => (
+        <View style={styles.themeList}>
+          {themes.slice(0, 3).map((theme) => (
             <Pressable
-              key={lesson.id}
-              onPress={() =>
-                navigation.navigate('LessonOverview', {
-                  lessonId: lesson.id,
-                  entrySource: 'HomeUpcoming',
-                })
-              }
+              key={theme.id}
+              onPress={() => navigation.navigate('Lessons', { themeId: theme.id })}
               style={({ pressed }) => [
-                styles.learningItem,
-                pressed && styles.learningItemPressed,
+                styles.themeItem,
+                pressed && styles.themeItemPressed,
               ]}
             >
-              <Card style={styles.learningCard}>
-                <GlossaryText
-                  text={homeCopy.lessonShort(lesson.position)}
-                  style={styles.learningMeta}
-                />
-                <GlossaryText text={lesson.title} style={styles.learningTitle} />
+              <Card style={styles.themeCard}>
+                <View style={styles.themeHeader}>
+                  <AppText style={styles.themeLabel}>{`Thema ${theme.order}`}</AppText>
+                  <View style={styles.themeHeaderRight}>
+                    <AppText style={styles.themeState}>
+                      {getThemeStateLabel(theme.state)}
+                    </AppText>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={components.sizes.icon.sm}
+                      color={colors.text.secondary}
+                    />
+                  </View>
+                </View>
+                <GlossaryText text={theme.title} style={styles.themeTitle} />
+                <View style={styles.themeMetaRow}>
+                  <AppText style={styles.themeMeta}>
+                    {formatLessonCount(theme.lessons)}
+                  </AppText>
+                </View>
               </Card>
             </Pressable>
           ))}
-        </ScrollView>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <SectionTitle title="Hulpmiddelen" />
+        <View style={styles.actionRow}>
+          {quickActions.map((action) => (
+            <Pressable
+              key={action.id}
+              onPress={() => navigation.navigate(action.target)}
+              style={({ pressed }) => [
+                styles.actionItem,
+                pressed && styles.actionItemPressed,
+              ]}
+            >
+              <Card style={styles.actionCard}>
+                <Ionicons
+                  name={action.icon}
+                  size={components.sizes.icon.lg}
+                  color={colors.text.secondary}
+                />
+                <AppText style={styles.actionTitle}>{action.title}</AppText>
+              </Card>
+            </Pressable>
+          ))}
+        </View>
       </View>
 
     </OnboardingScreen>
@@ -166,8 +240,11 @@ export default function HomeScreen() {
 const createStyles = (colors, components) =>
   StyleSheet.create({
     content: {
-      paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
+      paddingTop: components.layout.safeArea.top + components.layout.spacing.xl,
       paddingBottom: components.layout.safeArea.bottom,
+    },
+    topBlock: {
+      gap: components.layout.spacing.md,
     },
     header: {
       gap: components.layout.spacing.sm,
@@ -182,7 +259,7 @@ const createStyles = (colors, components) =>
       flex: 1,
     },
     greeting: {
-      ...typography.styles.h2,
+      ...typography.styles.h3,
       color: colors.text.primary,
     },
     profileButton: {
@@ -201,21 +278,26 @@ const createStyles = (colors, components) =>
     trajectoryBlock: {
       gap: components.layout.spacing.sm,
     },
-    trajectoryMeta: {
+    trajectoryRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: components.layout.spacing.sm,
+    },
+    trajectoryLabel: {
       ...typography.styles.small,
       color: colors.text.secondary,
     },
-    heroCard: {
-      ...components.card.base,
-      padding: components.layout.spacing.xl,
-      gap: components.layout.spacing.lg,
+    heroStack: {
       width: '100%',
       maxWidth: components.layout.contentWidth,
       alignSelf: 'center',
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value60),
-      overflow: 'hidden',
+    },
+    heroCard: {
+      padding: components.layout.spacing.xxl,
+      gap: components.layout.spacing.lg,
+      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value80),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
     },
     heroStepLabel: {
       ...typography.styles.stepLabel,
@@ -239,7 +321,7 @@ const createStyles = (colors, components) =>
     heroButton: {
       alignSelf: 'stretch',
     },
-    learningHeader: {
+    sectionHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -247,50 +329,110 @@ const createStyles = (colors, components) =>
     },
     viewAll: {
       ...typography.styles.small,
-      color: colors.accent.primary,
+      color: colors.text.secondary,
     },
-    learningList: {
+    themeList: {
       gap: components.layout.spacing.md,
-      paddingBottom: components.layout.spacing.xs,
-      paddingRight: components.layout.spacing.lg,
     },
-    learningItem: {
+    themeItem: {
       borderRadius: components.radius.card,
     },
-    learningItemPressed: {
+    themeItemPressed: {
       opacity: components.opacity.value94,
       transform: [{ scale: components.transforms.scalePressed }],
     },
-    learningCard: {
+    themeCard: {
       ...components.card.base,
-      width: components.sizes.illustration.xl,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
       padding: components.layout.spacing.lg,
+      gap: components.layout.spacing.xs,
+      shadowColor: colors.background.app,
+      shadowOpacity: components.shadows.stackedCard.opacity,
+      shadowRadius: components.shadows.stackedCard.radius,
+      shadowOffset: {
+        width: components.shadows.stackedCard.offsetX,
+        height: components.shadows.stackedCard.offsetY,
+      },
+      elevation: components.shadows.stackedCard.elevation,
+    },
+    themeHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       gap: components.layout.spacing.sm,
     },
-    learningMeta: {
+    themeHeaderRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: components.layout.spacing.xs,
+    },
+    themeLabel: {
       ...typography.styles.stepLabel,
       color: colors.text.secondary,
     },
-    learningTitle: {
-      ...typography.styles.h3,
+    themeState: {
+      ...typography.styles.small,
+      color: colors.text.secondary,
+    },
+    themeTitle: {
+      ...typography.styles.bodyStrong,
       color: colors.text.primary,
       flexShrink: 1,
+    },
+    themeMetaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: components.layout.spacing.sm,
+    },
+    themeMeta: {
+      ...typography.styles.small,
+      color: colors.text.secondary,
+    },
+    actionRow: {
+      flexDirection: 'row',
+      gap: components.layout.spacing.md,
+    },
+    actionItem: {
+      flex: 1,
+      borderRadius: components.radius.card,
+    },
+    actionItemPressed: {
+      opacity: components.opacity.value94,
+      transform: [{ scale: components.transforms.scalePressed }],
+    },
+    actionCard: {
+      ...components.card.base,
+      borderWidth: components.borderWidth.thin,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      padding: components.layout.spacing.lg,
+      gap: components.layout.spacing.sm,
+      alignItems: 'flex-start',
+      minHeight: components.sizes.list.minItemHeight,
+    },
+    actionTitle: {
+      ...typography.styles.bodyStrong,
+      color: colors.text.primary,
+    },
+    trajectoryBar: {
+      opacity: components.opacity.value80,
+    },
+    trajectoryMeta: {
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
   });
 
 const getGreeting = (homeCopy) => homeCopy.greetingHi || 'Hi';
 
-const shortenToLine = (value, maxChars) => {
-  if (!value) return '';
-  const normalized = value.trim().replace(/\s+/g, ' ');
-  if (normalized.length <= maxChars) return normalized;
-  const slice = normalized.slice(0, maxChars);
-  const lastSpace = slice.lastIndexOf(' ');
-  const trimmed = lastSpace > 20 ? slice.slice(0, lastSpace) : slice;
-  return trimmed.replace(/[.,;:]$/, '');
+const formatLessonCount = (count) => `${count} ${count === 1 ? 'lesson' : 'lessons'}`;
+
+const getThemeStateLabel = (state) => {
+  if (state === 'completed') return 'Afgerond';
+  if (state === 'in-progress') return 'Bezig';
+  return 'Nog te starten';
 };
 
 const getDisplayName = (authUser, homeCopy) => {
