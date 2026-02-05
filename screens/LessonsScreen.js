@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
 import GlossaryText from '../components/GlossaryText';
+import OnboardingScreen from '../components/OnboardingScreen';
+import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import { PrimaryButton } from '../components/Button';
@@ -75,13 +77,9 @@ export default function LessonsScreen() {
   const primaryCtaLabel = 'Verdergaan';
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.headerRow}>
-          <SectionTitle title="Nu bezig" />
+    <OnboardingScreen scroll backgroundVariant="bg3" contentContainerStyle={styles.content}>
+      <View style={styles.headerRow}>
+          <AppText style={styles.screenTitle}>Lesoverzicht</AppText>
           <Pressable
             onPress={() => navigation.navigate('Profile')}
             style={styles.profileButton}
@@ -93,85 +91,95 @@ export default function LessonsScreen() {
               color={colors.text.primary}
             />
           </Pressable>
-        </View>
+      </View>
 
-        <Card style={styles.currentCard}>
-          <View style={styles.currentMetaRow}>
-            <AppText style={styles.currentProgress}>
-              {formatLessonProgress(lessonPosition, totalLessons)}
-            </AppText>
-            <Tag label={STATUS_LABELS.current} tone="accent" />
-          </View>
-          <GlossaryText text={currentLessonTitle} style={styles.currentTitle} />
-          {currentLessonDescription ? (
-            <GlossaryText
-              text={currentLessonDescription}
-              style={styles.currentDescription}
-              numberOfLines={2}
-            />
-          ) : null}
-          <PrimaryButton
-            label={primaryCtaLabel}
-            onPress={() =>
-              navigation.navigate('LessonOverview', {
-                lessonId: currentLesson?.id,
-                entrySource: 'Lessons',
-              })
-            }
+      <SectionTitle title="Nu bezig" />
+
+      <Card style={styles.currentCard}>
+        <View style={styles.currentMetaRow}>
+          <AppText style={styles.currentProgress}>
+            {formatLessonProgress(lessonPosition, totalLessons)}
+          </AppText>
+          <Tag label={STATUS_LABELS.current} tone="accent" />
+        </View>
+        <GlossaryText text={currentLessonTitle} style={styles.currentTitle} />
+        {currentLessonDescription ? (
+          <GlossaryText
+            text={currentLessonDescription}
+            style={styles.currentDescription}
+            numberOfLines={2}
           />
-        </Card>
+        ) : null}
+        <PrimaryButton
+          label={primaryCtaLabel}
+          onPress={() =>
+            navigation.navigate('LessonOverview', {
+              lessonId: currentLesson?.id,
+              entrySource: 'Lessons',
+            })
+          }
+        />
+      </Card>
 
-        <View style={styles.modulesHeader}>
-          <SectionTitle title="Leerpad" />
-        </View>
+      <View style={styles.modulesHeader}>
+        <SectionTitle title="Leerpad" />
+      </View>
 
-        {modulesWithLessons
-          .filter((module) => module.lessons.length > 0)
-          .map((module) => {
-            const isExpanded = expandedModules[module.id];
-            const moduleNumber = getModuleNumber(module.id);
-            const moduleCompletedCount = module.lessons.filter((lesson) =>
-              completedLessonIds.includes(lesson.id)
-            ).length;
-            const moduleTotal = module.lessons.length;
-            const startLessonNumber = module.lessons[0].order + 1;
-            const endLessonNumber = module.lessons[moduleTotal - 1].order + 1;
-            const rangeLabel = formatLessonRange(startLessonNumber, endLessonNumber);
-            const progressLabel = formatThemeProgress(moduleCompletedCount, moduleTotal);
+      {modulesWithLessons
+        .filter((module) => module.lessons.length > 0)
+        .map((module) => {
+          const isExpanded = expandedModules[module.id];
+          const moduleNumber = getModuleNumber(module.id);
+          const moduleCompletedCount = module.lessons.filter((lesson) =>
+            completedLessonIds.includes(lesson.id)
+          ).length;
+          const moduleTotal = module.lessons.length;
+          const moduleProgress = moduleTotal > 0 ? moduleCompletedCount / moduleTotal : 0;
+          const isModuleCompleted = moduleTotal > 0 && moduleCompletedCount === moduleTotal;
+          const progressLabel = formatThemeProgress(moduleCompletedCount, moduleTotal);
 
-            return (
-              <View key={module.id} style={styles.module}>
-                <Pressable onPress={() => toggleModule(setExpandedModules, module.id)}>
-                  {({ pressed }) => (
-                    <Card
-                      style={[
-                        styles.moduleCard,
-                        isExpanded && styles.moduleCardExpanded,
-                        pressed && styles.moduleCardPressed,
-                      ]}
-                    >
-                      <View style={styles.moduleHeaderRow}>
-                        <View style={styles.moduleHeaderCopy}>
-                          <View style={styles.themeTitleRow}>
-                            <AppText style={styles.themeLabel}>
-                              {`Thema ${moduleNumber}`}
-                            </AppText>
-                            <AppText style={styles.themeDot}>·</AppText>
-                            <GlossaryText text={module.title} style={styles.themeTitle} />
-                          </View>
-                          {isExpanded ? (
-                            <GlossaryText
-                              text={module.description}
-                              style={styles.moduleSubtitle}
-                              numberOfLines={2}
-                            />
-                          ) : null}
-                          <View style={styles.moduleMetaRow}>
-                            <AppText style={styles.moduleMeta}>
-                              {`${rangeLabel} · ${progressLabel}`}
-                            </AppText>
-                          </View>
+          return (
+            <View key={module.id} style={styles.module}>
+              <Pressable onPress={() => toggleModule(setExpandedModules, module.id)}>
+                {({ pressed }) => (
+                  <Card
+                    style={[
+                      styles.moduleCard,
+                      isExpanded && styles.moduleCardExpanded,
+                      pressed && styles.moduleCardPressed,
+                    ]}
+                  >
+                    <View style={styles.moduleHeaderRow}>
+                      <View style={styles.moduleHeaderCopy}>
+                        <View style={styles.themeTitleRow}>
+                          <AppText style={styles.themeLabel}>
+                            {`Thema ${moduleNumber}`}
+                          </AppText>
+                          <AppText style={styles.themeDot}>·</AppText>
+                          <GlossaryText text={module.title} style={styles.themeTitle} />
                         </View>
+                        {isExpanded ? (
+                          <GlossaryText
+                            text={module.description}
+                            style={styles.moduleSubtitle}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          />
+                        ) : null}
+                        <View style={styles.moduleMetaRow}>
+                          {isModuleCompleted ? (
+                            <AppText style={[styles.moduleMeta, styles.moduleMetaCompleted]}>
+                              {progressLabel}
+                            </AppText>
+                          ) : (
+                            <AppText style={styles.moduleMeta}>{progressLabel}</AppText>
+                          )}
+                        </View>
+                      </View>
+                      <View style={styles.moduleHeaderRight}>
+                        {isModuleCompleted ? (
+                          <Tag label="Voltooid" tone="default" style={styles.moduleTag} />
+                        ) : null}
                         <Ionicons
                           name="chevron-down"
                           size={components.sizes.icon.md}
@@ -179,54 +187,72 @@ export default function LessonsScreen() {
                           style={[styles.chevron, isExpanded && styles.chevronOpen]}
                         />
                       </View>
-                    </Card>
-                  )}
-                </Pressable>
-                {isExpanded ? (
-                  <View style={styles.moduleLessons}>
-                    {module.lessons.map((lesson) => {
-                      const status = getLessonStatus(lesson.id, progress);
-                      const statusLabel = STATUS_LABELS[status] || STATUS_LABELS.upcoming;
-                      const lessonNumber = lesson.order + 1;
-                      return (
-                        <Pressable
-                          key={lesson.id}
-                          onPress={() =>
-                            navigation.navigate('LessonOverview', {
-                              lessonId: lesson.id,
-                              entrySource: 'Lessons',
-                            })
-                          }
-                        >
-                          {({ pressed }) => (
-                            <Card style={[styles.lessonCard, pressed && styles.lessonCardPressed]}>
-                              <View style={styles.lessonHeader}>
-                                <AppText style={styles.lessonNumber}>
-                                  {homeCopy.lessonShort(lessonNumber)}
-                                </AppText>
-                                <Tag
-                                  label={statusLabel}
-                                  tone={status === 'current' ? 'accent' : 'default'}
+                    </View>
+                    <View style={styles.themeProgress}>
+                      <ProgressBar progress={Math.min(1, Math.max(0, moduleProgress))} />
+                    </View>
+                  </Card>
+                )}
+              </Pressable>
+              {isExpanded ? (
+                <View style={styles.moduleLessons}>
+                  {module.lessons.map((lesson) => {
+                    const status = getLessonStatus(lesson.id, progress);
+                    const statusLabel = STATUS_LABELS[status] || STATUS_LABELS.upcoming;
+                    const lessonNumber = lesson.order + 1;
+                    return (
+                      <Pressable
+                        key={lesson.id}
+                        onPress={() =>
+                          navigation.navigate('LessonOverview', {
+                            lessonId: lesson.id,
+                            entrySource: 'Lessons',
+                          })
+                        }
+                      >
+                        {({ pressed }) => (
+                          <Card style={[styles.lessonCard, pressed && styles.lessonCardPressed]}>
+                            <View style={styles.lessonHeader}>
+                              <AppText style={styles.lessonNumber}>
+                                {homeCopy.lessonShort(lessonNumber)}
+                              </AppText>
+                              <Tag
+                                label={statusLabel}
+                                tone={status === 'current' ? 'accent' : 'default'}
+                              />
+                            </View>
+                            <View style={styles.lessonBody}>
+                              <View style={styles.lessonCopy}>
+                                <GlossaryText
+                                  text={lesson.title}
+                                  style={styles.lessonTitle}
+                                  numberOfLines={1}
+                                  ellipsizeMode="tail"
+                                />
+                                <GlossaryText
+                                  text={lesson.shortDescription}
+                                  style={styles.lessonDescription}
+                                  numberOfLines={1}
+                                  ellipsizeMode="tail"
                                 />
                               </View>
-                              <GlossaryText text={lesson.title} style={styles.lessonTitle} />
-                              <GlossaryText
-                                text={lesson.shortDescription}
-                                style={styles.lessonDescription}
-                                numberOfLines={1}
+                              <Ionicons
+                                name="chevron-forward"
+                                size={components.sizes.icon.sm}
+                                color={colors.text.secondary}
                               />
-                            </Card>
-                          )}
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                ) : null}
-              </View>
-            );
-          })}
-      </ScrollView>
-    </View>
+                            </View>
+                          </Card>
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              ) : null}
+            </View>
+          );
+        })}
+    </OnboardingScreen>
   );
 }
 
@@ -243,12 +269,10 @@ const toggleModule = (setExpandedModules, moduleId) => {
 
 const formatLessonProgress = (position, total) => `Les ${position} / ${total}`;
 
-const formatLessonRange = (start, end) => {
-  if (start === end) return `Les ${start}`;
-  return `Lessen ${start}-${end}`;
-};
+const formatLessonCount = (total) => (total === 1 ? '1 les' : `${total} lessen`);
 
-const formatThemeProgress = (completed, total) => `${completed}/${total} afgerond`;
+const formatThemeProgress = (completed, total) =>
+  `${formatLessonCount(total)} · ${completed} afgerond`;
 
 const STATUS_LABELS = {
   current: 'Huidig',
@@ -267,11 +291,6 @@ const toRgba = (hex, alpha) => {
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    container: {
-      ...components.screen.containerScroll,
-      flex: 1,
-      backgroundColor: colors.background.app,
-    },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
@@ -280,9 +299,13 @@ const createStyles = (colors, components) =>
     },
     headerRow: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       justifyContent: 'space-between',
       gap: components.layout.spacing.md,
+    },
+    screenTitle: {
+      ...typography.styles.h1,
+      color: colors.text.primary,
     },
     profileButton: {
       width: components.sizes.square.lg,
@@ -297,8 +320,8 @@ const createStyles = (colors, components) =>
     currentCard: {
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
-      backgroundColor: colors.background.surfaceActive,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
     },
     currentMetaRow: {
       flexDirection: 'row',
@@ -328,12 +351,12 @@ const createStyles = (colors, components) =>
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
       borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: colors.background.surface,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
       gap: components.layout.spacing.sm,
     },
     moduleCardExpanded: {
       borderColor: toRgba(colors.accent.primary, components.opacity.value45),
-      backgroundColor: colors.background.surfaceActive,
+      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value80),
     },
     moduleCardPressed: {
       opacity: components.opacity.value94,
@@ -348,6 +371,13 @@ const createStyles = (colors, components) =>
     moduleHeaderCopy: {
       flex: 1,
       gap: components.layout.spacing.xs,
+    },
+    moduleHeaderRight: {
+      alignItems: 'center',
+      gap: components.layout.spacing.xs,
+    },
+    moduleTag: {
+      alignSelf: 'flex-end',
     },
     themeTitleRow: {
       flexDirection: 'row',
@@ -380,6 +410,12 @@ const createStyles = (colors, components) =>
       ...typography.styles.small,
       color: colors.text.secondary,
     },
+    moduleMetaCompleted: {
+      opacity: components.opacity.value60,
+    },
+    themeProgress: {
+      opacity: components.opacity.value90,
+    },
     chevron: {
       transform: [{ rotate: '0deg' }],
     },
@@ -394,7 +430,7 @@ const createStyles = (colors, components) =>
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
       borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: colors.background.surface,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
       padding: components.layout.spacing.md,
       gap: components.layout.spacing.sm,
     },
@@ -407,6 +443,16 @@ const createStyles = (colors, components) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       gap: components.layout.spacing.md,
+    },
+    lessonBody: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: components.layout.spacing.md,
+    },
+    lessonCopy: {
+      flex: 1,
+      gap: components.layout.spacing.xs,
     },
     lessonNumber: {
       ...typography.styles.small,
