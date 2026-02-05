@@ -124,13 +124,10 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={styles.trajectoryBlock}>
-          <View style={styles.trajectoryRow}>
-            <AppText style={styles.trajectoryLabel}>Voortgang</AppText>
-            <GlossaryText
-              text={homeCopy.lessonPosition(lessonPosition, totalLessons)}
-              style={styles.trajectoryMeta}
-            />
-          </View>
+          <GlossaryText
+            text={formatLessonPosition(lessonPosition, totalLessons)}
+            style={styles.trajectoryMeta}
+          />
           <View style={styles.trajectoryBar}>
             <ProgressBar progress={displaySeriesProgress} />
           </View>
@@ -278,16 +275,6 @@ const createStyles = (colors, components) =>
     trajectoryBlock: {
       gap: components.layout.spacing.sm,
     },
-    trajectoryRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: components.layout.spacing.sm,
-    },
-    trajectoryLabel: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-    },
     heroStack: {
       width: '100%',
       maxWidth: components.layout.contentWidth,
@@ -420,14 +407,16 @@ const createStyles = (colors, components) =>
       opacity: components.opacity.value80,
     },
     trajectoryMeta: {
-      ...typography.styles.small,
-      color: colors.text.primary,
+      ...typography.styles.stepLabel,
+      color: colors.text.secondary,
     },
   });
 
 const getGreeting = (homeCopy) => homeCopy.greetingHi || 'Hi';
 
 const formatLessonCount = (count) => `${count} ${count === 1 ? 'lesson' : 'lessons'}`;
+
+const formatLessonPosition = (position, total) => `Les ${position} / ${total}`;
 
 const getThemeStateLabel = (state) => {
   if (state === 'completed') return 'Afgerond';
