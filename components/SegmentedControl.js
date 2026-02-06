@@ -51,6 +51,6 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     segmentTextActive: {
-      color: colors.text.primary,
+      color: colors.text.onAccent,
     },
   });

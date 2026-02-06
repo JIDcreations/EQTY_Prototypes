@@ -25,6 +25,8 @@ export default function OnboardingScreen({
   contentContainerStyle,
   style,
   showGlow = false,
+  scrollProps,
+  scrollRef,
 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
@@ -35,6 +37,8 @@ export default function OnboardingScreen({
   ];
 
   if (scroll) {
+    const { contentContainerStyle: scrollContentStyle, ...restScrollProps } =
+      scrollProps || {};
     return (
       <ImageBackground
         source={resolvedBackground}
@@ -52,13 +56,16 @@ export default function OnboardingScreen({
           ) : null}
           <View style={styles.scrollContainer}>
             <ScrollView
+              ref={scrollRef}
               style={styles.scroll}
               contentContainerStyle={[
                 styles.scrollContent,
                 contentContainerStyle,
+                scrollContentStyle,
               ]}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              {...restScrollProps}
             >
               {children}
             </ScrollView>
