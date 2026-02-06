@@ -21,10 +21,21 @@ export function GlossaryProvider({ children }) {
     setActiveTerm(null);
   }, []);
 
+  const getVideoUrl = useCallback((term) => {
+    if (!term?.term) return null;
+    return (
+      term.learnMoreUrl ||
+      `https://www.youtube.com/results?search_query=${encodeURIComponent(
+        `${term.term} investing explained`
+      )}`
+    );
+  }, []);
+
   const handleLearnMore = useCallback(async () => {
-    if (!activeTerm?.learnMoreUrl) return;
-    await Linking.openURL(activeTerm.learnMoreUrl);
-  }, [activeTerm]);
+    const videoUrl = getVideoUrl(activeTerm);
+    if (!videoUrl) return;
+    await Linking.openURL(videoUrl);
+  }, [activeTerm, getVideoUrl]);
 
 
   const value = useMemo(
@@ -40,26 +51,23 @@ export function GlossaryProvider({ children }) {
       <BottomSheet visible={!!activeTerm} onClose={closeTerm} title={activeTerm?.term}>
         <View style={styles.glossarySection}>
           <AppText style={styles.sheetLabel}>Definition</AppText>
-          <AppText style={styles.sheetText}>{activeTerm?.definition}</AppText>
+          <AppText style={styles.sheetDefinition}>{activeTerm?.definition}</AppText>
         </View>
         {activeTerm?.example ? (
           <View style={styles.glossarySection}>
             <AppText style={styles.sheetLabel}>Example</AppText>
-            <AppText style={styles.sheetText}>{activeTerm?.example}</AppText>
+            <AppText style={styles.sheetExample}>{activeTerm?.example}</AppText>
           </View>
         ) : null}
-        {activeTerm?.learnMoreUrl ? (
-          <View style={styles.glossarySection}>
-            <AppText style={styles.sheetLabel}>Learn more</AppText>
-            <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
-              <Ionicons
-                name="logo-youtube"
-                size={components.sizes.icon.md}
-                color={colors.accent.primary}
-              />
-              <AppText style={styles.learnMoreText}>Learn more on YouTube</AppText>
-            </Pressable>
-          </View>
+        {activeTerm?.term ? (
+          <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
+            <Ionicons
+              name="play-circle-outline"
+              size={components.sizes.icon.sm}
+              color={colors.text.secondary}
+            />
+            <AppText style={styles.learnMoreText}>Watch 2-minute video</AppText>
+          </Pressable>
         ) : null}
       </BottomSheet>
     </GlossaryContext.Provider>
@@ -72,13 +80,17 @@ export function useGlossary() {
 
 const createStyles = (colors, components) =>
   StyleSheet.create({
-    sheetText: {
+    sheetDefinition: {
       ...typography.styles.body,
-      color: colors.text.secondary,
+      color: colors.text.primary,
     },
     sheetLabel: {
       ...typography.styles.small,
-      color: colors.text.primary,
+      color: colors.text.secondary,
+    },
+    sheetExample: {
+      ...typography.styles.body,
+      color: colors.text.secondary,
     },
     glossarySection: {
       gap: components.layout.spacing.xs,
@@ -87,10 +99,10 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      paddingTop: components.layout.spacing.xs,
+      paddingTop: components.layout.spacing.sm,
     },
     learnMoreText: {
-      ...typography.styles.body,
-      color: colors.text.primary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });

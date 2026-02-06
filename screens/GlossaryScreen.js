@@ -105,9 +105,20 @@ export default function GlossaryScreen() {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   }, []);
 
+  const getVideoUrl = (term) => {
+    if (!term?.term) return null;
+    return (
+      term.learnMoreUrl ||
+      `https://www.youtube.com/results?search_query=${encodeURIComponent(
+        `${term.term} investing explained`
+      )}`
+    );
+  };
+
   const handleLearnMore = async () => {
-    if (!selectedTerm?.learnMoreUrl) return;
-    await Linking.openURL(selectedTerm.learnMoreUrl);
+    const videoUrl = getVideoUrl(selectedTerm);
+    if (!videoUrl) return;
+    await Linking.openURL(videoUrl);
   };
 
   const renderTermRow = (term, index, total) => (
@@ -308,24 +319,21 @@ export default function GlossaryScreen() {
       >
         <View style={styles.sheetSection}>
           <AppText style={styles.sheetLabel}>Definition</AppText>
-          <AppText style={styles.sheetText}>{selectedTerm?.definition}</AppText>
+          <AppText style={styles.sheetDefinition}>{selectedTerm?.definition}</AppText>
         </View>
         <View style={styles.sheetSection}>
           <AppText style={styles.sheetLabel}>Example</AppText>
-          <AppText style={styles.sheetText}>{selectedTerm?.example}</AppText>
+          <AppText style={styles.sheetExample}>{selectedTerm?.example}</AppText>
         </View>
-        {selectedTerm?.learnMoreUrl ? (
-          <View style={styles.sheetSection}>
-            <AppText style={styles.sheetLabel}>Learn more</AppText>
-            <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
-              <Ionicons
-                name="logo-youtube"
-                size={components.sizes.icon.md}
-                color={colors.accent.primary}
-              />
-              <AppText style={styles.learnMoreText}>Learn more on YouTube</AppText>
-            </Pressable>
-          </View>
+        {selectedTerm?.term ? (
+          <Pressable style={styles.learnMoreRow} onPress={handleLearnMore}>
+            <Ionicons
+              name="play-circle-outline"
+              size={components.sizes.icon.sm}
+              color={colors.text.secondary}
+            />
+            <AppText style={styles.learnMoreText}>Watch 2-minute video</AppText>
+          </Pressable>
         ) : null}
       </BottomSheet>
     </View>
@@ -541,9 +549,13 @@ const createStyles = (colors, components) =>
     },
     sheetLabel: {
       ...typography.styles.small,
+      color: colors.text.secondary,
+    },
+    sheetDefinition: {
+      ...typography.styles.body,
       color: colors.text.primary,
     },
-    sheetText: {
+    sheetExample: {
       ...typography.styles.body,
       color: colors.text.secondary,
     },
@@ -551,10 +563,10 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      paddingTop: components.layout.spacing.xs,
+      paddingTop: components.layout.spacing.sm,
     },
     learnMoreText: {
-      ...typography.styles.body,
-      color: colors.text.primary,
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
   });
