@@ -13,16 +13,13 @@ import { colors, typography, useTheme } from './theme';
 import { AppProvider, useApp } from './utils/AppContext';
 import { GlossaryProvider } from './components/GlossaryProvider';
 import HomeScreen from './screens/HomeScreen';
-import LessonsScreen from './screens/LessonsScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
 import ProfileStack from './navigation/ProfileStack';
 import OnboardingStack from './navigation/OnboardingStack';
-import LessonOverviewScreen from './screens/LessonOverviewScreen';
-import LessonStepScreen from './screens/LessonStepScreen';
 import GlossaryDetailScreen from './screens/GlossaryDetailScreen';
-import LessonSuccessScreen from './screens/LessonSuccessScreen';
 import OnboardingQuestionScreen from './screens/onboarding/OnboardingQuestionScreen';
 import OnboardingRequiredScreen from './screens/OnboardingRequiredScreen';
+import LessonsStack from './navigation/LessonsStack';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -62,7 +59,7 @@ function Tabs() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Lessons" component={LessonsScreen} />
+      <Tab.Screen name="Lessons" component={LessonsStack} />
       <Tab.Screen name="Glossary" component={GlossaryScreen} />
       <Tab.Screen
         name="Profile"
@@ -127,9 +124,6 @@ function RootStack() {
               isLast: true,
             }}
           />
-          <Stack.Screen name="LessonOverview" component={LessonOverviewScreen} />
-          <Stack.Screen name="LessonStep" component={LessonStepScreen} />
-          <Stack.Screen name="LessonSuccess" component={LessonSuccessScreen} />
           <Stack.Screen name="GlossaryDetail" component={GlossaryDetailScreen} />
         </>
       )}

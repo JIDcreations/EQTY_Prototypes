@@ -152,9 +152,12 @@ export default function HomeScreen() {
           <PrimaryButton
             label={primaryCtaLabel}
             onPress={() =>
-              navigation.navigate('LessonOverview', {
-                lessonId: currentLesson?.id,
-                entrySource: 'Home',
+              navigation.navigate('Lessons', {
+                screen: 'LessonOverview',
+                params: {
+                  lessonId: currentLesson?.id,
+                  entrySource: 'Home',
+                },
               })
             }
             style={styles.heroButton}

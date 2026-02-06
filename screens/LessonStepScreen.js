@@ -296,63 +296,85 @@ export default function LessonStepScreen() {
         sheetStyle={{ height: lessonGlossarySheetMaxHeight }}
         contentStyle={styles.lessonGlossaryContent}
       >
-        <View style={styles.lessonGlossarySearch}>
-          <Ionicons
-            name="search-outline"
-            size={components.sizes.icon.sm}
-            color={colors.text.secondary}
-          />
-          <AppTextInput
-            value={lessonTermQuery}
-            onChangeText={setLessonTermQuery}
-            placeholder="Search all terms"
-            placeholderTextColor={toRgba(colors.text.secondary, 0.6)}
-            style={styles.lessonGlossarySearchInput}
-          />
-        </View>
-        {isLessonSearchActive ? (
-          <AppText style={styles.lessonGlossarySearchLabel}>
-            Results from full glossary
-          </AppText>
-        ) : null}
-        {displayedLessonTerms.length ? (
-          <FlatList
-            data={displayedLessonTerms}
-            keyExtractor={(item) => item.id}
-            style={styles.lessonGlossaryList}
-            contentContainerStyle={styles.lessonGlossaryListContent}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <Pressable
-                onPress={() => handleLessonTermPress(item)}
-                style={[
-                  styles.lessonGlossaryRow,
-                  index < displayedLessonTerms.length - 1 && styles.lessonGlossaryDivider,
-                ]}
-              >
-                <View style={styles.lessonGlossaryRowTop}>
-                  <AppText style={styles.lessonGlossaryTitle}>{item.term}</AppText>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={components.sizes.icon.sm}
-                    color={colors.text.secondary}
-                  />
-                </View>
-                <AppText style={styles.lessonGlossaryDescription} numberOfLines={1}>
-                  {item.definition}
+        <FlatList
+          data={displayedLessonTerms}
+          keyExtractor={(item) => item.id}
+          style={styles.lessonGlossaryList}
+          contentContainerStyle={styles.lessonGlossaryListContent}
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          stickyHeaderIndices={[0]}
+          ListHeaderComponent={
+            <View style={styles.lessonGlossaryHeader}>
+              <View style={styles.lessonGlossarySearch}>
+                <Ionicons
+                  name="search-outline"
+                  size={components.sizes.icon.sm}
+                  color={colors.text.secondary}
+                />
+                <AppTextInput
+                  value={lessonTermQuery}
+                  onChangeText={setLessonTermQuery}
+                  placeholder="Search all terms"
+                  placeholderTextColor={toRgba(colors.text.secondary, 0.6)}
+                  style={styles.lessonGlossarySearchInput}
+                />
+                {lessonTermQuery ? (
+                  <Pressable
+                    onPress={() => setLessonTermQuery('')}
+                    hitSlop={components.layout.spacing.xs}
+                    style={({ pressed }) => [
+                      styles.lessonGlossaryClear,
+                      pressed && styles.lessonGlossaryClearPressed,
+                    ]}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={components.sizes.icon.sm}
+                      color={colors.text.secondary}
+                    />
+                  </Pressable>
+                ) : null}
+              </View>
+              {isLessonSearchActive ? (
+                <AppText style={styles.lessonGlossarySearchLabel}>
+                  Results from full glossary
                 </AppText>
-              </Pressable>
-            )}
-          />
-        ) : (
-          <View style={styles.lessonGlossaryEmpty}>
-            <AppText style={styles.lessonGlossaryEmptyTitle}>
-              {isLessonSearchActive
-                ? 'No matching terms found.'
-                : 'No terms defined for this lesson yet.'}
-            </AppText>
-          </View>
-        )}
+              ) : null}
+            </View>
+          }
+          renderItem={({ item, index }) => (
+            <Pressable
+              onPress={() => handleLessonTermPress(item)}
+              style={[
+                styles.lessonGlossaryRow,
+                index < displayedLessonTerms.length - 1 && styles.lessonGlossaryDivider,
+              ]}
+            >
+              <View style={styles.lessonGlossaryRowTop}>
+                <AppText style={styles.lessonGlossaryTitle}>{item.term}</AppText>
+                <Ionicons
+                  name="chevron-forward"
+                  size={components.sizes.icon.sm}
+                  color={colors.text.secondary}
+                />
+              </View>
+              <AppText style={styles.lessonGlossaryDescription} numberOfLines={1}>
+                {item.definition}
+              </AppText>
+            </Pressable>
+          )}
+          ListEmptyComponent={
+            <View style={styles.lessonGlossaryEmpty}>
+              <AppText style={styles.lessonGlossaryEmptyTitle}>
+                {isLessonSearchActive
+                  ? 'No matching terms found.'
+                  : 'No terms defined for this lesson yet.'}
+              </AppText>
+            </View>
+          }
+        />
       </BottomSheet>
 
     </LessonStepContainer>
@@ -2126,6 +2148,18 @@ const createStyles = (colors, components) =>
   lessonGlossarySearchLabel: {
     ...typography.styles.small,
     color: colors.text.secondary,
+  },
+  lessonGlossaryHeader: {
+    backgroundColor: colors.background.surfaceActive,
+    paddingBottom: components.layout.spacing.sm,
+    gap: components.layout.spacing.xs,
+  },
+  lessonGlossaryClear: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lessonGlossaryClearPressed: {
+    opacity: components.opacity.value60,
   },
   lessonGlossaryContent: {
     flex: 1,

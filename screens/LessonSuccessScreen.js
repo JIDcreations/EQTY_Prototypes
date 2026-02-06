@@ -24,6 +24,14 @@ export default function LessonSuccessScreen() {
     : '';
   const detail =
     lessonId === 'lesson_0' ? copy.lessonSuccess.introDetail : copy.lessonSuccess.detail;
+  const handleReturnHome = () => {
+    const parent = navigation.getParent();
+    if (parent) {
+      parent.navigate('Home');
+    } else {
+      navigation.navigate('Home');
+    }
+  };
 
   return (
     <OnboardingScreen
@@ -45,7 +53,7 @@ export default function LessonSuccessScreen() {
         <View style={styles.footer}>
           <PrimaryButton
             label={copy.lessonSuccess.cta}
-            onPress={() => navigation.navigate('Tabs', { screen: 'Home' })}
+            onPress={handleReturnHome}
           />
         </View>
       </View>
