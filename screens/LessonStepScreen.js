@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Dimensions,
+  FlatList,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -20,9 +22,10 @@ import { useGlossary } from '../components/GlossaryProvider';
 import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
 import StepHeader from '../components/StepHeader';
+import { glossaryTerms } from '../data/glossary';
 import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
-import { getScenarioVariant } from '../utils/helpers';
+import { getLessonById, getScenarioVariant } from '../utils/helpers';
 import {
   getIntroStepTitle,
   getLessonContent,
@@ -56,6 +59,11 @@ const VOLATILE_CURVE_POINTS = [
   { x: 90, y: 78 },
   { x: 100, y: 72 },
 ];
+
+const glossaryTermIndex = glossaryTerms.reduce((acc, term) => {
+  if (term?.id) acc[term.id] = term;
+  return acc;
+}, {});
 
 const getSmoothPoints = (basePoints, samplesPerSegment = 10) => {
   if (basePoints.length < 3) return basePoints;
@@ -99,7 +107,13 @@ export default function LessonStepScreen() {
   const route = useRoute();
   const { lessonId, step = 1, entrySource } = route.params || {};
   const { userContext, onboardingContext, addReflection, completeLesson, preferences } = useApp();
-  const { components } = useTheme();
+  const { colors, components, styles } = useLessonStepStyles();
+  const [isLessonGlossaryOpen, setLessonGlossaryOpen] = useState(false);
+  const [lessonTermQuery, setLessonTermQuery] = useState('');
+  const lessonGlossarySheetMaxHeight = Math.max(
+    components.sizes.screen.minPanelHeight,
+    Dimensions.get('window').height * 0.72
+  );
   const keyboardOffset =
     components.layout.spacing.xxl +
     components.layout.spacing.xl +
@@ -108,7 +122,28 @@ export default function LessonStepScreen() {
   const isIntroScenario = lessonId === 'lesson_0' && step === 3;
 
   const content = getLessonContent(lessonId, preferences?.language);
+  const lessonMeta = useMemo(() => getLessonById(lessonId), [lessonId]);
+  const lessonTermIds = lessonMeta?.termIds || [];
+  const lessonTerms = useMemo(
+    () => lessonTermIds.map((termId) => glossaryTermIndex[termId]).filter(Boolean),
+    [lessonTermIds]
+  );
+  const isLessonSearchActive = lessonTermQuery.trim().length > 0;
+  const globalSearchResults = useMemo(() => {
+    const query = lessonTermQuery.trim().toLowerCase();
+    if (!query) return [];
+    return glossaryTerms.filter((term) => {
+      const name = term.term?.toLowerCase() || '';
+      const definition = term.definition?.toLowerCase() || '';
+      return name.includes(query) || definition.includes(query);
+    });
+  }, [lessonTermQuery]);
+  const displayedLessonTerms = isLessonSearchActive ? globalSearchResults : lessonTerms;
   const copy = useMemo(() => getLessonStepCopy(preferences?.language), [preferences?.language]);
+  
+  useEffect(() => {
+    if (!isLessonGlossaryOpen) setLessonTermQuery('');
+  }, [isLessonGlossaryOpen]);
   const stepTitle = useMemo(() => {
     if (!content) return `${copy.labels.part} ${step}`;
     const introTitle = getIntroStepTitle(preferences?.language, step);
@@ -149,6 +184,13 @@ export default function LessonStepScreen() {
     if (glossary?.openTerm) glossary.openTerm(term);
   };
 
+  const handleLessonTermPress = (term) => {
+    setLessonGlossaryOpen(false);
+    if (glossary?.openTerm) {
+      setTimeout(() => glossary.openTerm(term), 180);
+    }
+  };
+
   const disableOuterScroll =
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
   const containerContentStyle =
@@ -161,7 +203,7 @@ export default function LessonStepScreen() {
 
   return (
     <LessonStepContainer
-      scrollEnabled={!disableOuterScroll}
+      scrollEnabled={!disableOuterScroll && !isLessonGlossaryOpen}
       contentStyle={containerContentStyle}
     >
       <StepHeader
@@ -169,6 +211,7 @@ export default function LessonStepScreen() {
         total={TOTAL_STEPS}
         title={stepTitle}
         onBack={() => navigation.goBack()}
+        onOpenGlossary={() => setLessonGlossaryOpen(true)}
         onPressTerm={handleTermPress}
         stepLabel={flowMetaLabel}
         helperText={
@@ -245,6 +288,72 @@ export default function LessonStepScreen() {
           />
         )
       )}
+
+      <BottomSheet
+        visible={isLessonGlossaryOpen}
+        onClose={() => setLessonGlossaryOpen(false)}
+        title="Terms in this lesson"
+        sheetStyle={{ height: lessonGlossarySheetMaxHeight }}
+        contentStyle={styles.lessonGlossaryContent}
+      >
+        <View style={styles.lessonGlossarySearch}>
+          <Ionicons
+            name="search-outline"
+            size={components.sizes.icon.sm}
+            color={colors.text.secondary}
+          />
+          <AppTextInput
+            value={lessonTermQuery}
+            onChangeText={setLessonTermQuery}
+            placeholder="Search all terms"
+            placeholderTextColor={toRgba(colors.text.secondary, 0.6)}
+            style={styles.lessonGlossarySearchInput}
+          />
+        </View>
+        {isLessonSearchActive ? (
+          <AppText style={styles.lessonGlossarySearchLabel}>
+            Results from full glossary
+          </AppText>
+        ) : null}
+        {displayedLessonTerms.length ? (
+          <FlatList
+            data={displayedLessonTerms}
+            keyExtractor={(item) => item.id}
+            style={styles.lessonGlossaryList}
+            contentContainerStyle={styles.lessonGlossaryListContent}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => (
+              <Pressable
+                onPress={() => handleLessonTermPress(item)}
+                style={[
+                  styles.lessonGlossaryRow,
+                  index < displayedLessonTerms.length - 1 && styles.lessonGlossaryDivider,
+                ]}
+              >
+                <View style={styles.lessonGlossaryRowTop}>
+                  <AppText style={styles.lessonGlossaryTitle}>{item.term}</AppText>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={components.sizes.icon.sm}
+                    color={colors.text.secondary}
+                  />
+                </View>
+                <AppText style={styles.lessonGlossaryDescription} numberOfLines={1}>
+                  {item.definition}
+                </AppText>
+              </Pressable>
+            )}
+          />
+        ) : (
+          <View style={styles.lessonGlossaryEmpty}>
+            <AppText style={styles.lessonGlossaryEmptyTitle}>
+              {isLessonSearchActive
+                ? 'No matching terms found.'
+                : 'No terms defined for this lesson yet.'}
+            </AppText>
+          </View>
+        )}
+      </BottomSheet>
 
     </LessonStepContainer>
   );
@@ -2002,6 +2111,64 @@ const createStyles = (colors, components) =>
   sheetText: {
     ...typography.styles.body,
     color: colors.text.primary,
+  },
+  lessonGlossarySearch: {
+    ...components.input.container,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: components.layout.spacing.sm,
+    paddingVertical: components.layout.spacing.sm,
+  },
+  lessonGlossarySearchInput: {
+    flex: 1,
+    ...components.input.text,
+  },
+  lessonGlossarySearchLabel: {
+    ...typography.styles.small,
+    color: colors.text.secondary,
+  },
+  lessonGlossaryContent: {
+    flex: 1,
+    minHeight: 0,
+    gap: components.layout.spacing.sm,
+  },
+  lessonGlossaryList: {
+    flex: 1,
+    minHeight: 0,
+  },
+  lessonGlossaryListContent: {
+    paddingBottom: components.layout.spacing.sm,
+  },
+  lessonGlossaryRow: {
+    ...components.list.row,
+    paddingVertical: components.layout.spacing.md,
+  },
+  lessonGlossaryDivider: {
+    borderBottomWidth: components.borderWidth.thin,
+    borderBottomColor: toRgba(colors.ui.divider, components.opacity.value45),
+  },
+  lessonGlossaryRowTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: components.layout.spacing.sm,
+  },
+  lessonGlossaryTitle: {
+    ...typography.styles.bodyStrong,
+    color: colors.text.primary,
+    flex: 1,
+  },
+  lessonGlossaryDescription: {
+    ...typography.styles.small,
+    color: colors.text.secondary,
+  },
+  lessonGlossaryEmpty: {
+    gap: components.layout.spacing.xs,
+    paddingVertical: components.layout.spacing.sm,
+  },
+  lessonGlossaryEmptyTitle: {
+    ...typography.styles.body,
+    color: colors.text.secondary,
   },
   scenarioCard: {
     gap: components.layout.spacing.md,

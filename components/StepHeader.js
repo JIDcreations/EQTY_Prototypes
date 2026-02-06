@@ -11,6 +11,8 @@ export default function StepHeader({
   total,
   title,
   onBack,
+  onOpenGlossary,
+  glossaryLabel = 'Glossary',
   onPressTerm,
   stepLabel,
   progressText,
@@ -38,6 +40,17 @@ export default function StepHeader({
             color={colors.text.primary}
           />
         </Pressable>
+        {onOpenGlossary ? (
+          <Pressable
+            onPress={onOpenGlossary}
+            style={({ pressed }) => [
+              styles.glossaryButton,
+              pressed && styles.glossaryButtonPressed,
+            ]}
+          >
+            <AppText style={styles.glossaryLabel}>{glossaryLabel}</AppText>
+          </Pressable>
+        ) : null}
       </View>
       {stepLabel ? <AppText style={styles.stepLabel}>{stepLabel}</AppText> : null}
       {progressText ? <AppText style={styles.progressInline}>{progressLabel}</AppText> : null}
@@ -59,7 +72,7 @@ const createStyles = (colors, components) =>
     topRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'flex-start',
+      justifyContent: 'space-between',
     },
     backButton: {
       width: components.sizes.square.lg,
@@ -68,6 +81,21 @@ const createStyles = (colors, components) =>
       backgroundColor: colors.background.surface,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    glossaryButton: {
+      paddingHorizontal: components.layout.spacing.md,
+      paddingVertical: components.layout.spacing.xs,
+      borderRadius: components.radius.pill,
+      borderWidth: components.borderWidth.thin,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+    },
+    glossaryButtonPressed: {
+      opacity: components.opacity.value90,
+    },
+    glossaryLabel: {
+      ...typography.styles.small,
+      color: colors.text.primary,
     },
     progressInline: {
       ...typography.styles.small,
@@ -86,3 +114,12 @@ const createStyles = (colors, components) =>
       color: colors.text.primary,
     },
   });
+
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};

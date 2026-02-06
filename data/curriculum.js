@@ -41,7 +41,49 @@ export const modules = [
   },
 ];
 
-export const lessons = [
+const lessonGlossary = {
+  lesson_0: ['mb_asset', 'rr_risk', 'rr_return', 'pb_asset_allocation', 'pb_diversification'],
+  lesson_1: [
+    'tg_goal_based',
+    'tg_time_horizon',
+    'tg_emergency_fund',
+    'tg_growth_investing',
+    'tg_income_investing',
+  ],
+  lesson_2: [
+    'tg_goal_based',
+    'tg_target_date_fund',
+    'tg_capital_preservation',
+    'tg_growth_investing',
+    'tg_income_investing',
+    'tg_liquidity_needs',
+  ],
+  lesson_3: ['rr_risk', 'rr_volatility', 'rr_drawdown', 'rr_correlation', 'tg_risk_tolerance'],
+  lesson_4: ['tg_risk_tolerance', 'tg_time_horizon', 'tg_liquidity_needs', 'rr_risk'],
+  lesson_5: ['tg_emergency_fund', 'tg_liquidity_needs', 'pb_dca', 'pb_lump_sum'],
+  lesson_6: ['tg_time_horizon', 'tg_goal_based', 'tg_target_date_fund', 'tg_capital_preservation'],
+  lesson_7: ['pb_target_allocation', 'pb_asset_allocation', 'pb_diversification', 'pb_glide_path'],
+  lesson_8: ['mb_liquidity', 'tg_liquidity_needs', 'mb_spread'],
+  lesson_9: [],
+  lesson_10: ['se_dividend', 'se_dividend_yield', 'tg_income_investing'],
+  lesson_11: ['cf_management_fee', 'cf_trading_fee', 'cf_spread_cost', 'ef_expense_ratio', 'cf_fx_fee'],
+  lesson_12: ['pb_target_allocation', 'pb_rebalancing', 'pb_portfolio_drift'],
+  lesson_13: ['pb_asset_allocation', 'pb_diversification', 'pb_target_allocation'],
+  lesson_14: ['mb_asset', 'se_stock', 'bi_bond', 'mb_equity'],
+  lesson_15: ['pb_diversification', 'se_blue_chip', 'se_growth_stock', 'se_value_stock'],
+  lesson_16: ['pb_glide_path', 'pb_target_allocation', 'tg_time_horizon'],
+  lesson_17: ['ef_etf', 'ef_mutual_fund', 'ef_index_fund', 'ef_active_fund'],
+  lesson_18: ['se_stock', 'se_pe', 'se_pb', 'se_growth_stock', 'se_value_stock'],
+  lesson_19: ['bi_bond', 'bi_coupon', 'bi_yield', 'bi_duration', 'bi_credit_risk'],
+  lesson_20: ['ef_etf', 'ef_expense_ratio', 'ef_tracking_error', 'ef_acc', 'ef_dist'],
+  lesson_21: ['rr_risk', 'rr_volatility', 'mr_currency_risk'],
+  lesson_22: ['ot_market_order', 'ot_limit_order', 'ot_slippage'],
+  lesson_23: ['ot_market_order', 'ot_limit_order', 'ot_stop_loss', 'cf_commission', 'cf_spread_cost'],
+  lesson_24: ['ot_slippage', 'rr_risk', 'cf_trading_fee'],
+  lesson_25: ['pb_asset_allocation', 'pb_diversification', 'rr_risk', 'rr_return', 'tg_time_horizon'],
+};
+
+const baseLessons = [
   {
     id: 'lesson_0',
     moduleId: 'module_0',
@@ -225,3 +267,8 @@ export const lessons = [
     shortDescription: 'Rebuild the full model end-to-end.',
   },
 ];
+
+export const lessons = baseLessons.map((lesson) => ({
+  ...lesson,
+  termIds: lessonGlossary[lesson.id] || [],
+}));

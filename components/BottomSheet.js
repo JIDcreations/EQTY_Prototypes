@@ -17,6 +17,8 @@ export default function BottomSheet({
   onClose,
   children,
   scrimOpacity: scrimOpacityOverride,
+  sheetStyle: sheetStyleOverride,
+  contentStyle,
 }) {
   const { colors, components } = useTheme();
   const scrimMaxOpacity =
@@ -93,9 +95,7 @@ export default function BottomSheet({
           <Pressable style={styles.scrimPressable} onPress={handleClose} />
         </Animated.View>
         <GestureDetector gesture={panGesture}>
-          <Animated.View
-            style={[styles.sheet, sheetStyle]}
-          >
+          <Animated.View style={[styles.sheet, sheetStyleOverride, sheetStyle]}>
             <View style={styles.handle} />
             <View style={styles.headerRow}>
               {title ? <AppText style={styles.title}>{title}</AppText> : <View />}
@@ -107,7 +107,7 @@ export default function BottomSheet({
                 />
               </Pressable>
             </View>
-            <View style={styles.content}>{children}</View>
+            <View style={[styles.content, contentStyle]}>{children}</View>
           </Animated.View>
         </GestureDetector>
       </View>
