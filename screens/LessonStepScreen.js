@@ -293,8 +293,12 @@ export default function LessonStepScreen() {
         visible={isLessonGlossaryOpen}
         onClose={() => setLessonGlossaryOpen(false)}
         title="Terms in this lesson"
-        sheetStyle={{ height: lessonGlossarySheetMaxHeight }}
+        sheetStyle={{
+          height: lessonGlossarySheetMaxHeight,
+          paddingBottom: components.layout.spacing.md,
+        }}
         contentStyle={styles.lessonGlossaryContent}
+        scrimOpacity={0}
       >
         <FlatList
           data={displayedLessonTerms}
@@ -2171,7 +2175,7 @@ const createStyles = (colors, components) =>
     minHeight: 0,
   },
   lessonGlossaryListContent: {
-    paddingBottom: components.layout.spacing.sm,
+    paddingBottom: components.layout.spacing.none,
   },
   lessonGlossaryRow: {
     ...components.list.row,

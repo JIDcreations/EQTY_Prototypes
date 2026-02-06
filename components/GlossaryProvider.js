@@ -48,7 +48,12 @@ export function GlossaryProvider({ children }) {
   return (
     <GlossaryContext.Provider value={value}>
       {children}
-      <BottomSheet visible={!!activeTerm} onClose={closeTerm} title={activeTerm?.term}>
+      <BottomSheet
+        visible={!!activeTerm}
+        onClose={closeTerm}
+        title={activeTerm?.term}
+        scrimOpacity={0}
+      >
         <View style={styles.glossarySection}>
           <AppText style={styles.sheetLabel}>Definition</AppText>
           <AppText style={styles.sheetDefinition}>{activeTerm?.definition}</AppText>
