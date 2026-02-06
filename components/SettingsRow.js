@@ -4,6 +4,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function SettingsRow({
   label,
   value,
@@ -53,7 +62,7 @@ const createStyles = (colors, components) =>
     },
     rowDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
+      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
     },
     rowDisabled: {
       opacity: components.opacity.value60,

@@ -30,7 +30,7 @@ const HELP_TOPICS = [
 const GUIDE_ITEMS = [
   {
     title: 'Reset your password',
-    description: 'Head to Profile > Reset password to update your credentials.',
+    description: 'Head to Settings > Account to reset your credentials.',
   },
   {
     title: 'Update profile details',

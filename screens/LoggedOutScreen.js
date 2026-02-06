@@ -13,7 +13,7 @@ export default function LoggedOutScreen({ navigation }) {
 
   const handleLogin = async () => {
     await updateAuthUser({});
-    navigation.replace('ProfileOverview');
+    navigation.replace('SettingsHome');
   };
 
   return (
