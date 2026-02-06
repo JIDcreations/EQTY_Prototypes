@@ -58,17 +58,10 @@ export default function SettingsPersonalContextScreen({ navigation }) {
       >
         <SettingsHeader
           title="Personal context (AI)"
-          subtitle="Your onboarding answers tailor explanations"
+          subtitle="Answer these questions to adapt examples, pacing, and feedback. No financial advice."
           onBack={() => navigation.goBack()}
         />
-        <View style={styles.pageHeader}>
-          <AppText style={styles.cardTitle}>Answer these questions</AppText>
-          <AppText style={styles.cardSubtitle}>
-            We use this to adapt examples, pacing, and feedback.
-          </AppText>
-        </View>
-
-        <View style={styles.field}>
+        <View style={[styles.questionBlock, styles.questionDivider]}>
           <AppText style={styles.questionLabel}>Question 01</AppText>
           <AppText style={styles.question}>
             What have you already done in terms of investing?
@@ -83,7 +76,7 @@ export default function SettingsPersonalContextScreen({ navigation }) {
           />
         </View>
 
-        <View style={styles.field}>
+        <View style={[styles.questionBlock, styles.questionDivider]}>
           <AppText style={styles.questionLabel}>Question 02</AppText>
           <AppText style={styles.question}>
             What do you already know about investing today?
@@ -98,7 +91,7 @@ export default function SettingsPersonalContextScreen({ navigation }) {
           />
         </View>
 
-        <View style={styles.field}>
+        <View style={styles.questionBlock}>
           <AppText style={styles.questionLabel}>Question 03</AppText>
           <AppText style={styles.question}>Why do you want to start investing?</AppText>
           <AppTextInput
@@ -138,19 +131,14 @@ const createStyles = (colors, components) =>
       paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
-    pageHeader: {
-      gap: components.layout.spacing.xs,
-    },
-    cardTitle: {
-      ...typography.styles.h2,
-      color: colors.text.primary,
-    },
-    cardSubtitle: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
-    },
-    field: {
+    questionBlock: {
       gap: components.layout.spacing.sm,
+    },
+    questionDivider: {
+      borderBottomWidth: components.borderWidth.thin,
+      borderBottomColor: toRgba(colors.ui.divider, components.opacity.value35),
+      paddingBottom: components.layout.spacing.lg,
+      marginBottom: components.layout.spacing.lg,
     },
     questionLabel: {
       ...typography.styles.stepLabel,
@@ -164,11 +152,14 @@ const createStyles = (colors, components) =>
       ...components.input.container,
       ...components.input.multiline,
       ...components.input.text,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
       textAlignVertical: 'top',
     },
     noteCard: {
-      backgroundColor: colors.background.surfaceActive,
-      borderRadius: components.radius.card,
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
       padding: components.layout.spacing.md,
     },
     noteText: {
@@ -183,3 +174,12 @@ const createStyles = (colors, components) =>
       flex: 1,
     },
   });
+
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};

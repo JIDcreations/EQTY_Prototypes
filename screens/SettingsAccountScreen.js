@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import OnboardingScreen from '../components/OnboardingScreen';
 import SettingsHeader from '../components/SettingsHeader';
 import SettingsRow from '../components/SettingsRow';
-import SettingsStackedCard from '../components/SettingsStackedCard';
 import Toast from '../components/Toast';
 import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
@@ -94,11 +94,20 @@ export default function SettingsAccountScreen({ navigation }) {
 
     const displayValue = value?.trim() ? value.trim() : '—';
     return (
-      <SettingsRow
-        label={label}
-        value={displayValue}
-        onPress={() => setActiveField(key)}
-      />
+      <View style={styles.inlineField}>
+        <AppText style={styles.label}>{label}</AppText>
+        <Pressable
+          onPress={() => setActiveField(key)}
+          style={styles.valueRow}
+        >
+          <AppText style={styles.valueText}>{displayValue}</AppText>
+          <Ionicons
+            name="pencil-outline"
+            size={components.sizes.icon.md}
+            color={colors.text.secondary}
+          />
+        </Pressable>
+      </View>
     );
   };
 
@@ -114,7 +123,7 @@ export default function SettingsAccountScreen({ navigation }) {
           subtitle="Update your username, email, and password"
           onBack={() => navigation.goBack()}
         />
-        <SettingsStackedCard contentStyle={styles.cardContent}>
+        <View style={styles.section}>
           {renderField({
             key: 'username',
             label: 'Username',
@@ -137,8 +146,9 @@ export default function SettingsAccountScreen({ navigation }) {
             label="Reset password"
             onPress={() => navigation.navigate('ChangePassword')}
             isLast
+            containerStyle={styles.rowCard}
           />
-        </SettingsStackedCard>
+        </View>
         {hasChanges ? (
           <View style={styles.actions}>
             <PrimaryButton
@@ -164,22 +174,38 @@ const createStyles = (colors, components) =>
       paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
-    cardContent: {
-      gap: components.layout.cardGap,
+    section: {
+      gap: components.layout.spacing.sm,
+    },
+    rowCard: {
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     inlineField: {
       gap: components.layout.spacing.xs,
-      paddingVertical: components.layout.spacing.md,
-      borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
     },
     label: {
       ...typography.styles.small,
       color: colors.text.secondary,
     },
+    valueRow: {
+      ...components.input.container,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+    },
+    valueText: {
+      ...typography.styles.body,
+      color: colors.text.primary,
+    },
     input: {
       ...components.input.container,
       ...components.input.text,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     actions: {
       gap: components.layout.spacing.md,

@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import AppText from '../components/AppText';
 import OnboardingScreen from '../components/OnboardingScreen';
-import SettingsStackedCard from '../components/SettingsStackedCard';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
 import { typography, useTheme } from '../theme';
@@ -21,7 +20,7 @@ export default function SettingsAccessibilityScreen({ navigation }) {
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const toast = useToast();
 
-  const renderTextSizeOption = (option, index) => {
+  const renderTextSizeOption = (option) => {
     const isActive = preferences?.textSize === option.value;
     return (
       <Pressable
@@ -30,7 +29,7 @@ export default function SettingsAccessibilityScreen({ navigation }) {
           updatePreferences({ textSize: option.value });
           toast.show('Saved');
         }}
-        style={[styles.textSizeRow, index !== TEXT_SIZE_OPTIONS.length - 1 && styles.rowDivider]}
+        style={styles.textSizeRow}
       >
         <View style={styles.textSizeLeft}>
           <View style={[styles.radio, isActive && styles.radioActive]}>
@@ -63,7 +62,7 @@ export default function SettingsAccessibilityScreen({ navigation }) {
           subtitle="Adjust text size for better readability"
           onBack={() => navigation.goBack()}
         />
-        <SettingsStackedCard contentStyle={styles.cardContent}>
+        <View style={styles.section}>
           <View style={styles.textSizeHeader}>
             <AppText style={styles.cardTitle}>Text size</AppText>
             <AppText style={styles.cardSubtitle}>
@@ -77,7 +76,7 @@ export default function SettingsAccessibilityScreen({ navigation }) {
               Investing is a long-term journey. Adjust the text size to match your comfort.
             </AppText>
           </View>
-        </SettingsStackedCard>
+        </View>
       </OnboardingScreen>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
     </View>
@@ -93,8 +92,8 @@ const createStyles = (colors, components) =>
       paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
-    cardContent: {
-      gap: components.layout.cardGap,
+    section: {
+      gap: components.layout.spacing.lg,
     },
     cardTitle: {
       ...typography.styles.h3,
@@ -108,22 +107,15 @@ const createStyles = (colors, components) =>
       gap: components.layout.spacing.xs,
     },
     textSizeList: {
-      borderRadius: components.radius.card,
-      overflow: 'hidden',
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.text.primary, components.opacity.value20),
+      gap: components.layout.spacing.sm,
     },
     textSizeRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      ...components.list.row,
-      paddingHorizontal: components.layout.spacing.lg,
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value90),
-    },
-    rowDivider: {
-      borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     textSizeLeft: {
       flexDirection: 'row',
@@ -165,9 +157,9 @@ const createStyles = (colors, components) =>
       backgroundColor: colors.accent.primary,
     },
     previewCard: {
-      backgroundColor: colors.background.surfaceActive,
-      padding: components.layout.spacing.md,
-      borderRadius: components.radius.card,
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
       gap: components.layout.spacing.xs,
     },
     previewTitle: {

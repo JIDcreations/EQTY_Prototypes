@@ -1,14 +1,22 @@
 import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import OnboardingScreen from '../components/OnboardingScreen';
-import SettingsStackedCard from '../components/SettingsStackedCard';
 import SettingsHeader from '../components/SettingsHeader';
 import SettingsRow from '../components/SettingsRow';
 import { useTheme } from '../theme';
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function SettingsSupportScreen({ navigation }) {
-  const { components } = useTheme();
-  const styles = useMemo(() => createStyles(components), [components]);
+  const { colors, components } = useTheme();
+  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
 
   return (
     <OnboardingScreen
@@ -21,32 +29,42 @@ export default function SettingsSupportScreen({ navigation }) {
         subtitle="Find answers or get in touch"
         onBack={() => navigation.goBack()}
       />
-      <SettingsStackedCard contentStyle={styles.cardContent}>
+      <View style={styles.section}>
         <SettingsRow
           label="Help center"
           onPress={() => navigation.navigate('HelpCenter')}
+          isLast
+          containerStyle={styles.rowCard}
         />
         <SettingsRow
           label="Contact support"
           onPress={() => navigation.navigate('ContactSupport')}
+          isLast
+          containerStyle={styles.rowCard}
         />
         <SettingsRow
           label="FAQ"
           onPress={() => navigation.navigate('FAQ')}
           isLast
+          containerStyle={styles.rowCard}
         />
-      </SettingsStackedCard>
+      </View>
     </OnboardingScreen>
   );
 }
 
-const createStyles = (components) =>
+const createStyles = (colors, components) =>
   StyleSheet.create({
     content: {
       paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
-    cardContent: {
-      gap: components.layout.cardGap,
+    section: {
+      gap: components.layout.spacing.sm,
+    },
+    rowCard: {
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
   });

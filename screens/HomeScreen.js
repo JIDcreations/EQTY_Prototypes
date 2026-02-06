@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
-import Card from '../components/Card';
 import { PrimaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
@@ -176,13 +175,18 @@ export default function HomeScreen() {
           {themes.slice(0, 3).map((theme) => (
             <Pressable
               key={theme.id}
-              onPress={() => navigation.navigate('Lessons', { themeId: theme.id })}
+              onPress={() =>
+                navigation.navigate('Lessons', {
+                  screen: 'LessonsHome',
+                  params: { moduleId: `module_${theme.order}` },
+                })
+              }
               style={({ pressed }) => [
                 styles.themeItem,
                 pressed && styles.themeItemPressed,
               ]}
             >
-              <Card style={styles.themeCard}>
+              <View style={styles.themeCard}>
                 <View style={styles.themeHeader}>
                   <AppText style={styles.themeLabel}>{`Thema ${theme.order}`}</AppText>
                   <View style={styles.themeHeaderRight}>
@@ -202,7 +206,7 @@ export default function HomeScreen() {
                     {formatLessonCount(theme.lessons)}
                   </AppText>
                 </View>
-              </Card>
+              </View>
             </Pressable>
           ))}
         </View>
@@ -220,14 +224,14 @@ export default function HomeScreen() {
                 pressed && styles.actionItemPressed,
               ]}
             >
-              <Card style={styles.actionCard}>
+              <View style={styles.actionCard}>
                 <Ionicons
                   name={action.icon}
                   size={components.sizes.icon.lg}
                   color={colors.text.secondary}
                 />
                 <AppText style={styles.actionTitle}>{action.title}</AppText>
-              </Card>
+              </View>
             </Pressable>
           ))}
         </View>
@@ -286,7 +290,7 @@ const createStyles = (colors, components) =>
     heroCard: {
       padding: components.layout.spacing.xxl,
       gap: components.layout.spacing.lg,
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value80),
+      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
       borderColor: toRgba(colors.ui.divider, components.opacity.value45),
     },
     heroStepLabel: {
@@ -332,20 +336,11 @@ const createStyles = (colors, components) =>
       transform: [{ scale: components.transforms.scalePressed }],
     },
     themeCard: {
-      ...components.card.base,
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.xs,
-      shadowColor: colors.background.app,
-      shadowOpacity: components.shadows.stackedCard.opacity,
-      shadowRadius: components.shadows.stackedCard.radius,
-      shadowOffset: {
-        width: components.shadows.stackedCard.offsetX,
-        height: components.shadows.stackedCard.offsetY,
-      },
-      elevation: components.shadows.stackedCard.elevation,
     },
     themeHeader: {
       flexDirection: 'row',
@@ -393,10 +388,9 @@ const createStyles = (colors, components) =>
       transform: [{ scale: components.transforms.scalePressed }],
     },
     actionCard: {
-      ...components.card.base,
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.sm,
       alignItems: 'flex-start',

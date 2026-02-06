@@ -4,7 +4,6 @@ import AppText from '../components/AppText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import SegmentedControl from '../components/SegmentedControl';
 import SettingsHeader from '../components/SettingsHeader';
-import SettingsStackedCard from '../components/SettingsStackedCard';
 import Toast from '../components/Toast';
 import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
@@ -52,40 +51,37 @@ export default function SettingsPreferencesScreen({ navigation }) {
           subtitle="Language and appearance choices"
           onBack={() => navigation.goBack()}
         />
-        <SettingsStackedCard contentStyle={styles.cardContent}>
-          <View style={styles.block}>
-            <AppText style={styles.cardTitle}>Language</AppText>
-            <View style={styles.optionList}>
-              {options.map((option, index) => {
-                const isActive = preferences?.language === option.value;
-                return (
-                  <Pressable
-                    key={option.value}
-                    onPress={() => {
-                      updatePreferences({ language: option.value });
-                      toast.show(settingsCopy.saved);
-                    }}
-                    style={[
-                      styles.optionRow,
-                      index !== options.length - 1 && styles.rowDivider,
-                    ]}
-                  >
-                    <View style={styles.rowLeft}>
-                      <View style={[styles.radio, isActive && styles.radioActive]}>
-                        {isActive ? <View style={styles.radioDot} /> : null}
-                      </View>
-                      <AppText style={styles.rowLabel}>{option.label}</AppText>
+        <View style={styles.block}>
+          <AppText style={styles.cardTitle}>Language</AppText>
+          <View style={styles.languageList}>
+            {options.map((option) => {
+              const isActive = preferences?.language === option.value;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => {
+                    updatePreferences({ language: option.value });
+                    toast.show(settingsCopy.saved);
+                  }}
+                  style={[styles.languageRow, isActive && styles.languageRowActive]}
+                >
+                  <View style={styles.rowLeft}>
+                    <View style={[styles.radio, isActive && styles.radioActive]}>
+                      {isActive ? <View style={styles.radioDot} /> : null}
                     </View>
-                    {isActive ? (
-                      <AppText style={styles.activeLabel}>{settingsCopy.selected}</AppText>
-                    ) : null}
-                  </Pressable>
-                );
-              })}
-            </View>
+                    <AppText style={styles.rowLabel}>{option.label}</AppText>
+                  </View>
+                  {isActive ? (
+                    <AppText style={styles.activeLabel}>{settingsCopy.selected}</AppText>
+                  ) : null}
+                </Pressable>
+              );
+            })}
           </View>
-          <View style={styles.appearanceBlock}>
-            <AppText style={styles.cardTitle}>Appearance</AppText>
+        </View>
+        <View style={styles.appearanceBlock}>
+          <AppText style={styles.cardTitle}>Appearance</AppText>
+          <View style={styles.appearanceContainer}>
             <SegmentedControl
               options={APPEARANCE_OPTIONS}
               value={preferences?.appearance || 'Dark'}
@@ -95,7 +91,7 @@ export default function SettingsPreferencesScreen({ navigation }) {
               }}
             />
           </View>
-        </SettingsStackedCard>
+        </View>
       </OnboardingScreen>
       <Toast message={toast.message} visible={toast.visible} onHide={toast.hide} />
     </View>
@@ -111,9 +107,6 @@ const createStyles = (colors, components) =>
       paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
-    cardContent: {
-      gap: components.layout.cardGap,
-    },
     block: {
       gap: components.layout.spacing.sm,
     },
@@ -121,23 +114,19 @@ const createStyles = (colors, components) =>
       ...typography.styles.h3,
       color: colors.text.primary,
     },
-    optionList: {
-      borderRadius: components.radius.card,
-      overflow: 'hidden',
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.text.primary, components.opacity.value20),
+    languageList: {
+      gap: components.layout.spacing.sm,
     },
-    optionRow: {
-      ...components.list.row,
-      paddingHorizontal: components.layout.spacing.lg,
+    languageRow: {
+      ...components.input.container,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value90),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
-    rowDivider: {
-      borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
+    languageRowActive: {
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     rowLeft: {
       flexDirection: 'row',
@@ -172,5 +161,11 @@ const createStyles = (colors, components) =>
     },
     appearanceBlock: {
       gap: components.layout.spacing.sm,
+    },
+    appearanceContainer: {
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      padding: components.layout.spacing.xs,
     },
   });

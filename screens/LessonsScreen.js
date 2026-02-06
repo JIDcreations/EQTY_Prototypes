@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
-import Card from '../components/Card';
 import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import ProgressBar from '../components/ProgressBar';
@@ -21,6 +20,9 @@ import { getLessonStatus } from '../utils/helpers';
 
 export default function LessonsScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const scrollRef = useRef(null);
+  const lastScrolled = useRef(null);
   const { progress, preferences } = useApp();
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
@@ -63,13 +65,46 @@ export default function LessonsScreen() {
     const moduleId = currentLesson?.moduleId;
     return moduleId ? { [moduleId]: true } : {};
   });
+  const [moduleOffsets, setModuleOffsets] = useState({});
+
+  const forcedModuleId = useMemo(
+    () =>
+      route?.params?.moduleId ||
+      getModuleIdFromTheme(route?.params?.themeId, localizedModules),
+    [localizedModules, route?.params?.moduleId, route?.params?.themeId]
+  );
 
   useEffect(() => {
+    if (!forcedModuleId) return;
+    setExpandedModules({ [forcedModuleId]: true });
+  }, [forcedModuleId]);
+
+  useEffect(() => {
+    if (forcedModuleId) return;
     if (!currentLesson?.moduleId) return;
     setExpandedModules((prev) =>
       prev[currentLesson.moduleId] ? prev : { ...prev, [currentLesson.moduleId]: true }
     );
-  }, [currentLesson?.moduleId]);
+  }, [currentLesson?.moduleId, forcedModuleId]);
+
+  useEffect(() => {
+    if (!forcedModuleId) return;
+    const offset = moduleOffsets[forcedModuleId];
+    if (typeof offset !== 'number') return;
+    if (lastScrolled.current === forcedModuleId) return;
+    lastScrolled.current = forcedModuleId;
+    scrollRef.current?.scrollTo({
+      y: Math.max(0, offset - components.layout.spacing.xxl),
+      animated: true,
+    });
+  }, [components.layout.spacing.xxl, forcedModuleId, moduleOffsets]);
+
+  const handleModuleLayout = (moduleId) => (event) => {
+    const nextOffset = event.nativeEvent.layout.y;
+    setModuleOffsets((prev) =>
+      prev[moduleId] === nextOffset ? prev : { ...prev, [moduleId]: nextOffset }
+    );
+  };
 
   const currentLessonTitle = currentLesson?.title || homeCopy.lessonFallbackTitle;
   const currentLessonDescription =
@@ -77,7 +112,12 @@ export default function LessonsScreen() {
   const primaryCtaLabel = 'Verdergaan';
 
   return (
-    <OnboardingScreen scroll backgroundVariant="bg3" contentContainerStyle={styles.content}>
+    <OnboardingScreen
+      scroll
+      backgroundVariant="bg3"
+      contentContainerStyle={styles.content}
+      scrollRef={scrollRef}
+    >
       <View style={styles.headerRow}>
           <AppText style={styles.screenTitle}>Lesoverzicht</AppText>
           <Pressable
@@ -95,7 +135,7 @@ export default function LessonsScreen() {
 
       <SectionTitle title="Nu bezig" />
 
-      <Card style={styles.currentCard}>
+      <View style={styles.currentCard}>
         <View style={styles.currentMetaRow}>
           <AppText style={styles.currentProgress}>
             {formatLessonProgress(lessonPosition, totalLessons)}
@@ -119,7 +159,7 @@ export default function LessonsScreen() {
             })
           }
         />
-      </Card>
+      </View>
 
       <View style={styles.modulesHeader}>
         <SectionTitle title="Leerpad" />
@@ -139,10 +179,14 @@ export default function LessonsScreen() {
           const progressLabel = formatThemeProgress(moduleCompletedCount, moduleTotal);
 
           return (
-            <View key={module.id} style={styles.module}>
+            <View
+              key={module.id}
+              style={styles.module}
+              onLayout={handleModuleLayout(module.id)}
+            >
               <Pressable onPress={() => toggleModule(setExpandedModules, module.id)}>
                 {({ pressed }) => (
-                  <Card
+                  <View
                     style={[
                       styles.moduleCard,
                       isExpanded && styles.moduleCardExpanded,
@@ -191,7 +235,7 @@ export default function LessonsScreen() {
                     <View style={styles.themeProgress}>
                       <ProgressBar progress={Math.min(1, Math.max(0, moduleProgress))} />
                     </View>
-                  </Card>
+                  </View>
                 )}
               </Pressable>
               {isExpanded ? (
@@ -211,7 +255,13 @@ export default function LessonsScreen() {
                         }
                       >
                         {({ pressed }) => (
-                          <Card style={[styles.lessonCard, pressed && styles.lessonCardPressed]}>
+                          <View
+                            style={[
+                              styles.lessonCard,
+                              isExpanded && styles.lessonCardActive,
+                              pressed && styles.lessonCardPressed,
+                            ]}
+                          >
                             <View style={styles.lessonHeader}>
                               <AppText style={styles.lessonNumber}>
                                 {homeCopy.lessonShort(lessonNumber)}
@@ -242,7 +292,7 @@ export default function LessonsScreen() {
                                 color={colors.text.secondary}
                               />
                             </View>
-                          </Card>
+                          </View>
                         )}
                       </Pressable>
                     );
@@ -265,6 +315,17 @@ const getModuleNumber = (moduleId) => {
 
 const toggleModule = (setExpandedModules, moduleId) => {
   setExpandedModules((prev) => ({ ...prev, [moduleId]: !prev[moduleId] }));
+};
+
+const getModuleIdFromTheme = (themeId, modules) => {
+  if (!themeId) return null;
+  if (typeof themeId === 'string' && themeId.startsWith('module_')) return themeId;
+  if (typeof themeId === 'string' && themeId.startsWith('t')) {
+    const index = Number(themeId.slice(1));
+    if (!Number.isNaN(index)) return `module_${index}`;
+  }
+  if (modules?.some((module) => module.id === themeId)) return themeId;
+  return null;
 };
 
 const formatLessonProgress = (position, total) => `Les ${position} / ${total}`;
@@ -314,14 +375,15 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
-      backgroundColor: colors.background.surface,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
     },
     currentCard: {
-      ...components.card.base,
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      padding: components.layout.spacing.lg,
+      gap: components.layout.spacing.md,
     },
     currentMetaRow: {
       flexDirection: 'row',
@@ -348,15 +410,15 @@ const createStyles = (colors, components) =>
       gap: components.layout.spacing.md,
     },
     moduleCard: {
-      ...components.card.base,
-      borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
+      ...components.input.container,
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      padding: components.layout.spacing.lg,
       gap: components.layout.spacing.sm,
     },
     moduleCardExpanded: {
-      borderColor: toRgba(colors.accent.primary, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value80),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
     },
     moduleCardPressed: {
       opacity: components.opacity.value94,
@@ -427,13 +489,16 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
     },
     lessonCard: {
-      ...components.card.base,
-      borderWidth: components.borderWidth.thin,
+      ...components.input.container,
       borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: colors.background.surfaceActive,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
       padding: components.layout.spacing.md,
       gap: components.layout.spacing.sm,
       width: components.layout.contentWidth - components.layout.spacing.xxl,
+    },
+    lessonCardActive: {
+      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
     },
     lessonCardPressed: {
       opacity: components.opacity.value94,

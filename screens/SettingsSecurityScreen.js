@@ -1,11 +1,19 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Switch } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
 import AppText from '../components/AppText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import SettingsHeader from '../components/SettingsHeader';
 import SettingsRow from '../components/SettingsRow';
-import SettingsStackedCard from '../components/SettingsStackedCard';
 import { typography, useTheme } from '../theme';
+
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
 
 export default function SettingsSecurityScreen({ navigation }) {
   const { colors, components } = useTheme();
@@ -22,7 +30,7 @@ export default function SettingsSecurityScreen({ navigation }) {
         subtitle="Account protection"
         onBack={() => navigation.goBack()}
       />
-      <SettingsStackedCard contentStyle={styles.cardContent}>
+      <View style={styles.section}>
         <SettingsRow
           label="Two-factor authentication"
           subtitle="Extra security for your account"
@@ -40,9 +48,10 @@ export default function SettingsSecurityScreen({ navigation }) {
           }
           isLast
           disabled
+          containerStyle={styles.rowCard}
         />
         <AppText style={styles.inlineHint}>Coming later</AppText>
-      </SettingsStackedCard>
+      </View>
     </OnboardingScreen>
   );
 }
@@ -53,8 +62,13 @@ const createStyles = (colors, components) =>
       paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
-    cardContent: {
-      gap: components.layout.cardGap,
+    section: {
+      gap: components.layout.spacing.sm,
+    },
+    rowCard: {
+      ...components.input.container,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     inlineHint: {
       ...typography.styles.small,

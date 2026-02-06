@@ -21,6 +21,7 @@ export default function SettingsRow({
   subtitle,
   isLast = false,
   disabled = false,
+  containerStyle,
 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
@@ -30,7 +31,12 @@ export default function SettingsRow({
     <Container
       onPress={onPress}
       disabled={disabled}
-      style={[styles.row, !isLast && styles.rowDivider, disabled && styles.rowDisabled]}
+      style={[
+        styles.row,
+        !isLast && styles.rowDivider,
+        disabled && styles.rowDisabled,
+        containerStyle,
+      ]}
     >
       <View style={styles.rowContent}>
         <AppText style={styles.label}>{label}</AppText>
