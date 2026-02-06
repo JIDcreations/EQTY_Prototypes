@@ -3,7 +3,6 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
-import Card from '../components/Card';
 import SettingsHeader from '../components/SettingsHeader';
 import Toast from '../components/Toast';
 import { typography, useTheme } from '../theme';
@@ -31,7 +30,7 @@ export default function ChangePasswordScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeader title="Reset password" onBack={() => navigation.goBack()} />
-        <Card style={styles.card}>
+        <View style={styles.section}>
           <View style={styles.field}>
             <AppText style={styles.label}>Current password</AppText>
             <AppTextInput
@@ -71,7 +70,7 @@ export default function ChangePasswordScreen({ navigation }) {
           >
             <AppText style={styles.forgotText}>Forgot password? Send reset link</AppText>
           </Pressable>
-        </Card>
+        </View>
         <View style={styles.actions}>
           <PrimaryButton label="Save changes" onPress={handleSave} disabled={!canSave} />
           <SecondaryButton label="Cancel" onPress={() => navigation.goBack()} />
@@ -95,8 +94,8 @@ const createStyles = (colors, components) =>
       gap: components.layout.contentGap,
       paddingBottom: components.layout.safeArea.bottom,
     },
-    card: {
-      gap: components.layout.cardGap,
+    section: {
+      gap: components.layout.spacing.sm,
     },
     field: {
       gap: components.layout.spacing.xs,
@@ -108,6 +107,8 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
     },
     forgotRow: {
       alignSelf: 'flex-start',
@@ -121,3 +122,12 @@ const createStyles = (colors, components) =>
       gap: components.layout.spacing.md,
     },
   });
+
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
