@@ -417,7 +417,7 @@ const createStyles = (colors, components) =>
       gap: components.layout.spacing.sm,
     },
     moduleCardExpanded: {
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      borderColor: toRgba(colors.accent.primary, components.opacity.value60),
       backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
     },
     moduleCardPressed: {
