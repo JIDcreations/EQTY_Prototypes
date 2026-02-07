@@ -12,7 +12,7 @@ export default function StepHeader({
   title,
   onBack,
   onOpenGlossary,
-  glossaryLabel = 'Glossary',
+  glossaryLabel = 'Terms in this lesson',
   onPressTerm,
   stepLabel,
   progressText,

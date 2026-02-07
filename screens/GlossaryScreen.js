@@ -480,8 +480,8 @@ const createStyles = (colors, components) =>
     termsCard: {
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value80),
+      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
       gap: components.layout.spacing.md,
     },
     termsHeader: {
@@ -511,7 +511,7 @@ const createStyles = (colors, components) =>
     },
     termDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.ui.divider, components.opacity.value45),
+      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
     },
     termRowTop: {
       flexDirection: 'row',

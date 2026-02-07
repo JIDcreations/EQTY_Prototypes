@@ -91,8 +91,20 @@ export default function HomeScreen() {
   );
   const quickActions = useMemo(
     () => [
-      { id: 'resources', title: 'Bronnen', icon: 'book-outline', target: 'Glossary' },
-      { id: 'videos', title: 'Video’s', icon: 'play-circle-outline', target: 'Lessons' },
+      {
+        id: 'resources',
+        title: 'Extra info',
+        subtitle: 'Sources and deeper context',
+        icon: 'book-outline',
+        target: 'Glossary',
+      },
+      {
+        id: 'videos',
+        title: 'Videos',
+        subtitle: 'Quick visual explainers',
+        icon: 'play-circle-outline',
+        target: 'Lessons',
+      },
     ],
     []
   );
@@ -231,6 +243,7 @@ export default function HomeScreen() {
                   color={colors.text.secondary}
                 />
                 <AppText style={styles.actionTitle}>{action.title}</AppText>
+                <AppText style={styles.actionSubtitle}>{action.subtitle}</AppText>
               </View>
             </Pressable>
           ))}
@@ -399,6 +412,10 @@ const createStyles = (colors, components) =>
     actionTitle: {
       ...typography.styles.bodyStrong,
       color: colors.text.primary,
+    },
+    actionSubtitle: {
+      ...typography.styles.small,
+      color: colors.text.secondary,
     },
     trajectoryBar: {
       opacity: components.opacity.value80,
