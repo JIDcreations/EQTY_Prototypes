@@ -28,4 +28,4 @@ Alert.alert = (title, message, buttons, options) => {
   }
 };
 
-export { default } from './App';
+export { default } from './App.js';
