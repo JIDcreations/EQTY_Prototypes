@@ -6,7 +6,7 @@ import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
-import OnboardingStackedCard from '../components/OnboardingStackedCard';
+import Card from '../components/Card';
 import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
 import {
@@ -146,11 +146,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <OnboardingStackedCard
-          style={styles.heroStack}
-          contentStyle={styles.heroCard}
-          showHandle={false}
-        >
+        <Card style={[styles.heroStack, styles.heroCard]}>
           <GlossaryText
             text={homeCopy.lessonShort(lessonPosition)}
             style={styles.heroStepLabel}
@@ -173,7 +169,7 @@ export default function HomeScreen() {
             }
             style={styles.heroButton}
           />
-        </OnboardingStackedCard>
+        </Card>
       </View>
 
       <View style={styles.section}>
@@ -304,6 +300,7 @@ const createStyles = (colors, components) =>
       padding: components.layout.spacing.xxl,
       gap: components.layout.spacing.lg,
       backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
+      borderWidth: components.borderWidth.thin,
       borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     heroStepLabel: {
