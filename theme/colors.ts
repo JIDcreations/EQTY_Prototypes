@@ -2,8 +2,8 @@ export const colors = {
   dark: {
     background: {
       app: '#12161C',
-      surface: '#1F252E',
-      surfaceActive: '#1E2738',
+       surface: '#1B2432',
+      surfaceActive: '#1A2A42',
     },
     text: {
       primary: '#F2F4F6',
@@ -20,7 +20,7 @@ export const colors = {
     opacity: {
       tint: 0.12,
       stroke: 0.35,
-      surface: 0.6,
+      surface: 0.60,
       emphasis: 0.9,
     },
   },

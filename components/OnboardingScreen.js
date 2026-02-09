@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../theme';
 
 const backgroundImages = {
@@ -31,10 +30,6 @@ export default function OnboardingScreen({
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const resolvedBackground = backgroundImages[backgroundVariant] || backgroundImages.bg2;
-  const resolvedGradientColors = [
-    toRgba(colors.background.app, colors.opacity.stroke),
-    toRgba(colors.background.app, colors.opacity.stroke),
-  ];
 
   if (scroll) {
     const { contentContainerStyle: scrollContentStyle, ...restScrollProps } =
@@ -46,7 +41,7 @@ export default function OnboardingScreen({
         imageStyle={styles.backgroundImage}
         resizeMode="cover"
       >
-        <LinearGradient colors={resolvedGradientColors} style={styles.gradient}>
+        <View style={styles.gradient}>
           {showGlow ? (
             <>
               <View pointerEvents="none" style={styles.glowTop} />
@@ -70,7 +65,7 @@ export default function OnboardingScreen({
               {children}
             </ScrollView>
           </View>
-        </LinearGradient>
+        </View>
       </ImageBackground>
     );
   }
@@ -82,7 +77,7 @@ export default function OnboardingScreen({
       imageStyle={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient colors={resolvedGradientColors} style={styles.gradient}>
+      <View style={styles.gradient}>
         {showGlow ? (
           <>
             <View pointerEvents="none" style={styles.glowTop} />
@@ -93,7 +88,7 @@ export default function OnboardingScreen({
         <View style={styles.safeArea}>
           <View style={[styles.content, contentContainerStyle]}>{children}</View>
         </View>
-      </LinearGradient>
+      </View>
     </ImageBackground>
   );
 }
