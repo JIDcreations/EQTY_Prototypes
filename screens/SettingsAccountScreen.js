@@ -179,8 +179,8 @@ const createStyles = (colors, components) =>
     },
     rowCard: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     inlineField: {
       gap: components.layout.spacing.xs,
@@ -194,8 +194,8 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     valueText: {
       ...typography.styles.body,
@@ -204,8 +204,8 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     actions: {
       gap: components.layout.spacing.md,

@@ -107,7 +107,7 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.md,
       height: components.sizes.illustration.md,
       borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.background.surface, 0.6),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
     },
     accentOrbBottom: {
       position: 'absolute',
@@ -116,6 +116,6 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.xxl,
       height: components.sizes.illustration.xxl,
       borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.accent.primary, 0.08),
+      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
     },
   });

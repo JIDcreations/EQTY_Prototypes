@@ -61,7 +61,7 @@ const createStyles = (colors, components) =>
       gap: components.layout.spacing.md,
     },
     bordered: {
-      borderColor: toRgba(colors.text.primary, components.opacity.value35),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     iconWrap: {
       borderRadius: components.radius.pill,

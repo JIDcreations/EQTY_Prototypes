@@ -206,7 +206,7 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.app,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       alignItems: 'center',
       justifyContent: 'center',
       position: 'relative',
@@ -226,16 +226,16 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     inputRow: {
       ...components.input.container,
       flexDirection: 'row',
       alignItems: 'center',
       gap: components.layout.spacing.sm,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     inputField: {
       ...components.input.text,
@@ -261,13 +261,11 @@ const createStyles = (colors, components) =>
     dividerLine: {
       flex: 1,
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
-      opacity: components.opacity.value20,
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     dividerText: {
       ...typography.styles.meta,
       color: colors.text.secondary,
-      opacity: components.opacity.value60,
     },
     socialRow: {
       flexDirection: 'row',
@@ -279,7 +277,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       borderRadius: components.radius.input,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.background.app, components.opacity.value20),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       backgroundColor: colors.text.primary,
       minHeight: components.sizes.input.minHeight,
       flexDirection: 'row',
@@ -290,7 +288,6 @@ const createStyles = (colors, components) =>
     socialText: {
       ...typography.styles.small,
       color: colors.background.app,
-      opacity: components.opacity.value90,
     },
     linkInline: {
       paddingTop: components.layout.spacing.sm,

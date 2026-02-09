@@ -114,8 +114,8 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     textSizeLeft: {
       flexDirection: 'row',
@@ -143,7 +143,7 @@ const createStyles = (colors, components) =>
       height: components.sizes.track.sm,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.text.secondary,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -158,8 +158,8 @@ const createStyles = (colors, components) =>
     },
     previewCard: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       gap: components.layout.spacing.xs,
     },
     previewTitle: {

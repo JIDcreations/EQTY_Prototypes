@@ -24,10 +24,11 @@ export default function BottomSheet({
   const scrimMaxOpacity =
     typeof scrimOpacityOverride === 'number'
       ? scrimOpacityOverride
-      : components.opacity.value50;
+      : colors.opacity.surface;
+  const scrimMinOpacity = Math.min(colors.opacity.stroke, scrimMaxOpacity);
   const styles = useMemo(
-    () => createStyles(colors, components, scrimMaxOpacity),
-    [colors, components, scrimMaxOpacity]
+    () => createStyles(colors, components),
+    [colors, components]
   );
   const sheetTranslateDistance =
     components.layout.spacing.xxl * 2 +
@@ -51,14 +52,21 @@ export default function BottomSheet({
       translateY.value = sheetTranslateDistance;
       scrimOpacity.value = 0;
       translateY.value = withTiming(0, { duration: 220 });
-      scrimOpacity.value = withTiming(1, { duration: 220 });
+      scrimOpacity.value = withTiming(scrimMaxOpacity, { duration: 220 });
     } else if (isMounted) {
       translateY.value = withTiming(sheetTranslateDistance, { duration: 180 }, (finished) => {
         if (finished) runOnJS(setIsMounted)(false);
       });
       scrimOpacity.value = withTiming(0, { duration: 180 });
     }
-  }, [visible, isMounted, scrimOpacity, sheetTranslateDistance, translateY]);
+  }, [
+    isMounted,
+    scrimMaxOpacity,
+    scrimOpacity,
+    sheetTranslateDistance,
+    translateY,
+    visible,
+  ]);
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -71,8 +79,10 @@ export default function BottomSheet({
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       translateY.value = Math.max(0, event.translationY);
-      const nextOpacity = 1 - Math.min(event.translationY / scrimFadeDistance, 1) * 0.5;
-      scrimOpacity.value = Math.max(0, nextOpacity);
+      const fadeRatio = Math.min(event.translationY / scrimFadeDistance, 1);
+      const nextOpacity =
+        scrimMaxOpacity - fadeRatio * (scrimMaxOpacity - scrimMinOpacity);
+      scrimOpacity.value = Math.max(scrimMinOpacity, nextOpacity);
     })
     .onEnd((event) => {
       const shouldClose =
@@ -82,7 +92,7 @@ export default function BottomSheet({
         runOnJS(handleClose)();
       } else {
         translateY.value = withTiming(0, { duration: 180 });
-        scrimOpacity.value = withTiming(1, { duration: 180 });
+        scrimOpacity.value = withTiming(scrimMaxOpacity, { duration: 180 });
       }
     });
 
@@ -124,9 +134,7 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors, components, scrimMaxOpacity) => {
-  const scrimColor = toRgba(colors.text.primary, scrimMaxOpacity);
-
+const createStyles = (colors, components) => {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -134,7 +142,7 @@ const createStyles = (colors, components, scrimMaxOpacity) => {
     },
     scrim: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: scrimColor,
+      backgroundColor: colors.text.primary,
     },
     scrimPressable: {
       flex: 1,
@@ -144,7 +152,7 @@ const createStyles = (colors, components, scrimMaxOpacity) => {
       borderTopLeftRadius: components.radius.card,
       borderTopRightRadius: components.radius.card,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.spacing.md,
       paddingBottom: components.layout.spacing.xxl + components.layout.safeArea.bottom,

@@ -120,7 +120,7 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.pill,
       backgroundColor: colors.background.app,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       alignItems: 'center',
       justifyContent: 'center',
       position: 'relative',
@@ -137,8 +137,8 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     hint: {
       ...components.input.helper,

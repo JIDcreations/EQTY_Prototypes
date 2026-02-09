@@ -380,8 +380,8 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
     },
     stickyControls: {
       gap: components.layout.spacing.md,
@@ -396,13 +396,13 @@ const createStyles = (colors, components) =>
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
       borderRadius: components.radius.input,
       paddingHorizontal: components.layout.spacing.lg,
       paddingVertical: components.layout.spacing.md,
       gap: components.layout.spacing.sm,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     searchInput: {
       flex: 1,
@@ -431,15 +431,15 @@ const createStyles = (colors, components) =>
       paddingVertical: components.layout.spacing.xs,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value80),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     },
     filterChipActive: {
       backgroundColor: colors.accent.primary,
-      borderColor: toRgba(colors.text.onAccent, components.opacity.value20),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     filterChipPressed: {
-      opacity: components.opacity.value90,
+      opacity: colors.opacity.emphasis,
     },
     filterChipText: {
       ...typography.styles.small,
@@ -480,8 +480,8 @@ const createStyles = (colors, components) =>
     termsCard: {
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
       gap: components.layout.spacing.md,
     },
     termsHeader: {
@@ -511,7 +511,7 @@ const createStyles = (colors, components) =>
     },
     termDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     termRowTop: {
       flexDirection: 'row',
@@ -538,11 +538,11 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value90),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     },
     scrollTopButtonPressed: {
-      opacity: components.opacity.value80,
+      opacity: colors.opacity.emphasis,
     },
     sheetSection: {
       gap: components.layout.spacing.xs,

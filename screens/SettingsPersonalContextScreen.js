@@ -136,7 +136,7 @@ const createStyles = (colors, components) =>
     },
     questionDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.ui.divider, components.opacity.value35),
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       paddingBottom: components.layout.spacing.lg,
       marginBottom: components.layout.spacing.lg,
     },
@@ -152,14 +152,14 @@ const createStyles = (colors, components) =>
       ...components.input.container,
       ...components.input.multiline,
       ...components.input.text,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       textAlignVertical: 'top',
     },
     noteCard: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.md,
     },
     noteText: {

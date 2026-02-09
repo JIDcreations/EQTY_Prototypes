@@ -162,7 +162,7 @@ const createStyles = (colors, components) =>
     learnCard: {
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.ui.border, colors.opacity.stroke),
       backgroundColor: colors.background.surfaceActive,
     },
     bulletList: {
@@ -179,7 +179,7 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.pill,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: toRgba(colors.accent.primary, 0.18),
+      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
       marginTop: components.layout.spacing.none,
     },
     bulletIndexText: {
@@ -197,7 +197,7 @@ const createStyles = (colors, components) =>
     structureCard: {
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     structureTitle: {
       ...typography.styles.h3,
@@ -210,11 +210,11 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       backgroundColor: colors.background.surfaceActive,
     },
     structurePressed: {
-      opacity: components.opacity.value90,
+      opacity: colors.opacity.emphasis,
     },
     structureRow: {
       flexDirection: 'row',

@@ -83,7 +83,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.ui.border, colors.opacity.stroke),
     },
     badgeDot: {
       width: components.sizes.dot.xs,
@@ -115,7 +115,7 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.smAlt,
       height: components.sizes.illustration.smAlt,
       borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.background.surface, 0.65),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
     },
     accentOrbBottom: {
       position: 'absolute',
@@ -124,6 +124,6 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.xl,
       height: components.sizes.illustration.xl,
       borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.accent.primary, 0.08),
+      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
     },
   });

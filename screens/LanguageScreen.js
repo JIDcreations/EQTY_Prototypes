@@ -9,6 +9,15 @@ import { useApp } from '../utils/AppContext';
 import { getLanguageOptions, getSettingsCopy } from '../utils/localization';
 import useToast from '../utils/useToast';
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function LanguageScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
   const { colors, components } = useTheme();
@@ -86,7 +95,7 @@ const createStyles = (colors, components) =>
     },
     rowDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     rowLeft: {
       flexDirection: 'row',
@@ -106,7 +115,7 @@ const createStyles = (colors, components) =>
       height: components.sizes.track.sm,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.text.secondary,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       alignItems: 'center',
       justifyContent: 'center',
     },

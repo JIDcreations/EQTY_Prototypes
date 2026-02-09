@@ -23,6 +23,15 @@ export default function OnboardingStackedCard({
   );
 }
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 const createStyles = (colors, components) =>
   StyleSheet.create({
     stack: {
@@ -36,8 +45,7 @@ const createStyles = (colors, components) =>
       right: components.offsets.stackedCard.insetSm,
       height: components.sizes.card.stackHeight,
       borderRadius: components.radius.card,
-      backgroundColor: colors.background.surfaceActive,
-      opacity: components.opacity.value60,
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
       transform: [{ rotate: '-1deg' }],
     },
     ghostTwo: {
@@ -47,8 +55,7 @@ const createStyles = (colors, components) =>
       right: components.offsets.stackedCard.insetMd,
       height: components.sizes.card.stackHeight,
       borderRadius: components.radius.card,
-      backgroundColor: colors.background.surfaceActive,
-      opacity: components.opacity.value35,
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.stroke),
       transform: [{ rotate: '1.5deg' }],
     },
     card: {
@@ -57,7 +64,7 @@ const createStyles = (colors, components) =>
       padding: components.layout.spacing.lg,
       gap: components.layout.cardGap,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.ui.border, colors.opacity.stroke),
       shadowColor: colors.background.app,
       shadowOpacity: components.shadows.stackedCard.opacity,
       shadowRadius: components.shadows.stackedCard.radius,

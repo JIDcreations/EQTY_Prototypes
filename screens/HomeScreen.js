@@ -286,8 +286,8 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
     },
     section: {
       gap: components.layout.spacing.md,
@@ -303,8 +303,8 @@ const createStyles = (colors, components) =>
     heroCard: {
       padding: components.layout.spacing.xxl,
       gap: components.layout.spacing.lg,
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     heroStepLabel: {
       ...typography.styles.stepLabel,
@@ -345,13 +345,13 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.card,
     },
     themeItemPressed: {
-      opacity: components.opacity.value94,
+      opacity: colors.opacity.emphasis,
       transform: [{ scale: components.transforms.scalePressed }],
     },
     themeCard: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.xs,
     },
@@ -397,13 +397,13 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.card,
     },
     actionItemPressed: {
-      opacity: components.opacity.value94,
+      opacity: colors.opacity.emphasis,
       transform: [{ scale: components.transforms.scalePressed }],
     },
     actionCard: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.sm,
       alignItems: 'flex-start',
@@ -418,7 +418,6 @@ const createStyles = (colors, components) =>
       color: colors.text.secondary,
     },
     trajectoryBar: {
-      opacity: components.opacity.value80,
     },
     trajectoryMeta: {
       ...typography.styles.stepLabel,

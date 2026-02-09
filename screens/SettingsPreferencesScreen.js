@@ -122,11 +122,11 @@ const createStyles = (colors, components) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     languageRowActive: {
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     rowLeft: {
       flexDirection: 'row',
@@ -146,7 +146,7 @@ const createStyles = (colors, components) =>
       height: components.sizes.track.sm,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.text.secondary,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -164,8 +164,8 @@ const createStyles = (colors, components) =>
     },
     appearanceContainer: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.xs,
     },
   });

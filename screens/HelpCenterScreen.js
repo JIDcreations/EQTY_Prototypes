@@ -50,6 +50,15 @@ const GUIDE_ITEMS = [
   },
 ];
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function HelpCenterScreen({ navigation }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
@@ -199,7 +208,7 @@ const createStyles = (colors, components) =>
     },
     listDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     itemTitle: {
       ...typography.styles.body,

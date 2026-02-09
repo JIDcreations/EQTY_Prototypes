@@ -158,7 +158,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.ui.border, colors.opacity.stroke),
     },
     badgeDot: {
       width: components.sizes.dot.xs,
@@ -191,6 +191,6 @@ const createStyles = (colors, components) =>
     input: {
       ...components.input.container,
       ...components.input.text,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
   });

@@ -87,11 +87,11 @@ const createStyles = (colors, components) =>
       paddingVertical: components.layout.spacing.xs,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
     },
     glossaryButtonPressed: {
-      opacity: components.opacity.value90,
+      opacity: colors.opacity.emphasis,
     },
     glossaryLabel: {
       ...typography.styles.small,

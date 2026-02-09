@@ -321,7 +321,7 @@ export default function LessonStepScreen() {
                   value={lessonTermQuery}
                   onChangeText={setLessonTermQuery}
                   placeholder="Search all terms"
-                  placeholderTextColor={toRgba(colors.text.secondary, 0.6)}
+                  placeholderTextColor={colors.text.secondary}
                   style={styles.lessonGlossarySearchInput}
                 />
                 {lessonTermQuery ? (
@@ -572,8 +572,11 @@ function IntroScenarioStep({ onNext, copy }) {
   const [progress, setProgress] = useState(0);
   const clampedProgress = Math.max(0, Math.min(progress, totalSteps));
   const progressRatio = totalSteps ? clampedProgress / totalSteps : 0;
-  const structuredEmphasis = 0.8 + 0.2 * progressRatio;
-  const reactiveEmphasis = 0.7 - 0.2 * progressRatio;
+  const structuredEmphasis =
+    colors.opacity.surface + (1 - colors.opacity.surface) * progressRatio;
+  const reactiveEmphasis =
+    colors.opacity.surface -
+    (colors.opacity.surface - colors.opacity.stroke) * progressRatio;
 
   const structuredSteps = steps.map((step, index) => {
     const threshold = index + 1;
@@ -618,7 +621,12 @@ function IntroScenarioStep({ onNext, copy }) {
       </View>
 
       <View style={styles.scenarioCompareGrid}>
-        <Card style={[styles.scenarioComparePanel, { opacity: structuredEmphasis }]}>
+        <Card
+          style={[
+            styles.scenarioComparePanel,
+            { backgroundColor: toRgba(colors.background.surface, structuredEmphasis) },
+          ]}
+        >
           <View style={styles.scenarioCompareHeader}>
             <AppText style={styles.scenarioCompareLabel}>
               {copy.introScenario.structuredLabel}
@@ -673,7 +681,7 @@ function IntroScenarioStep({ onNext, copy }) {
           style={[
             styles.scenarioComparePanel,
             styles.scenarioComparePanelReactive,
-            { opacity: reactiveEmphasis },
+            { backgroundColor: toRgba(colors.background.surfaceActive, reactiveEmphasis) },
           ]}
         >
           <View style={styles.scenarioCompareHeader}>
@@ -743,8 +751,9 @@ function ScenarioCurve({ variant, progress, label }) {
   const points =
     variant === 'stable' ? STABLE_CURVE_POINTS : VOLATILE_CURVE_POINTS;
   const smoothPoints = useMemo(() => getSmoothPoints(points, 14), [points]);
-  const lineColor =
-    variant === 'stable' ? colors.accent.primary : toRgba(colors.text.secondary, 0.9);
+  const lineBase = variant === 'stable' ? colors.accent.primary : colors.text.secondary;
+  const lineAlpha =
+    colors.opacity.stroke + (1 - colors.opacity.stroke) * clampedProgress;
 
   const { segments, totalLength } = useMemo(() => {
     if (!size.width || !size.height) return { segments: [], totalLength: 0 };
@@ -775,14 +784,7 @@ function ScenarioCurve({ variant, progress, label }) {
           })
         }
       >
-        <View
-          style={[
-            styles.scenarioCurveLine,
-            {
-              opacity: components.opacity.value20 + components.opacity.value80 * clampedProgress,
-            },
-          ]}
-        >
+        <View style={styles.scenarioCurveLine}>
           {segments.map((segment) => {
             if (!totalLength) return null;
             const visibleLength = Math.max(
@@ -799,7 +801,7 @@ function ScenarioCurve({ variant, progress, label }) {
                     width: visibleLength,
                     left: segment.x,
                     top: segment.y,
-                    backgroundColor: lineColor,
+                    backgroundColor: toRgba(lineBase, lineAlpha),
                     transform: [{ rotate: `${segment.angle}deg` }],
                   },
                 ]}
@@ -1026,7 +1028,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm, copy }) {
               >
                 <GlossaryText
                   text={item.label}
-                  style={styles.optionText}
+                  style={[styles.optionText, isSelected && styles.optionTextDisabled]}
                   onPressTerm={onPressTerm}
                 />
               </Pressable>
@@ -1715,7 +1717,7 @@ function ReflectionStep({ content, onSubmit, onPressTerm, copy, keyboardOffset }
                 setResponse(null);
               }}
               placeholder={placeholder}
-              placeholderTextColor={toRgba(colors.text.secondary, 0.7)}
+              placeholderTextColor={colors.text.secondary}
               multiline
             />
             <Pressable
@@ -2029,7 +2031,7 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.card,
     padding: components.layout.spacing.lg,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
     gap: components.layout.spacing.md,
     justifyContent: 'center',
@@ -2045,7 +2047,7 @@ const createStyles = (colors, components) =>
     paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   journeyStepText: {
@@ -2056,7 +2058,7 @@ const createStyles = (colors, components) =>
     width: components.sizes.square.xs,
     height: components.sizes.line.thin,
     borderRadius: components.radius.pill,
-    backgroundColor: toRgba(colors.accent.primary, 0.4),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.surface),
   },
   journeyLabel: {
     ...typography.styles.body,
@@ -2081,7 +2083,7 @@ const createStyles = (colors, components) =>
   journeyVisual: {
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
     padding: components.layout.spacing.md,
     height: components.sizes.chart.xl,
@@ -2093,7 +2095,7 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.text.secondary, 0.3),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     alignItems: 'center',
     justifyContent: 'center',
     gap: components.layout.spacing.xs,
@@ -2128,7 +2130,7 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.input,
     backgroundColor: colors.background.surfaceActive,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.text.primary,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   segmentLabel: {
     ...typography.styles.small,
@@ -2163,7 +2165,7 @@ const createStyles = (colors, components) =>
     justifyContent: 'center',
   },
   lessonGlossaryClearPressed: {
-    opacity: components.opacity.value60,
+    opacity: colors.opacity.emphasis,
   },
   lessonGlossaryContent: {
     flex: 1,
@@ -2183,7 +2185,7 @@ const createStyles = (colors, components) =>
   },
   lessonGlossaryDivider: {
     borderBottomWidth: components.borderWidth.thin,
-    borderBottomColor: toRgba(colors.ui.divider, components.opacity.value45),
+    borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   lessonGlossaryRowTop: {
     flexDirection: 'row',
@@ -2227,12 +2229,12 @@ const createStyles = (colors, components) =>
     padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
     gap: components.layout.spacing.lg,
   },
   scenarioComparePanelReactive: {
-    borderColor: toRgba(colors.text.secondary, 0.3),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   scenarioCompareHeader: {
@@ -2265,7 +2267,7 @@ const createStyles = (colors, components) =>
     height: components.sizes.dot.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: toRgba(colors.text.secondary, 0.5),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   scenarioCompareNodeActive: {
@@ -2274,34 +2276,34 @@ const createStyles = (colors, components) =>
   },
   scenarioCompareNodeActiveReactive: {
     backgroundColor: colors.text.primary,
-    borderColor: colors.text.primary,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioCompareNodeCurrent: {
     backgroundColor: colors.text.primary,
-    borderColor: colors.text.primary,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioCompareNodeMissing: {
     backgroundColor: 'transparent',
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.text.secondary, 0.45),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioCompareLine: {
     width: components.sizes.line.thin,
     height: components.sizes.track.sm,
     marginTop: components.layout.spacing.xs,
-    backgroundColor: toRgba(colors.text.secondary, 0.35),
+    backgroundColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioCompareLineActive: {
-    backgroundColor: toRgba(colors.accent.primary, 0.65),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.surface),
   },
   scenarioCompareLineActiveReactive: {
-    backgroundColor: toRgba(colors.text.primary, 0.75),
+    backgroundColor: toRgba(colors.text.primary, colors.opacity.surface),
   },
   scenarioCompareLineMissing: {
     backgroundColor: 'transparent',
     borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.text.secondary, 0.35),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioCompareStepLabel: {
     ...typography.styles.body,
@@ -2362,14 +2364,14 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.input,
   },
   outcomePressablePressed: {
-    opacity: components.opacity.value95,
+    opacity: colors.opacity.emphasis,
     transform: [{ scale: components.transforms.scalePressed }],
   },
   scenarioPanel: {
     padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
     gap: components.layout.spacing.md,
   },
@@ -2387,11 +2389,11 @@ const createStyles = (colors, components) =>
     paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: toRgba(colors.accent.primary, 0.6),
-    backgroundColor: toRgba(colors.accent.primary, 0.12),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   scenarioBadgeMuted: {
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   scenarioBadgeText: {
@@ -2420,29 +2422,29 @@ const createStyles = (colors, components) =>
     backgroundColor: colors.accent.primary,
   },
   scenarioNodeDegraded: {
-    opacity: components.opacity.value40,
+    backgroundColor: toRgba(colors.text.secondary, colors.opacity.surface),
   },
   scenarioNodeMissing: {
     backgroundColor: 'transparent',
     borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.text.secondary, 0.6),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioRailLine: {
     width: components.sizes.line.thin,
     height: components.sizes.track.sm,
     marginTop: components.layout.spacing.xs,
-    backgroundColor: toRgba(colors.text.secondary, 0.5),
+    backgroundColor: toRgba(colors.text.secondary, colors.opacity.surface),
   },
   scenarioRailLineBroken: {
     backgroundColor: 'transparent',
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
     borderStyle: 'dashed',
-    borderColor: toRgba(colors.text.secondary, 0.5),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   scenarioRailLineDegraded: {
-    opacity: components.opacity.value40,
+    backgroundColor: toRgba(colors.text.secondary, colors.opacity.stroke),
   },
   scenarioRailLabel: {
     ...typography.styles.body,
@@ -2475,7 +2477,7 @@ const createStyles = (colors, components) =>
     paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: toRgba(colors.accent.primary, 0.6),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
   },
   scenarioPrematureText: {
     ...typography.styles.meta,
@@ -2486,12 +2488,12 @@ const createStyles = (colors, components) =>
     padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   outcomePanelActive: {
-    borderColor: toRgba(colors.accent.primary, 0.7),
-    backgroundColor: toRgba(colors.accent.primary, 0.08),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   outcomeHeader: {
     flexDirection: 'row',
@@ -2519,12 +2521,12 @@ const createStyles = (colors, components) =>
     paddingVertical: components.layout.spacing.xs,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: toRgba(colors.text.secondary, 0.4),
-    backgroundColor: toRgba(colors.text.secondary, 0.12),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.text.secondary, colors.opacity.tint),
   },
   outcomeFocusPillActive: {
-    borderColor: toRgba(colors.accent.primary, 0.8),
-    backgroundColor: toRgba(colors.accent.primary, 0.18),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   outcomeFocusText: {
     ...typography.styles.meta,
@@ -2566,14 +2568,14 @@ const createStyles = (colors, components) =>
   option: {
     padding: components.layout.spacing.sm,
     borderRadius: components.radius.input,
-    backgroundColor: colors.background.surfaceActive,
+    backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.text.primary,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   optionActive: {
-    backgroundColor: colors.background.surfaceActive,
+    backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.text.primary,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   optionText: {
     ...typography.styles.small,
@@ -2629,19 +2631,19 @@ const createStyles = (colors, components) =>
     padding: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
     minHeight: components.sizes.list.minItemHeight,
   },
   exerciseSlotExecution: {
-    borderColor: toRgba(colors.accent.primary, 0.6),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
   },
   exerciseSlotWrong: {
-    borderColor: toRgba(colors.accent.primary, 0.8),
-    backgroundColor: toRgba(colors.accent.primary, 0.08),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   exerciseSlotHint: {
-    borderColor: toRgba(colors.accent.primary, 0.6),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
   },
   exerciseSlotIndex: {
     width: components.sizes.square.sm,
@@ -2678,7 +2680,7 @@ const createStyles = (colors, components) =>
     paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   exerciseChipText: {
@@ -2709,7 +2711,7 @@ const createStyles = (colors, components) =>
     padding: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   exerciseOutcomeHeader: {
@@ -2743,7 +2745,7 @@ const createStyles = (colors, components) =>
     backgroundColor: colors.text.secondary,
   },
   exerciseLineReactive: {
-    backgroundColor: toRgba(colors.text.secondary, 0.7),
+    backgroundColor: toRgba(colors.text.secondary, colors.opacity.surface),
   },
   exerciseOutcomeText: {
     ...typography.styles.small,
@@ -2765,7 +2767,7 @@ const createStyles = (colors, components) =>
     borderRadius: components.radius.input,
     backgroundColor: colors.background.surfaceActive,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.text.primary,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   sequenceIndex: {
     width: components.sizes.square.xs,
@@ -2804,7 +2806,11 @@ const createStyles = (colors, components) =>
     color: colors.text.secondary,
   },
   optionDisabled: {
-    opacity: components.opacity.value45,
+    backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.stroke),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+  },
+  optionTextDisabled: {
+    color: colors.text.secondary,
   },
   resultsBlock: {
     gap: components.layout.spacing.sm,
@@ -2869,7 +2875,7 @@ const createStyles = (colors, components) =>
     marginTop: 'auto',
     paddingTop: components.layout.spacing.sm,
     borderTopWidth: components.borderWidth.thin,
-    borderTopColor: toRgba(colors.text.secondary, 0.25),
+    borderTopColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   reflectionClosedCard: {
     flexDirection: 'row',
@@ -2879,7 +2885,7 @@ const createStyles = (colors, components) =>
     paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   reflectionClosedTextWrap: {
@@ -2900,7 +2906,7 @@ const createStyles = (colors, components) =>
     paddingVertical: components.layout.spacing.sm,
     paddingHorizontal: components.layout.spacing.md,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   chatBubbleSystem: {
@@ -2909,8 +2915,8 @@ const createStyles = (colors, components) =>
   },
   chatBubbleUser: {
     alignSelf: 'flex-end',
-    borderColor: toRgba(colors.accent.primary, 0.6),
-    backgroundColor: toRgba(colors.accent.primary, 0.08),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   chatLabel: {
     ...typography.styles.meta,
@@ -2941,14 +2947,15 @@ const createStyles = (colors, components) =>
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: components.borderWidth.thin,
-    borderColor: toRgba(colors.text.secondary, 0.5),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   reflectionSendButtonPressed: {
     transform: [{ scale: components.transforms.scalePressedStrong }],
   },
   reflectionSendButtonDisabled: {
-    opacity: components.opacity.value50,
+    backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   reflectionSavedPill: {
     alignSelf: 'flex-start',
@@ -2959,7 +2966,7 @@ const createStyles = (colors, components) =>
     paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   reflectionSavedText: {
@@ -3021,7 +3028,7 @@ const createStyles = (colors, components) =>
     bottom: components.layout.spacing.xs,
     width: components.sizes.line.thin,
     borderRadius: components.radius.pill,
-    backgroundColor: toRgba(colors.text.secondary, 0.25),
+    backgroundColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   processStationBlock: {
     gap: components.layout.spacing.xs,
@@ -3035,7 +3042,7 @@ const createStyles = (colors, components) =>
     gap: components.layout.spacing.sm,
   },
   processStationRowActive: {
-    backgroundColor: toRgba(colors.background.surfaceActive, 0.6),
+    backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     borderRadius: components.radius.input,
     paddingVertical: components.layout.spacing.sm,
     paddingHorizontal: components.layout.spacing.sm,
@@ -3045,20 +3052,20 @@ const createStyles = (colors, components) =>
     paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
     gap: components.layout.spacing.md,
   },
   summaryStationRowActive: {
-    borderColor: toRgba(colors.accent.primary, 0.6),
-    backgroundColor: toRgba(colors.accent.primary, 0.08),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   processNode: {
     width: components.sizes.dot.lg,
     height: components.sizes.dot.lg,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   processNodeActive: {
@@ -3082,15 +3089,15 @@ const createStyles = (colors, components) =>
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   summaryStationIndicator: {
-    borderColor: toRgba(colors.text.secondary, 0.5),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
   summaryStationIndicatorActive: {
-    borderColor: toRgba(colors.accent.primary, 0.7),
-    backgroundColor: toRgba(colors.accent.primary, 0.12),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   processStationIndex: {
     ...typography.styles.stepLabel,
@@ -3111,12 +3118,12 @@ const createStyles = (colors, components) =>
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   summaryIndexChipActive: {
-    borderColor: toRgba(colors.accent.primary, 0.7),
-    backgroundColor: toRgba(colors.accent.primary, 0.18),
+    borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+    backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
   },
   summaryIndexText: {
     ...typography.styles.stepLabel,
@@ -3131,7 +3138,7 @@ const createStyles = (colors, components) =>
     paddingHorizontal: components.layout.spacing.sm,
     borderRadius: components.radius.input,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
     gap: components.layout.spacing.sm,
   },
@@ -3139,7 +3146,7 @@ const createStyles = (colors, components) =>
     marginLeft: components.sizes.square.md + components.layout.spacing.md,
     paddingVertical: components.layout.spacing.md,
     paddingHorizontal: components.layout.spacing.md,
-    borderColor: toRgba(colors.text.secondary, 0.3),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   processDescription: {
@@ -3156,11 +3163,11 @@ const createStyles = (colors, components) =>
     paddingHorizontal: components.layout.spacing.md,
     borderRadius: components.radius.pill,
     borderWidth: components.borderWidth.thin,
-    borderColor: colors.ui.divider,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surfaceActive,
   },
   summaryProcessChip: {
-    borderColor: toRgba(colors.text.secondary, 0.35),
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     backgroundColor: colors.background.surface,
   },
   processChipText: {

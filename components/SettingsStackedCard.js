@@ -35,7 +35,7 @@ export default function SettingsStackedCard({
 const createStyles = (colors, components) =>
   StyleSheet.create({
     card: {
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value90),
-      borderColor: toRgba(colors.text.primary, components.opacity.value20),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
   });

@@ -3,6 +3,15 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { typography, useTheme } from '../theme';
 import AppText from './AppText';
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function Toast({ message, visible, onHide, duration = 1600 }) {
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
@@ -78,7 +87,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.md,
       alignItems: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     toastText: {
       ...typography.styles.small,

@@ -32,6 +32,15 @@ const TEXT_SIZE_OPTIONS = [
   { label: 'Large', value: 'Large' },
 ];
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function ProfileOverviewScreen() {
   const navigation = useNavigation();
   const { authUser, onboardingContext, preferences, updatePreferences, logOut } = useApp();
@@ -376,7 +385,7 @@ const createStyles = (colors, components) =>
       borderRadius: components.radius.card,
       overflow: 'hidden',
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.divider,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     textSizeRow: {
       flexDirection: 'row',
@@ -388,7 +397,7 @@ const createStyles = (colors, components) =>
     },
     rowDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     textSizeLeft: {
       flexDirection: 'row',
@@ -416,7 +425,7 @@ const createStyles = (colors, components) =>
       height: components.sizes.track.sm,
       borderRadius: components.radius.pill,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.text.secondary,
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       alignItems: 'center',
       justifyContent: 'center',
     },

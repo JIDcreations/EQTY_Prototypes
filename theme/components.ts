@@ -21,20 +21,6 @@ const borderWidth = {
   thin: 1,
 };
 
-const opacity = {
-  value95: 0.95,
-  value94: 0.94,
-  value90: 0.9,
-  value60: 0.6,
-  value55: 0.55,
-  value50: 0.5,
-  value45: 0.45,
-  value40: 0.4,
-  value35: 0.35,
-  value20: 0.2,
-  value80: 0.8,
-};
-
 const sizes = {
   icon: {
     xs: 14,
@@ -138,16 +124,6 @@ const offsets = {
   },
 };
 
-const shadows = {
-  stackedCard: {
-    opacity: 0.22,
-    radius: 16,
-    offsetX: 0,
-    offsetY: 10,
-    elevation: 6,
-  },
-};
-
 const transforms = {
   scalePressed: 0.99,
   scalePressedStrong: 0.96,
@@ -156,10 +132,17 @@ const transforms = {
 export const createComponents = (colors) => ({
   radius,
   borderWidth,
-  opacity,
   sizes,
   offsets,
-  shadows,
+  shadows: {
+    stackedCard: {
+      opacity: colors.opacity.stroke,
+      radius: 16,
+      offsetX: 0,
+      offsetY: 10,
+      elevation: 6,
+    },
+  },
   transforms,
   layout,
   screen: {
@@ -193,12 +176,12 @@ export const createComponents = (colors) => ({
     primary: {
       backgroundColor: colors.accent.primary,
       borderWidth: borderWidth.thin,
-      borderColor: toRgba(colors.text.onAccent, opacity.value20),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     secondary: {
       backgroundColor: colors.background.surface,
       borderWidth: borderWidth.thin,
-      borderColor: toRgba(colors.text.primary, opacity.value20),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     label: {
       ...typography.styles.bodyStrong,
@@ -209,7 +192,7 @@ export const createComponents = (colors) => ({
       color: colors.text.onAccent,
     },
     disabled: {
-      opacity: opacity.value55,
+      opacity: colors.opacity.surface,
     },
   },
   card: {
@@ -239,7 +222,7 @@ export const createComponents = (colors) => ({
       paddingHorizontal: layout.spacing.lg,
       backgroundColor: colors.background.surfaceActive,
       borderWidth: borderWidth.thin,
-      borderColor: toRgba(colors.text.primary, opacity.value20),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       minHeight: sizes.input.minHeight,
     },
     multiline: {
@@ -265,7 +248,7 @@ export const createComponents = (colors) => ({
     },
     divider: {
       borderBottomWidth: borderWidth.thin,
-      borderBottomColor: colors.ui.divider,
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     headerText: {
       ...typography.styles.h3,

@@ -24,6 +24,15 @@ import LessonsStack from './navigation/LessonsStack';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 function Tabs() {
   const { colors, typography, components } = useTheme();
   const tabBarHeight = components.layout.spacing.xxl * 2 + components.layout.safeArea.bottom;
@@ -38,7 +47,7 @@ function Tabs() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.background.surface,
-          borderTopColor: colors.ui.divider,
+          borderTopColor: toRgba(colors.ui.divider, colors.opacity.stroke),
           height: tabBarHeight,
           paddingTop: components.layout.spacing.xs,
           paddingBottom: tabBarPaddingBottom,

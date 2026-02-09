@@ -8,6 +8,15 @@ import { typography, useTheme } from '../../theme';
 import { useApp } from '../../utils/AppContext';
 import { getOnboardingCopy } from '../../utils/localization';
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function OnboardingConfirmationScreen() {
   const { updatePreferences, updateAuthUser, preferences } = useApp();
   const { colors, components } = useTheme();
@@ -74,7 +83,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.spacing.sm,
       paddingVertical: components.layout.spacing.xs,
       borderWidth: components.borderWidth.thin,
-      borderColor: colors.ui.border,
+      borderColor: toRgba(colors.ui.border, colors.opacity.stroke),
     },
     badgeDot: {
       width: components.sizes.dot.xs,

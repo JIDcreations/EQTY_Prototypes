@@ -32,8 +32,8 @@ export default function OnboardingScreen({
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const resolvedBackground = backgroundImages[backgroundVariant] || backgroundImages.bg2;
   const resolvedGradientColors = [
-    toRgba(colors.background.app, components.opacity.value35),
-    toRgba(colors.background.app, components.opacity.value35),
+    toRgba(colors.background.app, colors.opacity.stroke),
+    toRgba(colors.background.app, colors.opacity.stroke),
   ];
 
   if (scroll) {
@@ -146,8 +146,7 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.xxxl,
       height: components.sizes.illustration.xxxl,
       borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.accent.primary, 0.18),
-      opacity: components.opacity.value55,
+      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
     },
     glowMid: {
       position: 'absolute',
@@ -156,8 +155,7 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.xxl,
       height: components.sizes.illustration.xxl,
       borderRadius: components.radius.pill,
-      backgroundColor: colors.background.surfaceActive,
-      opacity: components.opacity.value55,
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     },
     glowBottom: {
       position: 'absolute',
@@ -166,7 +164,6 @@ const createStyles = (colors, components) =>
       width: components.sizes.illustration.lg,
       height: components.sizes.illustration.lg,
       borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.accent.primary, 0.18),
-      opacity: components.opacity.value35,
+      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
     },
   });

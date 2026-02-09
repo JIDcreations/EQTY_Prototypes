@@ -375,13 +375,13 @@ const createStyles = (colors, components) =>
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
     },
     currentCard: {
       ...components.input.container,
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value55),
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.md,
     },
@@ -411,17 +411,17 @@ const createStyles = (colors, components) =>
     },
     moduleCard: {
       ...components.input.container,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.sm,
     },
     moduleCardExpanded: {
-      borderColor: toRgba(colors.accent.primary, components.opacity.value60),
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
+      borderColor: toRgba(colors.accent.primary, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     },
     moduleCardPressed: {
-      opacity: components.opacity.value94,
+      opacity: colors.opacity.emphasis,
       transform: [{ scale: components.transforms.scalePressed }],
     },
     moduleHeaderRow: {
@@ -472,12 +472,11 @@ const createStyles = (colors, components) =>
       ...typography.styles.small,
       color: colors.text.secondary,
     },
-    moduleMetaCompleted: {
-      opacity: components.opacity.value60,
-    },
-    themeProgress: {
-      opacity: components.opacity.value90,
-    },
+  moduleMetaCompleted: {
+    color: colors.text.secondary,
+  },
+  themeProgress: {
+  },
     chevron: {
       transform: [{ rotate: '0deg' }],
     },
@@ -490,18 +489,18 @@ const createStyles = (colors, components) =>
     },
     lessonCard: {
       ...components.input.container,
-      borderColor: toRgba(colors.ui.divider, components.opacity.value35),
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value40),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
       padding: components.layout.spacing.md,
       gap: components.layout.spacing.sm,
       width: components.layout.contentWidth - components.layout.spacing.xxl,
     },
     lessonCardActive: {
-      borderColor: toRgba(colors.ui.divider, components.opacity.value45),
-      backgroundColor: toRgba(colors.background.surfaceActive, components.opacity.value55),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     },
     lessonCardPressed: {
-      opacity: components.opacity.value94,
+      opacity: colors.opacity.emphasis,
       transform: [{ scale: components.transforms.scalePressed }],
     },
     lessonHeader: {

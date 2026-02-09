@@ -86,15 +86,14 @@ const createStyles = (colors, components) =>
     },
     subtitle: {
       ...typography.styles.body,
-      color: colors.text.primary,
-      opacity: components.opacity.value80,
+      color: colors.text.secondary,
       textAlign: 'left',
     },
     actions: {
       gap: components.layout.spacing.md,
     },
     secondaryButton: {
-      backgroundColor: toRgba(colors.background.surface, components.opacity.value60),
-      borderColor: toRgba(colors.text.primary, components.opacity.value35),
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
   });

@@ -26,6 +26,9 @@ export default function SettingsRow({
   const { colors, components } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const Container = onPress ? Pressable : View;
+  const iconColor = disabled
+    ? toRgba(colors.text.secondary, colors.opacity.surface)
+    : colors.text.secondary;
 
   return (
     <Container
@@ -34,22 +37,27 @@ export default function SettingsRow({
       style={[
         styles.row,
         !isLast && styles.rowDivider,
-        disabled && styles.rowDisabled,
         containerStyle,
       ]}
     >
       <View style={styles.rowContent}>
-        <AppText style={styles.label}>{label}</AppText>
-        {subtitle ? <AppText style={styles.subtitle}>{subtitle}</AppText> : null}
+        <AppText style={[styles.label, disabled && styles.labelDisabled]}>{label}</AppText>
+        {subtitle ? (
+          <AppText style={[styles.subtitle, disabled && styles.subtitleDisabled]}>
+            {subtitle}
+          </AppText>
+        ) : null}
       </View>
       <View style={styles.rowRight}>
-        {value ? <AppText style={styles.value}>{value}</AppText> : null}
+        {value ? (
+          <AppText style={[styles.value, disabled && styles.valueDisabled]}>{value}</AppText>
+        ) : null}
         {right || null}
         {onPress ? (
           <Ionicons
             name="chevron-forward"
             size={components.sizes.icon.md}
-            color={colors.text.secondary}
+            color={iconColor}
           />
         ) : null}
       </View>
@@ -68,10 +76,7 @@ const createStyles = (colors, components) =>
     },
     rowDivider: {
       borderBottomWidth: components.borderWidth.thin,
-      borderBottomColor: toRgba(colors.text.primary, components.opacity.value20),
-    },
-    rowDisabled: {
-      opacity: components.opacity.value60,
+      borderBottomColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     rowContent: {
       flex: 1,
@@ -81,13 +86,22 @@ const createStyles = (colors, components) =>
       ...typography.styles.body,
       color: colors.text.primary,
     },
+    labelDisabled: {
+      color: toRgba(colors.text.primary, colors.opacity.surface),
+    },
     subtitle: {
       ...typography.styles.small,
       color: colors.text.secondary,
     },
+    subtitleDisabled: {
+      color: toRgba(colors.text.secondary, colors.opacity.surface),
+    },
     value: {
       ...typography.styles.small,
       color: colors.text.secondary,
+    },
+    valueDisabled: {
+      color: toRgba(colors.text.secondary, colors.opacity.surface),
     },
     rowRight: {
       flexDirection: 'row',

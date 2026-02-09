@@ -31,7 +31,7 @@ const createStyles = (colors, components) =>
       backgroundColor: colors.background.surfaceActive,
     },
     accent: {
-      backgroundColor: toRgba(colors.accent.primary, 0.18),
+      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
     },
     text: {
       ...typography.styles.small,
