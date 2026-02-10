@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import OnboardingScreen from '../components/OnboardingScreen';
 import OnboardingStackedCard from '../components/OnboardingStackedCard';
 import AppText from '../components/AppText';
@@ -15,7 +16,11 @@ export default function LessonSuccessScreen() {
   const { lessonId } = route.params || {};
   const { preferences } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const copy = useMemo(() => getLessonStepCopy(preferences?.language), [preferences?.language]);
   const content = getLessonContent(lessonId, preferences?.language);
   const lessonTitle = content?.title || copy.lessonSuccess.fallbackTitle;
@@ -37,6 +42,7 @@ export default function LessonSuccessScreen() {
     <OnboardingScreen
       gradientColors={[colors.background.app, colors.background.surfaceActive]}
       showGlow={false}
+      contentContainerStyle={styles.screen}
     >
       <View style={styles.container}>
         <View pointerEvents="none" style={styles.accentOrbTop} />
@@ -70,8 +76,11 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
+    screen: {
+      paddingBottom: tabBarHeight,
+    },
     container: {
       flex: 1,
       paddingBottom: components.layout.spacing.xl,

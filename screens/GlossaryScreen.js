@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
@@ -14,8 +15,12 @@ import { typography, useTheme } from '../theme';
 export default function GlossaryScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const tabBarHeight = useBottomTabBarHeight();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const [query, setQuery] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -349,7 +354,7 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -450,12 +455,11 @@ const createStyles = (colors, components) =>
     },
     scroll: {
       flex: 1,
-      marginBottom:
-        -(components.layout.spacing.xxl * 2 + components.layout.safeArea.bottom),
+      marginBottom: 0,
     },
     scrollContent: {
       paddingTop: components.layout.spacing.md,
-      paddingBottom: components.layout.spacing.none,
+      paddingBottom: tabBarHeight + components.layout.spacing.md,
       paddingHorizontal: components.layout.pagePaddingHorizontal,
     },
     termsBlock: {
@@ -531,7 +535,10 @@ const createStyles = (colors, components) =>
     scrollTopButton: {
       position: 'absolute',
       right: components.layout.spacing.lg,
-      bottom: components.layout.safeArea.bottom + components.layout.spacing.xxl,
+      bottom:
+        components.layout.safeArea.bottom +
+        tabBarHeight +
+        components.layout.spacing.xxl,
       width: components.sizes.square.md,
       height: components.sizes.square.md,
       borderRadius: components.radius.pill,

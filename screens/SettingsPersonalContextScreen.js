@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
@@ -13,7 +14,11 @@ import useToast from '../utils/useToast';
 export default function SettingsPersonalContextScreen({ navigation }) {
   const { onboardingContext, updateOnboardingContext } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const toast = useToast();
   const [experienceAnswer, setExperienceAnswer] = useState(
     onboardingContext?.experienceAnswer || ''
@@ -122,13 +127,16 @@ export default function SettingsPersonalContextScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     container: {
       flex: 1,
     },
     content: {
-      paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
+      paddingBottom:
+        components.layout.safeArea.bottom +
+        tabBarHeight +
+        components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
     questionBlock: {

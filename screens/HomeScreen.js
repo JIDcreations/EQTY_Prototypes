@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import { PrimaryButton } from '../components/Button';
@@ -18,9 +19,13 @@ import { useApp } from '../utils/AppContext';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const tabBarHeight = useBottomTabBarHeight();
   const { progress, authUser, preferences } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
 
   const localizedLessons = useMemo(
@@ -250,11 +255,12 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     content: {
       paddingTop: components.layout.safeArea.top + components.layout.spacing.xl,
-      paddingBottom: components.layout.safeArea.bottom,
+      paddingBottom:
+        components.layout.safeArea.bottom + tabBarHeight + components.layout.spacing.md,
     },
     topBlock: {
       gap: components.layout.spacing.md,

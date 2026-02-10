@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import GlossaryText from '../components/GlossaryText';
@@ -23,9 +24,13 @@ export default function LessonsScreen() {
   const route = useRoute();
   const scrollRef = useRef(null);
   const lastScrolled = useRef(null);
+  const tabBarHeight = useBottomTabBarHeight();
   const { progress, preferences } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const homeCopy = useMemo(
     () => getHomeCopy(preferences?.language),
     [preferences?.language]
@@ -350,13 +355,13 @@ const toRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: components.layout.safeArea.bottom,
+      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
     },
     headerRow: {
       flexDirection: 'row',

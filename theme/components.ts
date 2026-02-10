@@ -21,6 +21,16 @@ const borderWidth = {
   thin: 1,
 };
 
+const tabBar = {
+  height: layout.spacing.xxl * 2,
+  inset: layout.spacing.lg,
+  bottomOffset: 0,
+  paddingTop: layout.spacing.xs,
+  paddingBottom: layout.spacing.xs,
+  paddingHorizontal: layout.spacing.lg,
+  radius: radius.card,
+};
+
 const sizes = {
   icon: {
     xs: 14,
@@ -142,8 +152,27 @@ export const createComponents = (colors) => ({
       offsetY: 10,
       elevation: 6,
     },
+    tabBar: {
+      opacity: colors.opacity.stroke,
+      radius: 20,
+      offsetX: 0,
+      offsetY: 12,
+      elevation: 14,
+    },
   },
   transforms,
+  tabBar: {
+    height: tabBar.height,
+    inset: tabBar.inset,
+    bottomOffset: tabBar.bottomOffset,
+    paddingTop: tabBar.paddingTop,
+    paddingBottom: tabBar.paddingBottom,
+    paddingHorizontal: tabBar.paddingHorizontal,
+    radius: tabBar.radius,
+    background: toRgba(colors.background.surface, colors.opacity.surface),
+    borderWidth: borderWidth.thin,
+    borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+  },
   layout,
   screen: {
     safeArea: {

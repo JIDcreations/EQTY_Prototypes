@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import AppTextInput from '../components/AppTextInput';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
@@ -10,7 +11,11 @@ import useToast from '../utils/useToast';
 
 export default function ChangePasswordScreen({ navigation }) {
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const [currentPassword, setCurrentPassword] = useState('');
   const [nextPassword, setNextPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -81,7 +86,7 @@ export default function ChangePasswordScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     container: {
       ...components.screen.containerScroll,
@@ -92,7 +97,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: components.layout.safeArea.bottom,
+      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
     },
     section: {
       gap: components.layout.spacing.sm,

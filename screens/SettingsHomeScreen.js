@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import OnboardingScreen from '../components/OnboardingScreen';
 import SettingsHeader from '../components/SettingsHeader';
 import SettingsRow from '../components/SettingsRow';
@@ -58,7 +59,11 @@ const SETTINGS_CATEGORIES = [
 export default function SettingsHomeScreen({ navigation }) {
   const { logOut } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
 
   const handleLogOut = () => {
     Alert.alert('Log out', 'Are you sure you want to log out?', [
@@ -101,10 +106,13 @@ export default function SettingsHomeScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     content: {
-      paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
+      paddingBottom:
+        components.layout.safeArea.bottom +
+        tabBarHeight +
+        components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
     section: {

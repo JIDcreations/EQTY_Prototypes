@@ -7,7 +7,7 @@ export const colors = {
     },
     text: {
       primary: '#F2F4F6',
-      secondary: '#ACB4BF',
+      secondary: '#B4BCC6',
       onAccent: '#12161C',
     },
     ui: {

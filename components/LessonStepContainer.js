@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 import { useTheme } from '../theme';
 
 export default function LessonStepContainer({
@@ -9,7 +10,11 @@ export default function LessonStepContainer({
   contentStyle,
 }) {
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useContext(BottomTabBarHeightContext) || 0;
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const containerStyle = scrollEnabled
     ? [styles.content, styles.contentScroll, contentStyle]
     : [styles.content, styles.contentFixed, contentStyle];
@@ -35,7 +40,7 @@ export default function LessonStepContainer({
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     safeArea: {
       ...components.screen.container,
@@ -51,10 +56,11 @@ const createStyles = (colors, components) =>
     },
     contentScroll: {
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
-      paddingBottom: components.layout.safeArea.bottom,
+      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
     },
     contentFixed: {
       flex: 1,
+      paddingBottom: tabBarHeight,
     },
     contentInner: {
       flex: 1,

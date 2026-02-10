@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import SegmentedControl from '../components/SegmentedControl';
@@ -28,7 +29,11 @@ const toRgba = (hex, alpha) => {
 export default function SettingsPreferencesScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const toast = useToast();
   const options = useMemo(
     () => getLanguageOptions(preferences?.language),
@@ -98,13 +103,16 @@ export default function SettingsPreferencesScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     container: {
       flex: 1,
     },
     content: {
-      paddingBottom: components.layout.safeArea.bottom + components.layout.spacing.xl,
+      paddingBottom:
+        components.layout.safeArea.bottom +
+        tabBarHeight +
+        components.layout.spacing.xl,
       gap: components.layout.contentGap,
     },
     block: {

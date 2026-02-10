@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import { SecondaryButton } from '../components/Button';
 import Card from '../components/Card';
@@ -41,7 +42,11 @@ const FAQ_ITEMS = [
 
 export default function FAQScreen({ navigation }) {
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const tabBarHeight = useBottomTabBarHeight();
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
 
   return (
     <View style={styles.container}>
@@ -77,7 +82,7 @@ export default function FAQScreen({ navigation }) {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     container: {
       ...components.screen.containerScroll,
@@ -88,7 +93,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: components.layout.safeArea.bottom,
+      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
     },
     list: {
       gap: components.layout.spacing.md,

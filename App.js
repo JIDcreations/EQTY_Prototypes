@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useMemo } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,46 +24,57 @@ import LessonsStack from './navigation/LessonsStack';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const toRgba = (hex, alpha) => {
-  const cleaned = hex.replace('#', '');
-  const value = parseInt(cleaned, 16);
-  const r = (value >> 16) & 255;
-  const g = (value >> 8) & 255;
-  const b = value & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
 function Tabs() {
   const { colors, typography, components } = useTheme();
-  const tabBarHeight = components.layout.spacing.xxl * 2 + components.layout.safeArea.bottom;
-  const tabBarPaddingBottom = Math.max(
-    components.layout.safeArea.bottom,
-    components.layout.spacing.xs
-  );
+  const tabBarHeight = components.tabBar.height;
+  const tabBarBottom = components.layout.safeArea.bottom + components.tabBar.bottomOffset;
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.background.surface,
-          borderTopColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+          position: 'absolute',
+          left: components.tabBar.inset,
+          right: components.tabBar.inset,
+          bottom: tabBarBottom,
           height: tabBarHeight,
-          paddingTop: components.layout.spacing.xs,
-          paddingBottom: tabBarPaddingBottom,
+          paddingTop: components.tabBar.paddingTop,
+          paddingBottom: components.tabBar.paddingBottom,
+          paddingHorizontal: components.tabBar.paddingHorizontal,
+          borderRadius: components.tabBar.radius,
+          backgroundColor: components.tabBar.background,
+          borderWidth: components.tabBar.borderWidth,
+          borderColor: components.tabBar.borderColor,
+          shadowColor: colors.ui.divider,
+          shadowOpacity: components.shadows.tabBar.opacity,
+          shadowRadius: components.shadows.tabBar.radius,
+          shadowOffset: {
+            width: components.shadows.tabBar.offsetX,
+            height: components.shadows.tabBar.offsetY,
+          },
+          elevation: components.shadows.tabBar.elevation,
         },
         tabBarActiveTintColor: colors.accent.primary,
         tabBarInactiveTintColor: colors.text.secondary,
-        tabBarLabelStyle: {
-          ...typography.styles.small,
+        tabBarShowLabel: false,
+        tabBarItemStyle: {
+          borderRadius: components.radius.pill,
         },
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           let iconName = 'home-outline';
-          if (route.name === 'Home') iconName = 'home-outline';
-          if (route.name === 'Lessons') iconName = 'book-outline';
-          if (route.name === 'Glossary') iconName = 'list-outline';
-          if (route.name === 'Profile') iconName = 'person-outline';
-          return <Ionicons name={iconName} size={size} color={color} />;
+          if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
+          if (route.name === 'Lessons') iconName = focused ? 'book' : 'book-outline';
+          if (route.name === 'Glossary') iconName = focused ? 'list' : 'list-outline';
+          if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
+          return (
+            <View style={{ alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+              <Ionicons name={iconName} size={size} color={color} />
+              <Text style={{ ...typography.styles.meta, fontSize: 12, color }}>
+                {route.name}
+              </Text>
+            </View>
+          );
         },
       })}
     >

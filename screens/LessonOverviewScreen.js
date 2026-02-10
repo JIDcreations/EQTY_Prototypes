@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
@@ -14,10 +15,14 @@ import { typography, useTheme } from '../theme';
 export default function LessonOverviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const tabBarHeight = useBottomTabBarHeight();
   const { lessonId, entrySource } = route.params || {};
   const { preferences, onboardingContext } = useApp();
   const { colors, components } = useTheme();
-  const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const styles = useMemo(
+    () => createStyles(colors, components, tabBarHeight),
+    [colors, components, tabBarHeight]
+  );
   const [isStructureOpen, setIsStructureOpen] = useState(false);
   const overviewCopy = useMemo(
     () => getLessonOverviewCopy(preferences?.language),
@@ -127,7 +132,7 @@ export default function LessonOverviewScreen() {
   );
 }
 
-const createStyles = (colors, components) =>
+const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     container: {
       ...components.screen.containerScroll,
@@ -138,7 +143,7 @@ const createStyles = (colors, components) =>
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: components.layout.safeArea.bottom,
+      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
     },
     header: {
       gap: components.layout.spacing.sm,
