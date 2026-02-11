@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
+import GlossaryText from '../components/GlossaryText';
 import Card from '../components/Card';
 import { CtaButton, CtaSecondaryButton } from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
@@ -74,7 +75,7 @@ export default function LessonOverviewScreen() {
                 <View style={styles.bulletIndex}>
                   <AppText style={styles.bulletIndexText}>{index + 1}</AppText>
                 </View>
-                <AppText style={styles.bulletText}>{item}</AppText>
+                <GlossaryText style={styles.bulletText}>{item}</GlossaryText>
               </View>
             ))}
           </View>
@@ -97,7 +98,6 @@ export default function LessonOverviewScreen() {
             </Pressable>
             {isStructureOpen ? (
               <View style={styles.stepList}>
-                <AppText style={styles.flowHeader}>{overviewCopy.lessonFlowHeader}</AppText>
                 {overviewCopy.stepLabels.map((label, index) => (
                   <View key={label} style={styles.stepRow}>
                     <View style={styles.stepIndex}>
@@ -210,7 +210,7 @@ const createStyles = (colors, components, tabBarHeight) =>
       borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     structureTitle: {
-      ...typography.styles.h3,
+      ...typography.styles.bodyStrong,
       color: colors.text.primary,
     },
     structureToggle: {
@@ -235,10 +235,6 @@ const createStyles = (colors, components, tabBarHeight) =>
     stepList: {
       gap: components.layout.spacing.xs,
       paddingTop: components.layout.spacing.sm,
-    },
-    flowHeader: {
-      ...typography.styles.small,
-      color: colors.text.secondary,
     },
     stepRow: {
       flexDirection: 'row',
