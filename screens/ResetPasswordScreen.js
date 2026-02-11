@@ -95,7 +95,7 @@ const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     screen: {
       flex: 1,
-      paddingBottom: tabBarHeight + components.layout.spacing.md,
+      paddingBottom: tabBarHeight,
     },
     keyboard: {
       flex: 1,

@@ -12,7 +12,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { colors, typography, useTheme } from './theme';
 import { AppProvider, useApp } from './utils/AppContext';
 import { GlossaryProvider } from './components/GlossaryProvider';
-import AppTabBar from './components/AppTabBar';
 import HomeScreen from './screens/HomeScreen';
 import GlossaryScreen from './screens/GlossaryScreen';
 import ProfileStack from './navigation/ProfileStack';
@@ -27,12 +26,35 @@ const Stack = createStackNavigator();
 
 function Tabs() {
   const { colors, typography, components } = useTheme();
+  const tabBarHeight = components.tabBar.height;
+  const tabBarBottom = components.layout.safeArea.bottom + components.tabBar.bottomOffset;
 
   return (
     <Tab.Navigator
-      tabBar={(props) => <AppTabBar {...props} />}
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarStyle: {
+          position: 'absolute',
+          left: components.tabBar.inset,
+          right: components.tabBar.inset,
+          bottom: tabBarBottom,
+          height: tabBarHeight,
+          paddingTop: components.tabBar.paddingTop,
+          paddingBottom: components.tabBar.paddingBottom,
+          paddingHorizontal: components.tabBar.paddingHorizontal,
+          borderRadius: components.tabBar.radius,
+          backgroundColor: components.tabBar.background,
+          borderWidth: components.tabBar.borderWidth,
+          borderColor: components.tabBar.borderColor,
+          shadowColor: colors.ui.divider,
+          shadowOpacity: components.shadows.tabBar.opacity,
+          shadowRadius: components.shadows.tabBar.radius,
+          shadowOffset: {
+            width: components.shadows.tabBar.offsetX,
+            height: components.shadows.tabBar.offsetY,
+          },
+          elevation: components.shadows.tabBar.elevation,
+        },
         tabBarActiveTintColor: colors.accent.primary,
         tabBarInactiveTintColor: colors.text.secondary,
         tabBarShowLabel: false,

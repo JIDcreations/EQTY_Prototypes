@@ -22,7 +22,7 @@ const borderWidth = {
 };
 
 const tabBar = {
-  height: 67,
+  height: layout.spacing.xxl * 2,
   inset: layout.spacing.lg,
   bottomOffset: 0,
   paddingTop: layout.spacing.xs,
@@ -169,7 +169,7 @@ export const createComponents = (colors) => ({
     paddingBottom: tabBar.paddingBottom,
     paddingHorizontal: tabBar.paddingHorizontal,
     radius: tabBar.radius,
-    background: toRgba(colors.accent.primary, colors.opacity.surface),
+    background: toRgba(colors.background.surface, colors.opacity.surface),
     borderWidth: borderWidth.thin,
     borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },
