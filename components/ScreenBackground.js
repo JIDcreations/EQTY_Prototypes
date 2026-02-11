@@ -5,6 +5,7 @@ import { useTheme } from '../theme';
 const backgroundImages = {
   bg2: require('../assets/backgrounds/BG-2.png'),
   bg3: require('../assets/backgrounds/BG-3.png'),
+  light: require('../assets/backgrounds/WHITE-BLUR.png'),
 };
 
 const toRgba = (hex, alpha) => {
@@ -22,9 +23,12 @@ export default function ScreenBackground({
   showGlow = false,
   style,
 }) {
-  const { colors, components } = useTheme();
+  const { colors, components, mode } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const resolvedBackground = backgroundImages[variant] || backgroundImages.bg3;
+  const resolvedBackground =
+    mode === 'light'
+      ? backgroundImages.light
+      : backgroundImages[variant] || backgroundImages.bg3;
 
   return (
     <ImageBackground

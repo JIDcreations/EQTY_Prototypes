@@ -169,7 +169,7 @@ export const createComponents = (colors) => ({
     paddingBottom: tabBar.paddingBottom,
     paddingHorizontal: tabBar.paddingHorizontal,
     radius: tabBar.radius,
-    background: toRgba(colors.background.surface, colors.opacity.surface),
+    background: colors.background.surface,
     borderWidth: borderWidth.thin,
     borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
   },

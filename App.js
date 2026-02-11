@@ -26,14 +26,15 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function Tabs() {
-  const { colors, typography, components } = useTheme();
+  const { colors, typography, components, mode } = useTheme();
+  const isLight = mode === 'light';
 
   return (
     <Tab.Navigator
       tabBar={(props) => <AppTabBar {...props} />}
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.accent.primary,
+        tabBarActiveTintColor: isLight ? colors.text.primary : colors.accent.primary,
         tabBarInactiveTintColor: colors.text.secondary,
         tabBarShowLabel: false,
         tabBarItemStyle: {

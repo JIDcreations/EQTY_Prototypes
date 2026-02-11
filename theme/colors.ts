@@ -27,8 +27,8 @@ export const colors = {
   light: {
     background: {
       app: '#D8DDE4',
-      surface: '#E3E6EB',
-      surfaceActive: '#ECEEF1',
+      surface: '#E7EBF0',
+      surfaceActive: '#F1F4F8',
     },
     text: {
       primary: '#111317',
@@ -36,8 +36,8 @@ export const colors = {
       onAccent: '#111317',
     },
     ui: {
-      divider: '#D1D5DB',
-      border: '#D1D5DB',
+      divider: '#C4CBD4',
+      border: '#C4CBD4',
     },
     accent: {
       primary: '#FFD500',
