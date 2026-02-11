@@ -8,8 +8,14 @@ import AppText from './AppText';
 export const GlossaryContext = createContext(null);
 
 export function GlossaryProvider({ children }) {
-  const { colors, components } = useTheme();
+  const { colors, components, mode } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
+  const sheetBorderStyle = useMemo(() => {
+    if (mode !== 'light') return null;
+    return {
+      borderColor: colors.ui.border,
+    };
+  }, [colors.ui.border, mode]);
   const [activeTerm, setActiveTerm] = useState(null);
 
   const openTerm = useCallback((term) => {
@@ -52,6 +58,7 @@ export function GlossaryProvider({ children }) {
         onClose={closeTerm}
         title={activeTerm?.term}
         scrimOpacity={0}
+        sheetStyle={sheetBorderStyle}
       >
         <View style={styles.glossarySection}>
           <AppText style={styles.sheetLabel}>Definition</AppText>
