@@ -21,10 +21,10 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
   const { progress, authUser, preferences } = useApp();
-  const { colors, components } = useTheme();
+  const { colors, components, mode } = useTheme();
   const styles = useMemo(
-    () => createStyles(colors, components, tabBarHeight),
-    [colors, components, tabBarHeight]
+    () => createStyles(colors, components, tabBarHeight, mode),
+    [colors, components, tabBarHeight, mode]
   );
   const homeCopy = useMemo(() => getHomeCopy(preferences?.language), [preferences?.language]);
 
@@ -255,8 +255,9 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (colors, components, tabBarHeight) =>
-  StyleSheet.create({
+const createStyles = (colors, components, tabBarHeight, mode) => {
+  const isLight = mode === 'light';
+  return StyleSheet.create({
     content: {
       paddingTop: components.layout.safeArea.top + components.layout.spacing.xl,
       paddingBottom:
@@ -307,7 +308,9 @@ const createStyles = (colors, components, tabBarHeight) =>
       gap: components.layout.spacing.lg,
       backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
       borderWidth: components.borderWidth.thin,
-      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      borderColor: isLight
+        ? colors.ui.divider
+        : toRgba(colors.ui.divider, colors.opacity.stroke),
     },
     heroStepLabel: {
       ...typography.styles.stepLabel,
@@ -354,7 +357,9 @@ const createStyles = (colors, components, tabBarHeight) =>
     themeCard: {
       ...components.input.container,
       backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
-      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      borderColor: isLight
+        ? colors.ui.divider
+        : toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.xs,
     },
@@ -406,7 +411,9 @@ const createStyles = (colors, components, tabBarHeight) =>
     actionCard: {
       ...components.input.container,
       backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
-      borderColor: toRgba(colors.ui.divider, colors.opacity.stroke),
+      borderColor: isLight
+        ? colors.ui.divider
+        : toRgba(colors.ui.divider, colors.opacity.stroke),
       padding: components.layout.spacing.lg,
       gap: components.layout.spacing.sm,
       alignItems: 'flex-start',
@@ -427,6 +434,7 @@ const createStyles = (colors, components, tabBarHeight) =>
       color: colors.text.secondary,
     },
   });
+};
 
 const getGreeting = (homeCopy) => homeCopy.greetingHi || 'Hi';
 

@@ -15,7 +15,7 @@ export const getTheme = (appearance) => {
     typography,
     layout,
     spacing,
-    components: createComponents(palette),
+    components: createComponents(palette, mode),
   };
 };
 

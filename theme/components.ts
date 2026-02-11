@@ -139,7 +139,9 @@ const transforms = {
   scalePressedStrong: 0.96,
 };
 
-export const createComponents = (colors) => ({
+export const createComponents = (colors, mode = 'dark') => {
+  const isLight = mode === 'light';
+  return {
   radius,
   borderWidth,
   sizes,
@@ -227,6 +229,10 @@ export const createComponents = (colors) => ({
   card: {
     base: {
       backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
+      borderWidth: isLight ? borderWidth.thin : 0,
+      borderColor: isLight
+        ? colors.ui.divider
+        : 'transparent',
       borderRadius: radius.card,
       padding: layout.spacing.lg,
       gap: layout.spacing.md,
@@ -292,4 +298,5 @@ export const createComponents = (colors) => ({
       color: colors.text.secondary,
     },
   },
-});
+};
+};
