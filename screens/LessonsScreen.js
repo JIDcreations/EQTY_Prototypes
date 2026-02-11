@@ -4,12 +4,11 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
-import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import ProgressBar from '../components/ProgressBar';
 import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
-import { PrimaryButton } from '../components/Button';
+import { CtaButton } from '../components/Button';
 import {
   getHomeCopy,
   getLocalizedLessons,
@@ -147,15 +146,13 @@ export default function LessonsScreen() {
           </AppText>
           <Tag label={STATUS_LABELS.current} tone="accent" />
         </View>
-        <GlossaryText text={currentLessonTitle} style={styles.currentTitle} />
+        <AppText style={styles.currentTitle}>{currentLessonTitle}</AppText>
         {currentLessonDescription ? (
-          <GlossaryText
-            text={currentLessonDescription}
-            style={styles.currentDescription}
-            numberOfLines={2}
-          />
+          <AppText style={styles.currentDescription} numberOfLines={2}>
+            {currentLessonDescription}
+          </AppText>
         ) : null}
-        <PrimaryButton
+        <CtaButton
           label={primaryCtaLabel}
           onPress={() =>
             navigation.navigate('LessonOverview', {
@@ -170,143 +167,148 @@ export default function LessonsScreen() {
         <SectionTitle title="Leerpad" />
       </View>
 
-      {modulesWithLessons
-        .filter((module) => module.lessons.length > 0)
-        .map((module) => {
-          const isExpanded = expandedModules[module.id];
-          const moduleNumber = getModuleNumber(module.id);
-          const moduleCompletedCount = module.lessons.filter((lesson) =>
-            completedLessonIds.includes(lesson.id)
-          ).length;
-          const moduleTotal = module.lessons.length;
-          const moduleProgress = moduleTotal > 0 ? moduleCompletedCount / moduleTotal : 0;
-          const isModuleCompleted = moduleTotal > 0 && moduleCompletedCount === moduleTotal;
-          const progressLabel = formatThemeProgress(moduleCompletedCount, moduleTotal);
+      <View style={styles.modulesList}>
+        {modulesWithLessons
+          .filter((module) => module.lessons.length > 0)
+          .map((module) => {
+            const isExpanded = expandedModules[module.id];
+            const moduleNumber = getModuleNumber(module.id);
+            const moduleCompletedCount = module.lessons.filter((lesson) =>
+              completedLessonIds.includes(lesson.id)
+            ).length;
+            const moduleTotal = module.lessons.length;
+            const moduleProgress = moduleTotal > 0 ? moduleCompletedCount / moduleTotal : 0;
+            const isModuleCompleted = moduleTotal > 0 && moduleCompletedCount === moduleTotal;
+            const progressLabel = formatThemeProgress(moduleCompletedCount, moduleTotal);
 
-          return (
-            <View
-              key={module.id}
-              style={styles.module}
-              onLayout={handleModuleLayout(module.id)}
-            >
-              <Pressable onPress={() => toggleModule(setExpandedModules, module.id)}>
-                {({ pressed }) => (
-                  <View
-                    style={[
-                      styles.moduleCard,
-                      isExpanded && styles.moduleCardExpanded,
-                      pressed && styles.moduleCardPressed,
-                    ]}
-                  >
-                    <View style={styles.moduleHeaderRow}>
-                      <View style={styles.moduleHeaderCopy}>
-                        <View style={styles.themeTitleRow}>
-                          <AppText style={styles.themeLabel}>
-                            {`Thema ${moduleNumber}`}
-                          </AppText>
-                          <AppText style={styles.themeDot}>·</AppText>
-                          <GlossaryText text={module.title} style={styles.themeTitle} />
-                        </View>
-                        {isExpanded ? (
-                          <GlossaryText
-                            text={module.description}
-                            style={styles.moduleSubtitle}
-                            numberOfLines={2}
-                            ellipsizeMode="tail"
-                          />
-                        ) : null}
-                        <View style={styles.moduleMetaRow}>
-                          {isModuleCompleted ? (
-                            <AppText style={[styles.moduleMeta, styles.moduleMetaCompleted]}>
-                              {progressLabel}
+            return (
+              <View
+                key={module.id}
+                style={styles.module}
+                onLayout={handleModuleLayout(module.id)}
+              >
+                <Pressable onPress={() => toggleModule(setExpandedModules, module.id)}>
+                  {({ pressed }) => (
+                    <View
+                      style={[
+                        styles.moduleCard,
+                        isExpanded && styles.moduleCardExpanded,
+                        pressed && styles.moduleCardPressed,
+                      ]}
+                    >
+                      <View style={styles.moduleHeaderRow}>
+                        <View style={styles.moduleHeaderCopy}>
+                          <View style={styles.themeTitleRow}>
+                            <AppText style={styles.themeLabel}>
+                              {`Thema ${moduleNumber}`}
                             </AppText>
-                          ) : (
-                            <AppText style={styles.moduleMeta}>{progressLabel}</AppText>
-                          )}
+                            <AppText style={styles.themeDot}>·</AppText>
+                            <AppText style={styles.themeTitle}>{module.title}</AppText>
+                          </View>
+                          {isExpanded ? (
+                            <AppText
+                              style={styles.moduleSubtitle}
+                              numberOfLines={2}
+                              ellipsizeMode="tail"
+                            >
+                              {module.description}
+                            </AppText>
+                          ) : null}
+                          <View style={styles.moduleMetaRow}>
+                            {isModuleCompleted ? (
+                              <AppText style={[styles.moduleMeta, styles.moduleMetaCompleted]}>
+                                {progressLabel}
+                              </AppText>
+                            ) : (
+                              <AppText style={styles.moduleMeta}>{progressLabel}</AppText>
+                            )}
+                          </View>
+                        </View>
+                        <View style={styles.moduleHeaderRight}>
+                          {isModuleCompleted ? (
+                            <Tag label="Voltooid" tone="default" style={styles.moduleTag} />
+                          ) : null}
+                          <Ionicons
+                            name="chevron-down"
+                            size={components.sizes.icon.md}
+                            color={colors.text.secondary}
+                            style={[styles.chevron, isExpanded && styles.chevronOpen]}
+                          />
                         </View>
                       </View>
-                      <View style={styles.moduleHeaderRight}>
-                        {isModuleCompleted ? (
-                          <Tag label="Voltooid" tone="default" style={styles.moduleTag} />
-                        ) : null}
-                        <Ionicons
-                          name="chevron-down"
-                          size={components.sizes.icon.md}
-                          color={colors.text.secondary}
-                          style={[styles.chevron, isExpanded && styles.chevronOpen]}
-                        />
+                      <View style={styles.themeProgress}>
+                        <ProgressBar progress={Math.min(1, Math.max(0, moduleProgress))} />
                       </View>
                     </View>
-                    <View style={styles.themeProgress}>
-                      <ProgressBar progress={Math.min(1, Math.max(0, moduleProgress))} />
-                    </View>
-                  </View>
-                )}
-              </Pressable>
-              {isExpanded ? (
-                <View style={styles.moduleLessons}>
-                  {module.lessons.map((lesson) => {
-                    const status = getLessonStatus(lesson.id, progress);
-                    const statusLabel = STATUS_LABELS[status] || STATUS_LABELS.upcoming;
-                    const lessonNumber = lesson.order + 1;
-                    return (
-                      <Pressable
-                        key={lesson.id}
-                        onPress={() =>
-                          navigation.navigate('LessonOverview', {
-                            lessonId: lesson.id,
-                            entrySource: 'Lessons',
-                          })
-                        }
-                      >
-                        {({ pressed }) => (
-                          <View
-                            style={[
-                              styles.lessonCard,
-                              isExpanded && styles.lessonCardActive,
-                              pressed && styles.lessonCardPressed,
-                            ]}
-                          >
-                            <View style={styles.lessonHeader}>
-                              <AppText style={styles.lessonNumber}>
-                                {homeCopy.lessonShort(lessonNumber)}
-                              </AppText>
-                              <Tag
-                                label={statusLabel}
-                                tone={status === 'current' ? 'accent' : 'default'}
-                              />
-                            </View>
-                            <View style={styles.lessonBody}>
-                              <View style={styles.lessonCopy}>
-                                <GlossaryText
-                                  text={lesson.title}
-                                  style={styles.lessonTitle}
-                                  numberOfLines={1}
-                                  ellipsizeMode="tail"
-                                />
-                                <GlossaryText
-                                  text={lesson.shortDescription}
-                                  style={styles.lessonDescription}
-                                  numberOfLines={2}
-                                  ellipsizeMode="tail"
+                  )}
+                </Pressable>
+                {isExpanded ? (
+                  <View style={styles.moduleLessons}>
+                    {module.lessons.map((lesson) => {
+                      const status = getLessonStatus(lesson.id, progress);
+                      const statusLabel = STATUS_LABELS[status] || STATUS_LABELS.upcoming;
+                      const lessonNumber = lesson.order + 1;
+                      return (
+                        <Pressable
+                          key={lesson.id}
+                          onPress={() =>
+                            navigation.navigate('LessonOverview', {
+                              lessonId: lesson.id,
+                              entrySource: 'Lessons',
+                            })
+                          }
+                        >
+                          {({ pressed }) => (
+                            <View
+                              style={[
+                                styles.lessonCard,
+                                isExpanded && styles.lessonCardActive,
+                                pressed && styles.lessonCardPressed,
+                              ]}
+                            >
+                              <View style={styles.lessonHeader}>
+                                <AppText style={styles.lessonNumber}>
+                                  {homeCopy.lessonShort(lessonNumber)}
+                                </AppText>
+                                <Tag
+                                  label={statusLabel}
+                                  tone={status === 'current' ? 'accent' : 'default'}
                                 />
                               </View>
-                              <Ionicons
-                                name="chevron-forward"
-                                size={components.sizes.icon.sm}
-                                color={colors.text.secondary}
-                              />
+                              <View style={styles.lessonBody}>
+                                <View style={styles.lessonCopy}>
+                                  <AppText
+                                    style={styles.lessonTitle}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                  >
+                                    {lesson.title}
+                                  </AppText>
+                                  <AppText
+                                    style={styles.lessonDescription}
+                                    numberOfLines={2}
+                                    ellipsizeMode="tail"
+                                  >
+                                    {lesson.shortDescription}
+                                  </AppText>
+                                </View>
+                                <Ionicons
+                                  name="chevron-forward"
+                                  size={components.sizes.icon.sm}
+                                  color={colors.text.secondary}
+                                />
+                              </View>
                             </View>
-                          </View>
-                        )}
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              ) : null}
-            </View>
-          );
-        })}
+                          )}
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                ) : null}
+              </View>
+            );
+          })}
+      </View>
     </OnboardingScreen>
   );
 }
@@ -409,7 +411,10 @@ const createStyles = (colors, components, tabBarHeight) =>
       color: colors.text.secondary,
     },
     modulesHeader: {
-      marginTop: components.layout.spacing.sm,
+      marginTop: components.layout.spacing.none,
+    },
+    modulesList: {
+      gap: components.layout.spacing.md,
     },
     module: {
       gap: components.layout.spacing.md,

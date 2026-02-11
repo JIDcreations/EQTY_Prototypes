@@ -69,6 +69,31 @@ export function CtaButton({ label, onPress, style, disabled }) {
   );
 }
 
+export function CtaSecondaryButton({ label, onPress, style, disabled }) {
+  const { components } = useTheme();
+  const styles = useMemo(() => createStyles(components), [components]);
+  const { animatedStyle, onPressIn, onPressOut } = usePressScale();
+
+  return (
+    <AnimatedPressable
+      style={[
+        styles.secondaryButton,
+        styles.ctaButton,
+        animatedStyle,
+        disabled && styles.disabled,
+        style,
+      ]}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <View style={styles.secondaryBorder} />
+      <AppText style={styles.secondaryLabel}>{label}</AppText>
+    </AnimatedPressable>
+  );
+}
+
 export function SecondaryButton({ label, onPress, style, disabled }) {
   const { components } = useTheme();
   const styles = useMemo(() => createStyles(components), [components]);

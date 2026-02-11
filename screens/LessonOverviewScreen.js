@@ -5,8 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
-import { CtaButton, SecondaryButton } from '../components/Button';
-import GlossaryText from '../components/GlossaryText';
+import { CtaButton, CtaSecondaryButton } from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
 import ScreenBackground from '../components/ScreenBackground';
 import { useApp } from '../utils/AppContext';
@@ -39,7 +38,7 @@ export default function LessonOverviewScreen() {
       <View style={styles.container}>
         <View style={styles.content}>
           <AppText style={styles.fallbackTitle}>Lesson not found</AppText>
-          <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
+          <CtaSecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
         </View>
       </View>
     );
@@ -63,8 +62,8 @@ export default function LessonOverviewScreen() {
         >
         <View style={styles.header}>
           <AppText style={styles.moduleLabel}>{moduleLabel}</AppText>
-          <GlossaryText text={lesson.title} style={styles.title} />
-          <GlossaryText text={lesson.shortDescription} style={styles.subtitle} />
+          <AppText style={styles.title}>{lesson.title}</AppText>
+          <AppText style={styles.subtitle}>{lesson.shortDescription}</AppText>
         </View>
 
         <Card style={styles.learnCard}>
@@ -75,7 +74,7 @@ export default function LessonOverviewScreen() {
                 <View style={styles.bulletIndex}>
                   <AppText style={styles.bulletIndexText}>{index + 1}</AppText>
                 </View>
-                <GlossaryText text={item} style={styles.bulletText} />
+                <AppText style={styles.bulletText}>{item}</AppText>
               </View>
             ))}
           </View>
@@ -102,9 +101,9 @@ export default function LessonOverviewScreen() {
                 {overviewCopy.stepLabels.map((label, index) => (
                   <View key={label} style={styles.stepRow}>
                     <View style={styles.stepIndex}>
-                      <GlossaryText text={index + 1} style={styles.stepNumber} />
+                      <AppText style={styles.stepNumber}>{index + 1}</AppText>
                     </View>
-                    <GlossaryText text={label} style={styles.stepLabel} />
+                    <AppText style={styles.stepLabel}>{label}</AppText>
                   </View>
                 ))}
               </View>
@@ -127,7 +126,7 @@ export default function LessonOverviewScreen() {
               });
             }}
           />
-          <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
+          <CtaSecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
         </View>
         </ScrollView>
       </View>

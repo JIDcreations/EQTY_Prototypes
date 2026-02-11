@@ -5,7 +5,6 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
 import { CtaButton } from '../components/Button';
-import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import Card from '../components/Card';
 import ProgressBar from '../components/ProgressBar';
@@ -124,7 +123,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerMainRow}>
             <View style={styles.headerGreeting}>
-              <GlossaryText text={greetingLine} style={styles.greeting} />
+              <AppText style={styles.greeting}>{greetingLine}</AppText>
             </View>
             <Pressable
               onPress={() => navigation.navigate('Profile')}
@@ -140,10 +139,9 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={styles.trajectoryBlock}>
-          <GlossaryText
-            text={formatLessonPosition(lessonPosition, totalLessons)}
-            style={styles.trajectoryMeta}
-          />
+          <AppText style={styles.trajectoryMeta}>
+            {formatLessonPosition(lessonPosition, totalLessons)}
+          </AppText>
           <View style={styles.trajectoryBar}>
             <ProgressBar progress={displaySeriesProgress} />
           </View>
@@ -152,12 +150,10 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <Card style={[styles.heroStack, styles.heroCard]}>
-          <GlossaryText
-            text={homeCopy.lessonShort(lessonPosition)}
-            style={styles.heroStepLabel}
-            numberOfLines={1}
-          />
-          <GlossaryText text={lessonTitle} style={styles.heroTitle} />
+          <AppText style={styles.heroStepLabel} numberOfLines={1}>
+            {homeCopy.lessonShort(lessonPosition)}
+          </AppText>
+          <AppText style={styles.heroTitle}>{lessonTitle}</AppText>
           {heroDescription ? (
             <AppText style={styles.heroSubtitle}>{heroDescription}</AppText>
           ) : null}
@@ -213,7 +209,7 @@ export default function HomeScreen() {
                     />
                   </View>
                 </View>
-                <GlossaryText text={theme.title} style={styles.themeTitle} />
+                <AppText style={styles.themeTitle}>{theme.title}</AppText>
                 <View style={styles.themeMetaRow}>
                   <AppText style={styles.themeMeta}>
                     {formatLessonCount(theme.lessons)}
