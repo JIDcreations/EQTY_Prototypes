@@ -940,4 +940,70 @@ export const glossaryTerms = [
     categoryId: 'behavior_psychology',
     tags: ['Behavior', 'Mindset'],
   },
+  {
+    id: 'eqty_goal_definition',
+    term: 'Doelbepaling',
+    definition:
+      'Het duidelijk maken wat het geld moet bereiken en welke grenzen gelden. Defining what the money must achieve and the constraints to respect.',
+    example:
+      "'Ik wil binnen 10 jaar een huis kopen' is een doelbepaling. 'I want to buy a house in 10 years' is a goal definition.",
+    categoryId: 'time_goals',
+    tags: ['Process'],
+    aliases: ['Goal definition'],
+  },
+  {
+    id: 'eqty_risk_analysis',
+    term: 'Individuele risicoanalyse',
+    definition:
+      'Het inschatten van je persoonlijke risicocapaciteit, risicotolerantie en tijdshorizon. Assessing your personal risk capacity, risk tolerance, and time horizon.',
+    example:
+      'Een korte tijdshorizon betekent meestal minder risico. A short time horizon usually means less risk.',
+    categoryId: 'risk_return',
+    tags: ['Process'],
+    aliases: ['Individual risk analysis'],
+  },
+  {
+    id: 'eqty_investment_strategy',
+    term: 'Financiele investeringsstrategie',
+    definition:
+      'De set regels die bepaalt hoe je het doel uitvoert, op basis van je risicoanalyse. The rule set that defines how you will pursue the goal based on your risk analysis.',
+    example:
+      "'60/40 met jaarlijkse herweging' is een strategie. '60/40 with annual rebalancing' is a strategy.",
+    categoryId: 'portfolio_building',
+    tags: ['Process'],
+    aliases: ['Financial investment strategy', 'Financiële investeringsstrategie'],
+  },
+  {
+    id: 'eqty_capital_allocation',
+    term: 'Kapitaalallocatie',
+    definition:
+      'Het verdelen van kapitaal over activaklassen of doelen. The distribution of capital across asset classes or goals.',
+    example:
+      '70% aandelen en 30% obligaties is een allocatie. 70% stocks and 30% bonds is an allocation.',
+    categoryId: 'portfolio_building',
+    tags: ['Process'],
+    aliases: ['Capital allocation'],
+  },
+  {
+    id: 'eqty_investment_vehicle',
+    term: 'Beleggingsinstrument',
+    definition:
+      'Het concrete product waarmee je de allocatie uitvoert, zoals een ETF of aandeel. The specific product used to implement the allocation, such as an ETF or stock.',
+    example:
+      'Een wereldwijde ETF kiezen als instrument. Choosing a global ETF as the vehicle.',
+    categoryId: 'etfs_funds',
+    tags: ['Process'],
+    aliases: ['Investment vehicle', 'Investment vehicles', 'Beleggingsinstrumenten'],
+  },
+  {
+    id: 'eqty_execution',
+    term: 'Uitvoering',
+    definition:
+      'Het plaatsen van de order nadat alle eerdere stappen zijn bepaald. Placing the trade after the previous steps are defined.',
+    example:
+      'Pas kopen nadat doel en strategie vastliggen. Buying only after the goal and strategy are set.',
+    categoryId: 'orders_trading',
+    tags: ['Process'],
+    aliases: ['Execution'],
+  },
 ];

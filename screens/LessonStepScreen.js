@@ -25,7 +25,8 @@ import StepHeader from '../components/StepHeader';
 import { glossaryTerms } from '../data/glossary';
 import { typography, useTheme } from '../theme';
 import { useApp } from '../utils/AppContext';
-import { getLessonById, getScenarioVariant } from '../utils/helpers';
+import { getScenarioVariant } from '../utils/helpers';
+import { collectGlossaryTermIds } from '../utils/glossary';
 import {
   getIntroStepTitle,
   getLessonContent,
@@ -122,8 +123,10 @@ export default function LessonStepScreen() {
   const isIntroScenario = lessonId === 'lesson_0' && step === 3;
 
   const content = getLessonContent(lessonId, preferences?.language);
-  const lessonMeta = useMemo(() => getLessonById(lessonId), [lessonId]);
-  const lessonTermIds = lessonMeta?.termIds || [];
+  const lessonTermIds = useMemo(
+    () => collectGlossaryTermIds(content || {}),
+    [content]
+  );
   const lessonTerms = useMemo(
     () => lessonTermIds.map((termId) => glossaryTermIndex[termId]).filter(Boolean),
     [lessonTermIds]

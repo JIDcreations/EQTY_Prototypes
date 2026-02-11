@@ -1,57 +1,29 @@
 import React, { useContext, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import { glossaryTerms } from '../data/glossary';
 import AppText from './AppText';
+import GlossaryTerm from './GlossaryTerm';
 import { GlossaryContext } from './GlossaryProvider';
-import { useTheme } from '../theme';
-
-const glossaryIndex = buildGlossaryIndex(glossaryTerms);
-
-function buildGlossaryIndex(terms) {
-  const escapedTerms = terms
-    .map((item) => item.term?.trim())
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length)
-    .map(escapeRegExp);
-
-  if (escapedTerms.length === 0) {
-    return { regex: null, map: {} };
-  }
-
-  return {
-    regex: new RegExp(`\\b(${escapedTerms.join('|')})\\b`, 'gi'),
-    map: terms.reduce((acc, item) => {
-      if (item.term) acc[item.term.toLowerCase()] = item;
-      return acc;
-    }, {}),
-  };
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+import { glossaryIndex, normalizeGlossarySegments, splitGlossaryText } from '../utils/glossary';
 
 export default function GlossaryText({
   text,
   children,
+  segments,
   style,
   termStyle,
   onPressTerm,
   ...textProps
 }) {
   const glossary = useContext(GlossaryContext);
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
-  const content = text ?? children;
+  const content = segments ?? text ?? children;
   const resolvedText = typeof content === 'number' ? String(content) : content;
   const parts = useMemo(() => {
-    if (!resolvedText || typeof resolvedText !== 'string' || !glossaryIndex.regex) {
+    if (Array.isArray(resolvedText)) {
+      return normalizeGlossarySegments(resolvedText, glossaryIndex);
+    }
+    if (typeof resolvedText !== 'string') {
       return [{ text: resolvedText }];
     }
-    return resolvedText.split(glossaryIndex.regex).map((part) => {
-      const term = glossaryIndex.map[part.toLowerCase()];
-      return term ? { text: part, term } : { text: part };
-    });
+    return splitGlossaryText(resolvedText, glossaryIndex);
   }, [resolvedText]);
 
   const handlePress = onPressTerm || glossary?.openTerm;
@@ -61,27 +33,15 @@ export default function GlossaryText({
       {parts.map((part, index) => {
         if (!part.term) return part.text;
         return (
-          <AppText
+          <GlossaryTerm
             key={`${part.text}-${index}`}
-            style={[styles.term, termStyle]}
-            onPress={(event) => {
-              if (!handlePress) return;
-              if (event?.stopPropagation) event.stopPropagation();
-              handlePress(part.term);
-            }}
-          >
-            {part.text}
-          </AppText>
+            term={part.term}
+            text={part.text}
+            style={termStyle}
+            onPressTerm={handlePress}
+          />
         );
       })}
     </AppText>
   );
 }
-
-const createStyles = (colors) =>
-  StyleSheet.create({
-    term: {
-      color: colors.text.primary,
-      textDecorationLine: 'underline',
-    },
-  });

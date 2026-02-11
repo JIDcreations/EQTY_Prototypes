@@ -37,7 +37,6 @@ export function GlossaryProvider({ children }) {
     await Linking.openURL(videoUrl);
   }, [activeTerm, getVideoUrl]);
 
-
   const value = useMemo(
     () => ({
       openTerm,

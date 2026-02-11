@@ -57,7 +57,16 @@ function Tabs() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Lessons" component={LessonsStack} />
+      <Tab.Screen
+        name="Lessons"
+        component={LessonsStack}
+        listeners={({ navigation }) => ({
+          tabPress: (event) => {
+            event.preventDefault();
+            navigation.navigate('Lessons', { screen: 'LessonsHome' });
+          },
+        })}
+      />
       <Tab.Screen name="Glossary" component={GlossaryScreen} />
       <Tab.Screen
         name="Profile"
