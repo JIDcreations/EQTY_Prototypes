@@ -15,7 +15,7 @@ export default function LessonSuccessScreen() {
   const route = useRoute();
   const { lessonId } = route.params || {};
   const { preferences } = useApp();
-  const { colors, components } = useTheme();
+  const { colors, components, mode } = useTheme();
   const tabBarHeight = useBottomTabBarHeight();
   const styles = useMemo(
     () => createStyles(colors, components, tabBarHeight),
@@ -40,7 +40,7 @@ export default function LessonSuccessScreen() {
 
   return (
     <OnboardingScreen
-      backgroundVariant="whiteNoBlur"
+      backgroundVariant={mode === 'dark' ? 'bg2' : 'whiteNoBlur'}
       showGlow={false}
       contentContainerStyle={styles.screen}
     >

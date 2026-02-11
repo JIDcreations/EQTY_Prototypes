@@ -19,7 +19,7 @@ const toRgba = (hex, alpha) => {
 
 export default function OnboardingConfirmationScreen() {
   const { updatePreferences, updateAuthUser, preferences } = useApp();
-  const { colors, components } = useTheme();
+  const { colors, components, mode } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
@@ -29,7 +29,7 @@ export default function OnboardingConfirmationScreen() {
   };
 
   return (
-    <OnboardingScreen>
+    <OnboardingScreen backgroundVariant={mode === 'dark' ? 'bg2' : 'whiteNoBlur'}>
       <View style={styles.container}>
         <View style={styles.topArea}>
           <AppText style={styles.logo}>EQTY</AppText>

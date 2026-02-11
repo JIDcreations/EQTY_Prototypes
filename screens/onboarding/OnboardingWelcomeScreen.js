@@ -9,7 +9,7 @@ import { getOnboardingCopy } from '../../utils/localization';
 
 export default function OnboardingWelcomeScreen({ navigation }) {
   const { preferences, updatePreferences } = useApp();
-  const { colors, components } = useTheme();
+  const { colors, components, mode } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const copy = useMemo(() => getOnboardingCopy(preferences?.language), [preferences?.language]);
 
@@ -20,7 +20,7 @@ export default function OnboardingWelcomeScreen({ navigation }) {
 
   return (
     <OnboardingScreen
-      backgroundVariant="whiteNoBlur"
+      backgroundVariant={mode === 'dark' ? 'bg2' : 'whiteNoBlur'}
       showGlow={false}
       contentContainerStyle={styles.screen}
     >
