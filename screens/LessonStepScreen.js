@@ -193,8 +193,6 @@ export default function LessonStepScreen() {
 
   const disableOuterScroll =
     lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
-  const containerContentStyle =
-    disableOuterScroll && (step === 2 || step === 5) ? { paddingBottom: components.layout.spacing.none } : null;
   let flowPhaseLabel = copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
   if (lessonId === 'lesson_0' && step === 6) {
     flowPhaseLabel = 'Samenvatting';
@@ -204,7 +202,6 @@ export default function LessonStepScreen() {
   return (
     <LessonStepContainer
       scrollEnabled={!disableOuterScroll && !isLessonGlossaryOpen}
-      contentStyle={containerContentStyle}
     >
       <StepHeader
         step={step}

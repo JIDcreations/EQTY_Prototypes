@@ -56,11 +56,12 @@ const createStyles = (colors, components, tabBarHeight) =>
     },
     contentScroll: {
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
-      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
+      paddingBottom:
+        components.layout.safeArea.bottom + tabBarHeight + components.layout.spacing.md,
     },
     contentFixed: {
       flex: 1,
-      paddingBottom: tabBarHeight,
+      paddingBottom: tabBarHeight + components.layout.spacing.md,
     },
     contentInner: {
       flex: 1,
