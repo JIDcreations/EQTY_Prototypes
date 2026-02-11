@@ -152,10 +152,18 @@ export default function GlossaryScreen() {
   return (
     <View style={styles.container}>
       <OnboardingScreen
+        scroll
         backgroundVariant="bg3"
-        contentContainerStyle={styles.screen}
+        contentContainerStyle={styles.content}
+        scrollProps={{
+          showsVerticalScrollIndicator: false,
+          keyboardShouldPersistTaps: 'handled',
+          onScroll: handleScroll,
+          scrollEventThrottle: 16,
+        }}
+        scrollRef={scrollRef}
       >
-        <View style={styles.fixedHeader}>
+        <View style={styles.headerBlock}>
           <View style={styles.headerSection}>
             <View style={styles.headerRow}>
               <SectionTitle
@@ -255,49 +263,39 @@ export default function GlossaryScreen() {
           </View>
         </View>
 
-        <ScrollView
-          ref={scrollRef}
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-        >
-          <View style={styles.termsBlock}>
-            <View style={styles.sortTextRow}>
-              <Pressable onPress={() => setSortAz((prev) => !prev)}>
-                <View style={styles.sortTextInner}>
-                  <Ionicons
-                    name="swap-vertical"
-                    size={components.sizes.icon.xs}
-                    color={sortAz ? colors.text.primary : colors.text.secondary}
-                  />
-                  <AppText
-                    style={[styles.sortText, sortAz && styles.sortTextActive]}
-                  >
-                    A-Z
-                  </AppText>
-                </View>
-              </Pressable>
-            </View>
-            <Card style={styles.termsCard}>
-              <View style={styles.termsHeader}>
-                <AppText style={styles.termsTitle}>{listTitle}</AppText>
-                <AppText style={styles.termsCount}>{displayTerms.length} terms</AppText>
+        <View style={styles.termsBlock}>
+          <View style={styles.sortTextRow}>
+            <Pressable onPress={() => setSortAz((prev) => !prev)}>
+              <View style={styles.sortTextInner}>
+                <Ionicons
+                  name="swap-vertical"
+                  size={components.sizes.icon.xs}
+                  color={sortAz ? colors.text.primary : colors.text.secondary}
+                />
+                <AppText
+                  style={[styles.sortText, sortAz && styles.sortTextActive]}
+                >
+                  A-Z
+                </AppText>
               </View>
-              {displayTerms.length === 0 ? (
-                <AppText style={styles.emptyText}>No matches. Try another term.</AppText>
-              ) : (
-                <View style={styles.termList}>
-                  {displayTerms.map((term, index) =>
-                    renderTermRow(term, index, displayTerms.length)
-                  )}
-                </View>
-              )}
-            </Card>
+            </Pressable>
           </View>
-        </ScrollView>
+          <Card style={styles.termsCard}>
+            <View style={styles.termsHeader}>
+              <AppText style={styles.termsTitle}>{listTitle}</AppText>
+              <AppText style={styles.termsCount}>{displayTerms.length} terms</AppText>
+            </View>
+            {displayTerms.length === 0 ? (
+              <AppText style={styles.emptyText}>No matches. Try another term.</AppText>
+            ) : (
+              <View style={styles.termList}>
+                {displayTerms.map((term, index) =>
+                  renderTermRow(term, index, displayTerms.length)
+                )}
+              </View>
+            )}
+          </Card>
+        </View>
       </OnboardingScreen>
 
       {showScrollTop ? (
@@ -360,16 +358,15 @@ const createStyles = (colors, components, tabBarHeight) =>
       flex: 1,
       backgroundColor: colors.background.app,
     },
-    screen: {
-      flex: 1,
-      paddingTop: 0,
-      paddingBottom: 0,
-      paddingHorizontal: 0,
-    },
-    fixedHeader: {
+    content: {
       gap: components.layout.spacing.lg,
-      paddingTop: components.layout.spacing.xl,
-      paddingHorizontal: components.layout.pagePaddingHorizontal,
+      paddingBottom:
+        components.layout.safeArea.bottom +
+        tabBarHeight +
+        components.layout.spacing.md,
+    },
+    headerBlock: {
+      gap: components.layout.spacing.lg,
     },
     headerSection: {},
     headerRow: {
@@ -452,15 +449,6 @@ const createStyles = (colors, components, tabBarHeight) =>
     },
     filterChipTextActive: {
       color: colors.text.onAccent,
-    },
-    scroll: {
-      flex: 1,
-      marginBottom: 0,
-    },
-    scrollContent: {
-      paddingTop: components.layout.spacing.md,
-      paddingBottom: tabBarHeight + components.layout.spacing.md,
-      paddingHorizontal: components.layout.pagePaddingHorizontal,
     },
     termsBlock: {
       gap: components.layout.spacing.sm,
