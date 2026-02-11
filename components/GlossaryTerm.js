@@ -4,6 +4,15 @@ import AppText from './AppText';
 import { useGlossary } from './GlossaryProvider';
 import { useTheme } from '../theme';
 
+const toRgba = (hex, alpha) => {
+  const cleaned = hex.replace('#', '');
+  const value = parseInt(cleaned, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function GlossaryTerm({
   term,
   text,
@@ -22,7 +31,7 @@ export default function GlossaryTerm({
   return (
     <AppText
       {...textProps}
-      style={[styles.term, style]}
+      style={[style, styles.term]}
       onPress={(event) => {
         if (!term || !handlePress) return;
         if (event?.stopPropagation) event.stopPropagation();
@@ -39,9 +48,9 @@ export default function GlossaryTerm({
 const createStyles = (colors) =>
   StyleSheet.create({
     term: {
-      color: colors.text.primary,
+      color: colors.accent.primary,
       textDecorationLine: 'underline',
-      textDecorationStyle: 'dotted',
-      textDecorationColor: colors.accent.primary,
+      textDecorationStyle: 'solid',
+      textDecorationColor: toRgba(colors.accent.primary, colors.opacity.stroke),
     },
   });

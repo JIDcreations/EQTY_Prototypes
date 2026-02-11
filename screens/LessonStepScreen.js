@@ -278,7 +278,12 @@ export default function LessonStepScreen() {
       )}
       {step === 6 && (
         lessonId === 'lesson_0' ? (
-          <IntroSummaryStep content={content} onComplete={handleComplete} copy={copy} />
+          <IntroSummaryStep
+            content={content}
+            onComplete={handleComplete}
+            onPressTerm={handleTermPress}
+            copy={copy}
+          />
         ) : (
           <SummaryStep
             content={content}
@@ -921,7 +926,14 @@ function ExerciseStep({ content, lessonId, onNext, onPressTerm, copy }) {
   }
 
   if (lessonId === 'lesson_0') {
-    return <IntroExerciseStep exercise={exercise} onNext={onNext} copy={copy} />;
+    return (
+      <IntroExerciseStep
+        exercise={exercise}
+        onNext={onNext}
+        onPressTerm={onPressTerm}
+        copy={copy}
+      />
+    );
   }
 
   switch (exercise.type) {
@@ -1058,7 +1070,7 @@ function SequenceExercise({ exercise, onNext, onPressTerm, copy }) {
   );
 }
 
-function IntroExerciseStep({ exercise, onNext, copy }) {
+function IntroExerciseStep({ exercise, onNext, onPressTerm, copy }) {
   const { styles } = useLessonStepStyles();
   const { items = [], correctOrder = [] } = exercise;
   const [placements, setPlacements] = useState(
@@ -1785,7 +1797,7 @@ function SummaryStep({ content, onComplete, onPressTerm, copy }) {
   );
 }
 
-function IntroSummaryStep({ content, onComplete, copy }) {
+function IntroSummaryStep({ content, onComplete, onPressTerm, copy }) {
   const { colors, components, styles } = useLessonStepStyles();
   const summarySubtext =
     'Dit is het vaste stappenplan dat elke investering structureert.';
@@ -1833,8 +1845,16 @@ function IntroSummaryStep({ content, onComplete, copy }) {
   return (
     <View style={[styles.stepBody, styles.summaryBody]}>
       <View style={styles.summaryHeaderBlock}>
-        <AppText style={styles.summarySubtitle}>{summarySubtext}</AppText>
-        <AppText style={styles.summaryHelper}>{summaryHelper}</AppText>
+        <GlossaryText
+          text={summarySubtext}
+          style={styles.summarySubtitle}
+          onPressTerm={onPressTerm}
+        />
+        <GlossaryText
+          text={summaryHelper}
+          style={styles.summaryHelper}
+          onPressTerm={onPressTerm}
+        />
       </View>
 
       <View style={styles.summaryContent}>
@@ -1877,14 +1897,15 @@ function IntroSummaryStep({ content, onComplete, copy }) {
                       </AppText>
                     </View>
                     <View style={styles.summaryStationText}>
-                      <AppText
+                      <GlossaryText
                         style={[
                           styles.processStationTitle,
                           isActive && styles.summaryStationTitleActive,
                         ]}
+                        onPressTerm={onPressTerm}
                       >
                         {station.title}
-                      </AppText>
+                      </GlossaryText>
                     </View>
                     <View
                       style={[
@@ -1902,16 +1923,22 @@ function IntroSummaryStep({ content, onComplete, copy }) {
                   </Pressable>
                   {isActive ? (
                     <View style={[styles.processPanel, styles.summaryProcessPanel]}>
-                      <AppText style={styles.processDescription}>
-                        {station.description}
-                      </AppText>
+                      <GlossaryText
+                        text={station.description}
+                        style={styles.processDescription}
+                        onPressTerm={onPressTerm}
+                      />
                       <View style={styles.processSubsteps}>
                         {station.substeps?.map((item) => (
                           <View
                             key={`${station.id}-${item}`}
                             style={[styles.processChip, styles.summaryProcessChip]}
                           >
-                            <AppText style={styles.processChipText}>{item}</AppText>
+                            <GlossaryText
+                              text={item}
+                              style={styles.processChipText}
+                              onPressTerm={onPressTerm}
+                            />
                           </View>
                         ))}
                       </View>

@@ -37,7 +37,7 @@ export default function GlossaryText({
             key={`${part.text}-${index}`}
             term={part.term}
             text={part.text}
-            style={termStyle}
+            style={[style, termStyle]}
             onPressTerm={handlePress}
           />
         );
