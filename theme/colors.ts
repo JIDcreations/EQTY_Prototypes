@@ -27,7 +27,7 @@ export const colors = {
   light: {
     background: {
       app: '#D8DDE4',
-      surface: '#F4F7FA',
+      surface: '#F8FAFD',
       surfaceActive: '#FFFFFF',
     },
     text: {
