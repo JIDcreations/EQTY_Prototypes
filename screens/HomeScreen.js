@@ -201,7 +201,7 @@ export default function HomeScreen() {
             >
               <View style={styles.themeCard}>
                 <View style={styles.themeHeader}>
-                  <AppText style={styles.themeLabel}>{`Thema ${theme.order}`}</AppText>
+                  <AppText style={styles.themeLabel}>{`Thema ${theme.order + 1}`}</AppText>
                   <View style={styles.themeHeaderRight}>
                     <AppText style={styles.themeState}>
                       {getThemeStateLabel(theme.state)}
