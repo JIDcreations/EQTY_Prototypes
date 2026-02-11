@@ -226,7 +226,7 @@ export const createComponents = (colors) => ({
   },
   card: {
     base: {
-      backgroundColor: colors.background.surface,
+      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
       borderRadius: radius.card,
       padding: layout.spacing.lg,
       gap: layout.spacing.md,

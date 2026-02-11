@@ -8,6 +8,7 @@ export default function LessonStepContainer({
   children,
   scrollEnabled = true,
   contentStyle,
+  containerStyle,
 }) {
   const { colors, components } = useTheme();
   const tabBarHeight = useContext(BottomTabBarHeightContext) || 0;
@@ -15,22 +16,24 @@ export default function LessonStepContainer({
     () => createStyles(colors, components, tabBarHeight),
     [colors, components, tabBarHeight]
   );
-  const containerStyle = scrollEnabled
+  const contentContainerStyle = scrollEnabled
     ? [styles.content, styles.contentScroll, contentStyle]
     : [styles.content, styles.contentFixed, contentStyle];
-  const wrapperStyle = scrollEnabled ? styles.containerScroll : styles.safeArea;
+  const wrapperStyle = scrollEnabled
+    ? [styles.containerScroll, containerStyle]
+    : [styles.safeArea, containerStyle];
 
   return (
     <View style={wrapperStyle}>
       {scrollEnabled ? (
         <ScrollView
-          contentContainerStyle={containerStyle}
+          contentContainerStyle={contentContainerStyle}
           showsVerticalScrollIndicator={false}
         >
           <Animated.View entering={FadeInDown.duration(280)}>{children}</Animated.View>
         </ScrollView>
       ) : (
-        <View style={containerStyle}>
+        <View style={contentContainerStyle}>
           <Animated.View style={styles.contentInner} entering={FadeInDown.duration(280)}>
             {children}
           </Animated.View>

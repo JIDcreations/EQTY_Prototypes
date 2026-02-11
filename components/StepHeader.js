@@ -24,7 +24,7 @@ export default function StepHeader({
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
   const isPlainTitle = typeof title === 'string' || typeof title === 'number';
   const titleNode = isPlainTitle ? (
-    <GlossaryText text={String(title)} style={styles.title} onPressTerm={onPressTerm} />
+    <AppText style={styles.title}>{String(title)}</AppText>
   ) : (
     title
   );

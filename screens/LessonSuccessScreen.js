@@ -40,13 +40,11 @@ export default function LessonSuccessScreen() {
 
   return (
     <OnboardingScreen
-      gradientColors={[colors.background.app, colors.background.surfaceActive]}
+      backgroundVariant="bg3"
       showGlow={false}
       contentContainerStyle={styles.screen}
     >
       <View style={styles.container}>
-        <View pointerEvents="none" style={styles.accentOrbTop} />
-        <View pointerEvents="none" style={styles.accentOrbBottom} />
         <View style={styles.content}>
           <OnboardingStackedCard>
             <View style={styles.cardHeader}>
@@ -66,15 +64,6 @@ export default function LessonSuccessScreen() {
     </OnboardingScreen>
   );
 }
-
-const toRgba = (hex, alpha) => {
-  const cleaned = hex.replace('#', '');
-  const value = parseInt(cleaned, 16);
-  const r = (value >> 16) & 255;
-  const g = (value >> 8) & 255;
-  const b = value & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
 
 const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
@@ -108,23 +97,5 @@ const createStyles = (colors, components, tabBarHeight) =>
     },
     footer: {
       paddingTop: components.layout.spacing.lg,
-    },
-    accentOrbTop: {
-      position: 'absolute',
-      top: components.offsets.onboarding.orbTopMd,
-      left: components.offsets.onboarding.orbLeftLg,
-      width: components.sizes.illustration.md,
-      height: components.sizes.illustration.md,
-      borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.background.surface, colors.opacity.surface),
-    },
-    accentOrbBottom: {
-      position: 'absolute',
-      bottom: components.offsets.onboarding.orbBottomSm,
-      right: components.offsets.onboarding.orbRightLg,
-      width: components.sizes.illustration.xxl,
-      height: components.sizes.illustration.xxl,
-      borderRadius: components.radius.pill,
-      backgroundColor: toRgba(colors.accent.primary, colors.opacity.tint),
     },
   });

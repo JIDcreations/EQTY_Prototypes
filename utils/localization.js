@@ -448,9 +448,9 @@ const LESSON_STEP_COPY = {
     },
     introScenario: {
       structuredLabel: 'Met\nstappenplan',
-      structuredSubline: 'Eerst kiezen, dan uitvoeren.',
+      structuredSubline: 'Eerst kiezen,\ndan uitvoeren.',
       reactiveLabel: 'Zonder stappenplan',
-      reactiveSubline: 'Uitvoeren zonder richting.',
+      reactiveSubline: 'Uitvoeren\nzonder plan.',
       headerHelper:
         'Zie het verschil tussen direct investeren zonder plan en investeren als een doordacht proces.',
       progressLabel: 'Procesvoortgang',

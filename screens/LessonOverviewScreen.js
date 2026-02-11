@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
+import ScreenBackground from '../components/ScreenBackground';
 import { useApp } from '../utils/AppContext';
 import { getLessonContent, getLessonOverviewCopy, getLocalizedLessons, formatLessonModuleLabel } from '../utils/localization';
 import { typography, useTheme } from '../theme';
@@ -54,11 +55,12 @@ export default function LessonOverviewScreen() {
     lesson.id === 'lesson_1' && !onboardingContext?.onboardingComplete;
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+    <ScreenBackground variant="bg3">
+      <View style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
         <View style={styles.header}>
           <AppText style={styles.moduleLabel}>{moduleLabel}</AppText>
           <GlossaryText text={lesson.title} style={styles.title} />
@@ -127,8 +129,9 @@ export default function LessonOverviewScreen() {
           />
           <SecondaryButton label={overviewCopy.back} onPress={() => navigation.goBack()} />
         </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </ScreenBackground>
   );
 }
 
@@ -137,7 +140,7 @@ const createStyles = (colors, components, tabBarHeight) =>
     container: {
       ...components.screen.containerScroll,
       flex: 1,
-      backgroundColor: colors.background.app,
+      backgroundColor: 'transparent',
     },
     content: {
       paddingHorizontal: components.layout.pagePaddingHorizontal,
@@ -171,7 +174,7 @@ const createStyles = (colors, components, tabBarHeight) =>
       ...components.card.base,
       borderWidth: components.borderWidth.thin,
       borderColor: toRgba(colors.ui.border, colors.opacity.stroke),
-      backgroundColor: colors.background.surfaceActive,
+      backgroundColor: toRgba(colors.background.surfaceActive, colors.opacity.surface),
     },
     bulletList: {
       gap: components.layout.spacing.sm,

@@ -21,6 +21,7 @@ import { PrimaryButton, SecondaryButton } from '../components/Button';
 import { useGlossary } from '../components/GlossaryProvider';
 import GlossaryText from '../components/GlossaryText';
 import LessonStepContainer from '../components/LessonStepContainer';
+import ScreenBackground from '../components/ScreenBackground';
 import StepHeader from '../components/StepHeader';
 import { glossaryTerms } from '../data/glossary';
 import { typography, useTheme } from '../theme';
@@ -194,8 +195,7 @@ export default function LessonStepScreen() {
     }
   };
 
-  const disableOuterScroll =
-    lessonId === 'lesson_0' && (step === 2 || step === 5 || step === 6);
+  const disableOuterScroll = lessonId === 'lesson_0' && step === 5;
   let flowPhaseLabel = copy.labels.lessonFlowPhases?.[step] || copy.labels.part;
   if (lessonId === 'lesson_0' && step === 6) {
     flowPhaseLabel = 'Samenvatting';
@@ -203,9 +203,11 @@ export default function LessonStepScreen() {
   const flowMetaLabel = `${flowPhaseLabel} · ${step}/${TOTAL_STEPS}`.toUpperCase();
 
   return (
-    <LessonStepContainer
-      scrollEnabled={!disableOuterScroll && !isLessonGlossaryOpen}
-    >
+    <ScreenBackground variant="bg3">
+      <LessonStepContainer
+        scrollEnabled={!disableOuterScroll && !isLessonGlossaryOpen}
+        containerStyle={styles.transparentScreen}
+      >
       <StepHeader
         step={step}
         total={TOTAL_STEPS}
@@ -386,7 +388,8 @@ export default function LessonStepScreen() {
         />
       </BottomSheet>
 
-    </LessonStepContainer>
+      </LessonStepContainer>
+    </ScreenBackground>
   );
 }
 
@@ -499,15 +502,8 @@ function IntroConceptStep({ content, onNext, copy }) {
 
 function IntroVisualizationStep({ onNext, copy }) {
   const { styles, components } = useLessonStepStyles();
-  const [cardHeight, setCardHeight] = useState(null);
   const [expandedCards, setExpandedCards] = useState({});
-  const peek = components.layout.spacing.lg;
   const steps = copy.introVisualization.steps;
-  const handleLayout = (event) => {
-    const layoutHeight = event.nativeEvent.layout.height;
-    const nextHeight = Math.max(260, layoutHeight - peek - components.layout.spacing.md);
-    setCardHeight((prev) => (prev === nextHeight ? prev : nextHeight));
-  };
 
   const toggleCard = (id) => {
     setExpandedCards((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -519,52 +515,45 @@ function IntroVisualizationStep({ onNext, copy }) {
         <AppText style={styles.journeySubtitle}>
           {copy.introVisualization.subtitle}
         </AppText>
-        <ScrollView
-          style={styles.journeyPager}
-          contentContainerStyle={styles.journeyPagerContent}
-          onLayout={handleLayout}
-          showsVerticalScrollIndicator={false}
-        >
-          {steps.map((step, index) => (
-            <Pressable
-              key={step.id}
-              onPress={() => toggleCard(step.id)}
-              style={[styles.journeyPage, cardHeight ? { height: cardHeight } : null]}
-            >
-              <View style={styles.journeyHeaderRow}>
-                <View style={styles.journeyStepChip}>
-                  <AppText style={styles.journeyStepText}>
-                    {`${index + 1}`.padStart(2, '0')}
-                  </AppText>
-                </View>
-                <View style={styles.journeyAccent} />
+        {steps.map((step, index) => (
+          <Pressable
+            key={step.id}
+            onPress={() => toggleCard(step.id)}
+            style={styles.journeyPage}
+          >
+            <View style={styles.journeyHeaderRow}>
+              <View style={styles.journeyStepChip}>
+                <AppText style={styles.journeyStepText}>
+                  {`${index + 1}`.padStart(2, '0')}
+                </AppText>
               </View>
-              <AppText style={styles.journeyLabel}>{step.label}</AppText>
-              {expandedCards[step.id] ? (
-                <>
-                  <AppText style={styles.journeyDetail}>{step.detail}</AppText>
-                  <AppText style={styles.journeyTapHint}>{copy.labels.tapReturn}</AppText>
-                </>
-              ) : (
-                <>
-                  <AppText style={styles.journeyQuestion}>{step.question}</AppText>
-                  <View style={styles.journeyVisual}>
-                    <View style={styles.journeyPlaceholder}>
-                      <AppText style={styles.journeyPlaceholderText}>
-                        {copy.labels.animationPlaceholder}
-                      </AppText>
-                    </View>
+              <View style={styles.journeyAccent} />
+            </View>
+            <AppText style={styles.journeyLabel}>{step.label}</AppText>
+            {expandedCards[step.id] ? (
+              <>
+                <AppText style={styles.journeyDetail}>{step.detail}</AppText>
+                <AppText style={styles.journeyTapHint}>{copy.labels.tapReturn}</AppText>
+              </>
+            ) : (
+              <>
+                <AppText style={styles.journeyQuestion}>{step.question}</AppText>
+                <View style={styles.journeyVisual}>
+                  <View style={styles.journeyPlaceholder}>
+                    <AppText style={styles.journeyPlaceholderText}>
+                      {copy.labels.animationPlaceholder}
+                    </AppText>
                   </View>
-                  <AppText style={styles.journeyWhy}>{step.why}</AppText>
-                  <AppText style={styles.journeyTapHint}>{copy.labels.tapDetails}</AppText>
-                </>
-              )}
-            </Pressable>
-          ))}
-          <View style={styles.journeyNextWrap}>
-            <PrimaryButton label={copy.buttons.next} onPress={onNext} />
-          </View>
-        </ScrollView>
+                </View>
+                <AppText style={styles.journeyWhy}>{step.why}</AppText>
+                <AppText style={styles.journeyTapHint}>{copy.labels.tapDetails}</AppText>
+              </>
+            )}
+          </Pressable>
+        ))}
+        <View style={styles.journeyNextWrap}>
+          <PrimaryButton label={copy.buttons.next} onPress={onNext} />
+        </View>
       </View>
     </View>
   );
@@ -577,11 +566,6 @@ function IntroScenarioStep({ onNext, copy }) {
   const [progress, setProgress] = useState(0);
   const clampedProgress = Math.max(0, Math.min(progress, totalSteps));
   const progressRatio = totalSteps ? clampedProgress / totalSteps : 0;
-  const structuredEmphasis =
-    colors.opacity.surface + (1 - colors.opacity.surface) * progressRatio;
-  const reactiveEmphasis =
-    colors.opacity.surface -
-    (colors.opacity.surface - colors.opacity.stroke) * progressRatio;
 
   const structuredSteps = steps.map((step, index) => {
     const threshold = index + 1;
@@ -629,7 +613,12 @@ function IntroScenarioStep({ onNext, copy }) {
         <Card
           style={[
             styles.scenarioComparePanel,
-            { backgroundColor: toRgba(colors.background.surface, structuredEmphasis) },
+            {
+              backgroundColor: toRgba(
+                colors.background.surfaceActive,
+                colors.opacity.surface
+              ),
+            },
           ]}
         >
           <View style={styles.scenarioCompareHeader}>
@@ -686,7 +675,12 @@ function IntroScenarioStep({ onNext, copy }) {
           style={[
             styles.scenarioComparePanel,
             styles.scenarioComparePanelReactive,
-            { backgroundColor: toRgba(colors.background.surfaceActive, reactiveEmphasis) },
+            {
+              backgroundColor: toRgba(
+                colors.background.surface,
+                colors.opacity.surface
+              ),
+            },
           ]}
         >
           <View style={styles.scenarioCompareHeader}>
@@ -1768,11 +1762,7 @@ function SummaryStep({ content, onComplete, onPressTerm, copy }) {
                 size={components.sizes.icon.md}
                 color={colors.accent.primary}
               />
-              <GlossaryText
-                text={item}
-                style={styles.takeawayText}
-                onPressTerm={onPressTerm}
-              />
+              <AppText style={styles.takeawayText}>{item}</AppText>
             </View>
           ))}
         </View>
@@ -1845,24 +1835,12 @@ function IntroSummaryStep({ content, onComplete, onPressTerm, copy }) {
   return (
     <View style={[styles.stepBody, styles.summaryBody]}>
       <View style={styles.summaryHeaderBlock}>
-        <GlossaryText
-          text={summarySubtext}
-          style={styles.summarySubtitle}
-          onPressTerm={onPressTerm}
-        />
-        <GlossaryText
-          text={summaryHelper}
-          style={styles.summaryHelper}
-          onPressTerm={onPressTerm}
-        />
+        <AppText style={styles.summarySubtitle}>{summarySubtext}</AppText>
+        <AppText style={styles.summaryHelper}>{summaryHelper}</AppText>
       </View>
 
       <View style={styles.summaryContent}>
-        <ScrollView
-          style={styles.summaryScroll}
-          contentContainerStyle={styles.summaryScrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.summaryScroll}>
           <View style={[styles.processMap, styles.summaryProcessMap]}>
             {stations.map((station, index) => {
               const isActive = index === activeIndex;
@@ -1897,15 +1875,14 @@ function IntroSummaryStep({ content, onComplete, onPressTerm, copy }) {
                       </AppText>
                     </View>
                     <View style={styles.summaryStationText}>
-                      <GlossaryText
+                      <AppText
                         style={[
                           styles.processStationTitle,
                           isActive && styles.summaryStationTitleActive,
                         ]}
-                        onPressTerm={onPressTerm}
                       >
                         {station.title}
-                      </GlossaryText>
+                      </AppText>
                     </View>
                     <View
                       style={[
@@ -1923,22 +1900,16 @@ function IntroSummaryStep({ content, onComplete, onPressTerm, copy }) {
                   </Pressable>
                   {isActive ? (
                     <View style={[styles.processPanel, styles.summaryProcessPanel]}>
-                      <GlossaryText
-                        text={station.description}
-                        style={styles.processDescription}
-                        onPressTerm={onPressTerm}
-                      />
+                      <AppText style={styles.processDescription}>
+                        {station.description}
+                      </AppText>
                       <View style={styles.processSubsteps}>
                         {station.substeps?.map((item) => (
                           <View
                             key={`${station.id}-${item}`}
                             style={[styles.processChip, styles.summaryProcessChip]}
                           >
-                            <GlossaryText
-                              text={item}
-                              style={styles.processChipText}
-                              onPressTerm={onPressTerm}
-                            />
+                            <AppText style={styles.processChipText}>{item}</AppText>
                           </View>
                         ))}
                       </View>
@@ -1948,7 +1919,7 @@ function IntroSummaryStep({ content, onComplete, onPressTerm, copy }) {
               );
             })}
           </View>
-        </ScrollView>
+        </View>
       </View>
 
       <View style={styles.summaryFooter}>
@@ -2037,18 +2008,10 @@ const createStyles = (colors, components) =>
     ...typography.styles.body,
     color: colors.text.secondary,
   },
-  journeyPager: {
-    flex: 1,
-    marginTop: components.layout.spacing.sm,
-  },
-  journeyPagerContent: {
-    paddingBottom: components.layout.spacing.none,
-  },
   journeyBody: {
-    flex: 1,
   },
   journeyContent: {
-    flex: 1,
+    marginTop: components.layout.spacing.sm,
     gap: components.layout.spacing.sm,
   },
   journeyNextWrap: {
@@ -3038,6 +3001,9 @@ const createStyles = (colors, components) =>
   },
   summaryFooter: {
     marginTop: 'auto',
+  },
+  transparentScreen: {
+    backgroundColor: 'transparent',
   },
   processMap: {
     position: 'relative',
