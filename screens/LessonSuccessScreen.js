@@ -79,7 +79,7 @@ const toRgba = (hex, alpha) => {
 const createStyles = (colors, components, tabBarHeight) =>
   StyleSheet.create({
     screen: {
-      paddingBottom: tabBarHeight,
+      paddingBottom: tabBarHeight + components.layout.spacing.md,
     },
     container: {
       flex: 1,

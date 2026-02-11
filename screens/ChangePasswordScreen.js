@@ -97,7 +97,10 @@ const createStyles = (colors, components, tabBarHeight) =>
       paddingHorizontal: components.layout.pagePaddingHorizontal,
       paddingTop: components.layout.safeArea.top + components.layout.spacing.lg,
       gap: components.layout.contentGap,
-      paddingBottom: components.layout.safeArea.bottom + tabBarHeight,
+      paddingBottom:
+        components.layout.safeArea.bottom +
+        tabBarHeight +
+        components.layout.spacing.md,
     },
     section: {
       gap: components.layout.spacing.sm,
