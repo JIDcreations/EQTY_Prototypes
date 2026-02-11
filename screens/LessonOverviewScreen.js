@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import AppText from '../components/AppText';
 import Card from '../components/Card';
-import { PrimaryButton, SecondaryButton } from '../components/Button';
+import { CtaButton, SecondaryButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import SectionTitle from '../components/SectionTitle';
 import ScreenBackground from '../components/ScreenBackground';
@@ -113,7 +113,7 @@ export default function LessonOverviewScreen() {
         </View>
 
         <View style={styles.ctaStack}>
-          <PrimaryButton
+          <CtaButton
             label={overviewCopy.startLesson}
             onPress={() => {
               if (isLessonGateRequired) {

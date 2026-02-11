@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AppText from '../components/AppText';
-import { PrimaryButton } from '../components/Button';
+import { CtaButton } from '../components/Button';
 import GlossaryText from '../components/GlossaryText';
 import OnboardingScreen from '../components/OnboardingScreen';
 import Card from '../components/Card';
@@ -161,7 +161,7 @@ export default function HomeScreen() {
           {heroDescription ? (
             <AppText style={styles.heroSubtitle}>{heroDescription}</AppText>
           ) : null}
-          <PrimaryButton
+          <CtaButton
             label={primaryCtaLabel}
             onPress={() =>
               navigation.navigate('Lessons', {
