@@ -6,6 +6,7 @@ const backgroundImages = {
   bg2: require('../assets/backgrounds/BG-2.png'),
   bg3: require('../assets/backgrounds/BG-3.png'),
   light: require('../assets/backgrounds/WHITE-BLUR.png'),
+  whiteNoBlur: require('../assets/backgrounds/White_NO-BLUR.png'),
 };
 
 const toRgba = (hex, alpha) => {
@@ -30,8 +31,10 @@ export default function OnboardingScreen({
 }) {
   const { colors, components, mode } = useTheme();
   const styles = useMemo(() => createStyles(colors, components), [colors, components]);
-  const resolvedBackground =
-    mode === 'light'
+  const useExplicitBackground = backgroundVariant === 'whiteNoBlur';
+  const resolvedBackground = useExplicitBackground
+    ? backgroundImages.whiteNoBlur
+    : mode === 'light'
       ? backgroundImages.light
       : backgroundImages[backgroundVariant] || backgroundImages.bg2;
 

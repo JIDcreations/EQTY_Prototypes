@@ -20,7 +20,7 @@ export default function OnboardingWelcomeScreen({ navigation }) {
 
   return (
     <OnboardingScreen
-      gradientColors={[colors.background.app, colors.background.surfaceActive]}
+      backgroundVariant="whiteNoBlur"
       showGlow={false}
       contentContainerStyle={styles.screen}
     >

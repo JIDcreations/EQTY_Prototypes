@@ -40,7 +40,7 @@ export default function LessonSuccessScreen() {
 
   return (
     <OnboardingScreen
-      backgroundVariant="bg3"
+      backgroundVariant="whiteNoBlur"
       showGlow={false}
       contentContainerStyle={styles.screen}
     >
