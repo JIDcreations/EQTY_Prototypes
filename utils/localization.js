@@ -497,7 +497,7 @@ const ONBOARDING_COPY = {
     welcome: {
       title: 'Welcome to EQTY',
       subtitle:
-        'A calm space to understand investing, shaped around your pace and goals.',
+        'EQTY provides a structured preparation for investing, with a focus on insight before action.',
       primaryCta: 'Create account',
       secondaryCta: 'Log in',
       tapHint: 'Tap to continue',
@@ -639,7 +639,7 @@ const ONBOARDING_COPY = {
     welcome: {
       title: 'Welkom bij EQTY',
       subtitle:
-        'Een rustige plek om investeren te begrijpen, afgestemd op jouw tempo en doelen.',
+        'EQTY biedt een gestructureerde voorbereiding op beleggen, met focus op inzicht vóór actie.',
       primaryCta: 'Maak account',
       secondaryCta: 'Log in',
       tapHint: 'Tik om door te gaan',
